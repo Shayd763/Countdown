@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Acquisition Exchange - Coming Soon</title>
+  <style>
+    /* Reset & basics */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #07363C; /* Dark teal background from provided color */
+      color: #E4C19D; /* Warm gold tone from logo colors */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      letter-spacing: 0.18em;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: #E4C19D;
+      text-shadow: 0 0 10px rgba(228, 193, 157, 0.8);
+      animation: pulseGlow 3s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    .tagline {
+      font-size: 1.25rem;
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      color: #d7b78f;
+    }
+
+    /* Subtle glowing underline animation to build anticipation */
+    .underline {
+      display: block;
+      margin: 0 auto 3rem;
+      width: 120px;
+      height: 3px;
+      background: linear-gradient(90deg, #E4C19D 0%, #A87C4A 50%, #E4C19D 100%);
+      border-radius: 2px;
+      animation: glowPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% {
+        box-shadow: 0 0 12px #E4C19D;
+        opacity: 1;
+      }
+      50% {
+        box-shadow: 0 0 25px #E4C19D;
+        opacity: 0.6;
+      }
+    }
+
+    /* Countdown timer styling */
+    .countdown {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      color: #E4C19D;
+      margin-bottom: 1rem;
+      user-select: text;
+    }
+
+    .anticipation {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: #bba074;
+      margin-top: 0.5rem;
+      letter-spacing: 0.06em;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        text-shadow: 0 0 15px #E4C19D, 0 0 25px #A87C4A;
+      }
+      50% {
+        text-shadow: 0 0 35px #E4C19D, 0 0 45px #A87C4A;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Acquisition Exchange coming soon page">
+    <h1 aria-live="polite">Acquisition Exchange</h1>
+    <span class="underline" aria-hidden="true"></span>
+    <p class="tagline">Buy - Sell - Invest</p>
+    <div class="countdown" aria-live="polite" aria-atomic="true" aria-label="Countdown timer">
+      Loading countdown...
+    </div>
+    <p class="anticipation">Coming soon.</p>
+  </div>
+
+  <script>
+    // Set the launch date: October 1, 2025, 09:00:00 UK time (BST)
+    // UK time is currently BST (UTC+1) during summer, so 9am BST = 8am UTC
+    // October 1 is still BST, so handle accordingly:
+
+    function getUKLaunchDateUTC() {
+      // October 1, 2025, 09:00:00 BST (UTC+1) is 2025-10-01T08:00:00Z in UTC
+      return new Date(Date.UTC(2025, 9, 1, 8, 0, 0));
+    }
+
+    const launchDate = getUKLaunchDateUTC();
+
+    const countdownEl = document.querySelector('.countdown');
+
+    function updateCountdown() {
+      const now = new Date();
+
+      // Calculate difference in milliseconds
+      let diff = launchDate - now;
+
+      if (diff <= 0) {
+        countdownEl.textContent = "We have launched!";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      diff -= days * (1000 * 60 * 60 * 24);
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      diff -= hours * (1000 * 60 * 60);
+      const minutes = Math.floor(diff / (1000 * 60));
+      diff -= minutes * (1000 * 60);
+      const seconds = Math.floor(diff / 1000);
+
+      countdownEl.textContent =
+        `${days}d ${hours.toString().padStart(2,'0')}h ${minutes.toString().padStart(2,'0')}m ${seconds.toString().padStart(2,'0')}s`;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
