@@ -1,0 +1,256 @@
+<title>BTC Systematic Bot — Positions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#FBF9F5; --surface:#FFFFFF; --surface-2:#F4F0E8; --border:#E7E0D3;
+    --ink:#1C1A16; --muted:#6E695E; --faint:#A79F90;
+    --accent:#B4690E; --pos:#2E866B; --neg:#C24B3B;
+    --c-strat:#C8791C; --c-hold:#2E7DA3; --grid:rgba(28,26,22,.07); --chart-surface:#FFFFFF;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#100F0C; --surface:#17150F; --surface-2:#1F1C15; --border:#2C281F;
+    --ink:#ECE6D9; --muted:#9A9384; --faint:#6A6456;
+    --accent:#E0912F; --pos:#46B189; --neg:#E0776A;
+    --c-strat:#DE9033; --c-hold:#3C9BC0; --grid:rgba(236,230,217,.07); --chart-surface:#17150F;
+  }}
+  :root[data-theme="light"]{
+    --bg:#FBF9F5; --surface:#FFFFFF; --surface-2:#F4F0E8; --border:#E7E0D3;
+    --ink:#1C1A16; --muted:#6E695E; --faint:#A79F90;
+    --accent:#B4690E; --pos:#2E866B; --neg:#C24B3B;
+    --c-strat:#C8791C; --c-hold:#2E7DA3; --grid:rgba(28,26,22,.07); --chart-surface:#FFFFFF;
+  }
+  :root[data-theme="dark"]{
+    --bg:#100F0C; --surface:#17150F; --surface-2:#1F1C15; --border:#2C281F;
+    --ink:#ECE6D9; --muted:#9A9384; --faint:#6A6456;
+    --accent:#E0912F; --pos:#46B189; --neg:#E0776A;
+    --c-strat:#DE9033; --c-hold:#3C9BC0; --grid:rgba(236,230,217,.07); --chart-surface:#17150F;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 20px 64px}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+    padding-bottom:22px;border-bottom:1px solid var(--border)}
+  h1{font-size:22px;font-weight:650;margin:2px 0 4px;letter-spacing:-.01em}
+  header .sub{color:var(--muted);font-size:13px}
+  .tbtn{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;
+    padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+    transition:color .12s,border-color .12s}
+  .tbtn:hover{color:var(--ink);border-color:var(--faint)}
+  .tbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  section{margin-top:30px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .sec-head h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);font-weight:650;margin:0}
+  .sec-head .note{font-size:12px;color:var(--faint)}
+
+  /* NOW hero */
+  .now{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px;
+    display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+  .now .badge{width:74px;height:74px;border-radius:16px;display:grid;place-items:center;flex:none;
+    font-size:30px;background:var(--surface-2);border:1px solid var(--border)}
+  .now .big{font-size:27px;font-weight:650;letter-spacing:-.02em;line-height:1.15}
+  .now .expl{color:var(--muted);font-size:14px;margin-top:4px;max-width:52ch}
+  .now .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .chip{display:inline-flex;gap:7px;align-items:center;font-size:12.5px;padding:5px 11px;border-radius:999px;
+    background:var(--surface-2);border:1px solid var(--border)}
+  .chip b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
+  .chip .k{color:var(--muted)}
+
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 14px}
+  .stat .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .stat .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:21px;font-weight:550;margin-top:6px}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 16px 10px}
+  .card h3{font-size:13px;margin:0 0 2px;font-weight:600}
+  .card .cap{font-size:12px;color:var(--muted);margin:0 0 6px}
+  .chart{position:relative;width:100%}
+  .chart svg{display:block;width:100%;height:auto;overflow:visible}
+  .tick{fill:var(--faint);font-family:var(--mono);font-size:10.5px}
+  .tt{position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-118%);background:var(--surface);
+    border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:12px;
+    box-shadow:0 6px 22px rgba(0,0,0,.16);white-space:nowrap;transition:opacity .08s;z-index:5}
+  .tt .d{color:var(--muted);font-size:11px;margin-bottom:3px}
+  .tt .r{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono)}
+
+  /* log */
+  .logwrap{max-height:520px;overflow-y:auto;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+  table.log{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.log th,table.log td{padding:11px 14px;text-align:left;vertical-align:middle}
+  table.log thead th{position:sticky;top:0;background:var(--surface);z-index:1;font-size:10.5px;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)}
+  table.log tbody tr{border-bottom:1px solid var(--border)}
+  table.log tbody tr:last-child{border-bottom:none}
+  table.log td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;color:var(--muted)}
+  .act{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+  .arrow{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;flex:none}
+  .up{background:color-mix(in srgb,var(--c-strat) 16%,transparent);color:var(--c-strat)}
+  .down{background:color-mix(in srgb,var(--c-hold) 16%,transparent);color:var(--c-hold)}
+  .posbar{display:inline-block;width:46px;height:7px;border-radius:4px;background:var(--surface-2);
+    border:1px solid var(--border);position:relative;vertical-align:middle;margin-left:2px}
+  .posbar i{position:absolute;left:0;top:0;bottom:0;background:var(--c-strat);border-radius:3px}
+  .empty{color:var(--muted);font-size:14px;padding:18px 4px}
+
+  footer{margin-top:32px;color:var(--faint);font-size:12px;text-align:center}
+  @media (max-width:720px){
+    .stats{grid-template-columns:repeat(2,1fr)} .now .big{font-size:23px}
+    table.log td.hidem,table.log th.hidem{display:none}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Positions &amp; activity</div>
+      <h1>Bitcoin Trend + Flow Bot</h1>
+      <div class="sub">What it holds now, and every position it has taken · <span id="period" class="num"></span></div>
+    </div>
+    <button id="themeBtn" class="tbtn" type="button" aria-label="Toggle colour theme"></button>
+  </header>
+
+  <section>
+    <div class="sec-head"><h2>Right now</h2><div class="note" id="asof"></div></div>
+    <div class="now" id="now"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Live activity — paper account</h2><div class="note">Real forward trades, once it starts trading</div></div>
+    <div id="livelog"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Position history</h2><div class="note" id="histnote"></div></div>
+    <div class="stats" id="stats"></div>
+    <div class="card" style="margin-top:12px">
+      <h3>Exposure over time</h3>
+      <div class="cap">% held in BTC vs cash. Flat stretches at 0% are when it stepped aside.</div>
+      <div class="chart" id="ex"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Every position change</h2><div class="note" id="logcount"></div></div>
+    <div class="logwrap">
+      <table class="log" id="logtable"></table>
+    </div>
+  </section>
+
+  <footer>Live position from the running paper bot · history from the strategy on real Kraken BTC/USD data.</footer>
+</div>
+<div class="tt" id="tt"></div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const usd = v => "$" + Math.round(v).toLocaleString("en-US");
+const pct0 = v => Math.round(v*100) + "%";
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function renderNow(){
+  const L=DATA.live, H=DATA.history;
+  $("#period").textContent = H.summary.period;
+  $("#asof").textContent = L.as_of ? ("as of "+L.as_of) : "";
+  const inMkt = L.exposure >= 0.01;
+  const big = inMkt ? `Holding ${pct0(L.exposure)} in Bitcoin` : "Currently in cash";
+  const icon = inMkt ? "₿" : "◵";
+  const expl = inMkt
+    ? "The strategy is risk-on: its trend, flow and fee signals favour Bitcoin. It will trim or exit as those weaken."
+    : "The strategy is out of the market — its combined signal is 0%. It re-enters only when trend, on-chain flows and network fees turn favourable together.";
+  const chips = [
+    ["Signal", L.signal>=0.01 ? pct0(L.signal)+" target" : "0% (flat)"],
+    ["BTC", L.price?usd(L.price):"—"],
+    ["Live trades", String(L.trades.length)],
+  ];
+  $("#now").innerHTML =
+    `<div class="badge">${icon}</div><div style="flex:1;min-width:240px">
+      <div class="big">${big}</div><div class="expl">${expl}</div>
+      <div class="chips">${chips.map(([k,v])=>`<span class="chip"><span class="k">${k}</span><b>${v}</b></span>`).join("")}</div>
+     </div>`;
+}
+
+function renderLive(){
+  const t=DATA.live.trades;
+  if(!t.length){ $("#livelog").innerHTML =
+    `<div class="card"><div class="empty">No live trades yet — the paper account is in cash, waiting for the signal to turn risk-on. Every real forward trade will appear here.</div></div>`;
+    return; }
+  $("#livelog").innerHTML = `<div class="logwrap"><table class="log"><thead><tr>
+    <th>Date</th><th>Action</th><th class="n">Units</th><th class="n">Price</th></tr></thead><tbody>`+
+    t.map(x=>`<tr><td class="num">${x.date}</td><td><span class="act"><span class="arrow ${x.side=="buy"?"up":"down"}">${x.side=="buy"?"▲":"▼"}</span>${x.side==="buy"?"Bought":"Sold"}</span></td>
+      <td class="n">${x.units.toFixed(6)}</td><td class="n">${usd(x.price)}</td></tr>`).join("")+`</tbody></table></div>`;
+}
+
+function renderStats(){
+  const s=DATA.history.summary;
+  $("#histnote").textContent = "Strategy on real Kraken data · "+s.period;
+  const cur = DATA.live.exposure>=0.01 ? "In BTC" : `${s.current_days}d in cash`;
+  const items=[
+    ["Position changes", s.changes],
+    ["Time in market", pct0(s.time_in_market)],
+    ["Avg exposure", pct0(s.avg_expo)],
+    ["Avg hold", s.avg_hold+"d"],
+    ["Longest hold", s.longest+"d"],
+  ];
+  $("#stats").innerHTML = items.map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+}
+
+function chart(hostId){
+  const host=$("#"+hostId), D=DATA.history; const W=host.clientWidth||680,H=220;
+  const m={t:10,r:16,b:22,l:44},iw=W-m.l-m.r,ih=H-m.t-m.b,n=D.dates.length;
+  const X=i=> m.l+(n<=1?0:i/(n-1)*iw), Y=v=> m.t+ih-v*ih;
+  let d="";for(let i=0;i<n;i++){const x=X(i),y=Y(D.expo[i]); d+= i===0?`M${x} ${y}`:` H${x} L${x} ${y}`;}
+  const g=cssv("--grid"),c=cssv("--c-strat");
+  let svg=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img">`;
+  for(const t of [0,.5,1]){const y=Y(t).toFixed(1);
+    svg+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="${g}"/><text class="tick" x="${m.l-8}" y="${+y+3.5}" text-anchor="end">${pct0(t)}</text>`;}
+  let py=null; D.dates.forEach((dt,i)=>{const yr=dt.slice(0,4); if(yr!==py){py=yr;
+    svg+=`<text class="tick" x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="middle">${yr}</text>`;}});
+  svg+=`<path d="${d} L${X(n-1)} ${Y(0)} L${X(0)} ${Y(0)} Z" fill="${c}" fill-opacity=".16"/>`;
+  svg+=`<path d="${d}" fill="none" stroke="${c}" stroke-width="1.8" stroke-linejoin="round"/>`;
+  svg+=`<rect id="${hostId}-hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent" style="cursor:crosshair"/>`;
+  svg+=`<line id="${hostId}-cr" x1="0" x2="0" y1="${m.t}" y2="${m.t+ih}" stroke="${cssv('--faint')}" stroke-dasharray="3 3" opacity="0"/></svg>`;
+  host.innerHTML=svg;
+  const hit=$("#"+hostId+"-hit"),cr=$("#"+hostId+"-cr"),tt=$("#tt");
+  hit.addEventListener("pointermove",e=>{const r=host.getBoundingClientRect();let i=Math.round(((e.clientX-r.left)/r.width*W-m.l)/iw*(n-1));
+    i=Math.max(0,Math.min(n-1,i)); const sx=X(i)/W*r.width;
+    cr.setAttribute("x1",X(i));cr.setAttribute("x2",X(i));cr.setAttribute("opacity","1");
+    tt.style.opacity="1";tt.style.left=(r.left+scrollX+sx)+"px";tt.style.top=(r.top+scrollY+m.t)+"px";
+    tt.innerHTML=`<div class="d">${D.dates[i]}</div><div class="r"><span style="color:${c}">Exposure</span><span>${pct0(D.expo[i])}</span></div>`;});
+  hit.addEventListener("pointerleave",()=>{cr.setAttribute("opacity","0");tt.style.opacity="0";});
+}
+
+function renderLog(){
+  const log=DATA.history.log;
+  $("#logcount").textContent = log.length+" changes · newest first";
+  $("#logtable").innerHTML = `<thead><tr><th>Date</th><th>Action</th><th class="hidem">Position</th>
+    <th class="n">BTC price</th><th class="n hidem">Held before</th></tr></thead><tbody>`+
+    log.map(x=>{
+      const arrow = x.dir==="up" ? "▲" : "▼";
+      const w = Math.round(x.to*100);
+      return `<tr>
+        <td class="num">${x.date}</td>
+        <td><span class="act"><span class="arrow ${x.dir}">${arrow}</span>${x.action}</span>
+            <div style="color:var(--muted);font-size:12px;margin-top:2px">${x.desc}</div></td>
+        <td class="hidem"><span class="num" style="color:var(--muted)">${w}%</span>
+            <span class="posbar"><i style="width:${w}%"></i></span></td>
+        <td class="n">${usd(x.price)}</td>
+        <td class="n hidem">${x.held!=null? x.held+"d":"—"}</td></tr>`;
+    }).join("")+`</tbody>`;
+}
+
+function currentTheme(){const t=document.documentElement.getAttribute("data-theme");
+  return t || (matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");}
+function syncBtn(){$("#themeBtn").textContent=currentTheme()==="dark"?"☀ Light mode":"☾ Dark mode";}
+$("#themeBtn").addEventListener("click",()=>{document.documentElement.setAttribute("data-theme",currentTheme()==="dark"?"light":"dark");syncBtn();});
+
+function renderAll(){renderNow();renderLive();renderStats();chart("ex");renderLog();syncBtn();}
+renderAll();
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>chart("ex"),120);});
+new MutationObserver(()=>chart("ex")).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+matchMedia("(prefers-color-scheme:dark)").addEventListener("change",()=>chart("ex"));
+</script>
