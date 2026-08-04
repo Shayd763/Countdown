@@ -1,0 +1,296 @@
+<title>BTC Systematic Bot — Performance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#FBF9F5; --surface:#FFFFFF; --surface-2:#F4F0E8; --border:#E7E0D3;
+    --ink:#1C1A16; --muted:#6E695E; --faint:#A79F90;
+    --accent:#B4690E; --pos:#2E866B; --neg:#C24B3B;
+    --c-strat:#C8791C; --c-hold:#2E7DA3; --grid:rgba(28,26,22,.07);
+    --chart-surface:#FFFFFF;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#100F0C; --surface:#17150F; --surface-2:#1F1C15; --border:#2C281F;
+    --ink:#ECE6D9; --muted:#9A9384; --faint:#6A6456;
+    --accent:#E0912F; --pos:#46B189; --neg:#E0776A;
+    --c-strat:#DE9033; --c-hold:#3C9BC0; --grid:rgba(236,230,217,.07);
+    --chart-surface:#17150F;
+  }}
+  :root[data-theme="light"]{
+    --bg:#FBF9F5; --surface:#FFFFFF; --surface-2:#F4F0E8; --border:#E7E0D3;
+    --ink:#1C1A16; --muted:#6E695E; --faint:#A79F90;
+    --accent:#B4690E; --pos:#2E866B; --neg:#C24B3B;
+    --c-strat:#C8791C; --c-hold:#2E7DA3; --grid:rgba(28,26,22,.07); --chart-surface:#FFFFFF;
+  }
+  :root[data-theme="dark"]{
+    --bg:#100F0C; --surface:#17150F; --surface-2:#1F1C15; --border:#2C281F;
+    --ink:#ECE6D9; --muted:#9A9384; --faint:#6A6456;
+    --accent:#E0912F; --pos:#46B189; --neg:#E0776A;
+    --c-strat:#DE9033; --c-hold:#3C9BC0; --grid:rgba(236,230,217,.07); --chart-surface:#17150F;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1060px;margin:0 auto;padding:28px 20px 64px}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    font-weight:600}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+    flex-wrap:wrap;padding-bottom:22px;border-bottom:1px solid var(--border)}
+  h1{font-size:22px;font-weight:650;margin:2px 0 4px;letter-spacing:-.01em}
+  header .sub{color:var(--muted);font-size:13px}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;
+    padding:6px 11px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--pos);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--pos) 22%,transparent)}
+  @media (prefers-reduced-motion:no-preference){.dot{animation:pulse 2.4s ease-in-out infinite}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+  section{margin-top:30px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .sec-head h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);
+    font-weight:650;margin:0}
+  .sec-head .note{font-size:12px;color:var(--faint)}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 16px}
+  .tile .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .tile .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:25px;
+    font-weight:550;margin-top:8px;letter-spacing:-.02em}
+  .tile .s{font-size:12px;color:var(--muted);margin-top:3px}
+  .pos{color:var(--pos)} .neg{color:var(--neg)}
+  .chip{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 9px;border-radius:6px;
+    background:var(--surface-2);border:1px solid var(--border);margin-top:6px}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 16px 10px}
+  .card h3{font-size:13px;margin:0;font-weight:600}
+  .card .cap{font-size:12px;color:var(--muted);margin:2px 0 6px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:2px}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:11px;height:3px;border-radius:2px;display:inline-block}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  .chart{position:relative;width:100%}
+  .chart svg{display:block;width:100%;height:auto;overflow:visible}
+  .tick{fill:var(--faint);font-family:var(--mono);font-size:10.5px}
+  .tt{position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-118%);
+    background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 10px;
+    font-size:12px;box-shadow:0 6px 22px rgba(0,0,0,.16);white-space:nowrap;transition:opacity .08s;z-index:5}
+  .tt .d{color:var(--muted);font-size:11px;margin-bottom:4px}
+  .tt .r{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);
+    font-variant-numeric:tabular-nums}
+
+  table.metrics{width:100%;border-collapse:collapse;font-size:14px}
+  table.metrics th,table.metrics td{padding:11px 12px;text-align:right}
+  table.metrics th:first-child,table.metrics td:first-child{text-align:left;color:var(--muted);font-weight:500}
+  table.metrics thead th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    border-bottom:1px solid var(--border);font-weight:600}
+  table.metrics tbody tr{border-bottom:1px solid var(--border)}
+  table.metrics tbody tr:last-child{border-bottom:none}
+  table.metrics td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+  .win{color:var(--accent);font-weight:600}
+
+  .caveats{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+  .caveats ul{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:13.5px}
+  .caveats li{margin:6px 0}
+  .caveats b{color:var(--ink);font-weight:600}
+  footer{margin-top:32px;color:var(--faint);font-size:12px;text-align:center}
+  @media (max-width:720px){
+    .kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}
+    .tile .v{font-size:22px}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Systematic crypto strategy</div>
+      <h1>Bitcoin Trend + Flow Bot</h1>
+      <div class="sub">Ensemble signal · volatility-targeted · weekly rebalance · <span id="period" class="num"></span></div>
+    </div>
+    <div class="pill"><span class="dot"></span> Live · Paper account</div>
+  </header>
+
+  <section>
+    <div class="sec-head"><h2>Live paper account</h2><div class="note" id="asof"></div></div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Strategy performance</h2>
+      <div class="note">Backtest · real Kraken BTC/USD + on-chain data · after fees</div>
+    </div>
+    <div class="card">
+      <h3>Growth of $1,000</h3>
+      <div class="cap">Log scale. The strategy tracks Bitcoin's long-run return with far steadier growth.</div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--c-strat)"></i> Strategy</span>
+        <span><i class="swatch" style="background:var(--c-hold)"></i> Buy &amp; hold BTC</span>
+      </div>
+      <div class="chart" id="eq"></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card">
+        <h3>Drawdown</h3>
+        <div class="cap">How far below the prior peak — the pain of holding through.</div>
+        <div class="legend">
+          <span><i class="swatch" style="background:var(--c-strat)"></i> Strategy</span>
+          <span><i class="swatch" style="background:var(--c-hold)"></i> Buy &amp; hold</span>
+        </div>
+        <div class="chart" id="dd"></div>
+      </div>
+      <div class="card">
+        <h3>Market exposure</h3>
+        <div class="cap">Fraction in BTC vs cash. It sits out the dangerous stretches.</div>
+        <div class="legend"><span><i class="swatch" style="background:var(--c-strat)"></i> % in BTC</span></div>
+        <div class="chart" id="ex"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Metrics vs buy &amp; hold</h2><div class="note">Same period, after costs</div></div>
+    <div class="card" style="padding:4px 4px 0">
+      <table class="metrics" id="mtable"></table>
+    </div>
+  </section>
+
+  <section>
+    <div class="caveats">
+      <div class="eyebrow">Read this before trusting the numbers</div>
+      <ul>
+        <li><b>This is a paper account and a backtest — not proof of future profit.</b> Validated on history and real Kraken prices, but markets change.</li>
+        <li><b>Regime-dependent.</b> The edge is crash-protection: it lags buy &amp; hold in bull markets and earns its keep in bears. Roughly half of any six-month stretch is negative.</li>
+        <li><b>Honest max drawdown ≈ −23%.</b> You must be able to hold through a loss like that without capitulating.</li>
+        <li><b>Long/flat only, spot BTC.</b> No leverage, no shorting (not viable for UK retail). Paper account is in USD.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Generated from the strategy's committed track record · updates as the paper bot runs.</footer>
+</div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const usd = v => "$" + Math.round(v).toLocaleString("en-US");
+const usd2 = v => "$" + v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct = (v,d=1) => (v>=0?"+":"") + (v*100).toFixed(d) + "%";
+const pct0 = v => Math.round(v*100) + "%";
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function renderKpis(){
+  const L = DATA.live;
+  $("#period").textContent = DATA.period;
+  $("#asof").textContent = L.as_of ? ("as of " + L.as_of) : "";
+  const posTxt = L.exposure < .01 ? "All cash" : pct0(L.exposure) + " in BTC";
+  const sig = L.signal < .01 ? "Cash" : pct0(L.signal) + " in BTC";
+  const rc = L.ret > 0 ? "pos" : (L.ret < 0 ? "neg" : "");
+  $("#kpis").innerHTML = [
+    ["Balance", usd2(L.balance), "since $1,000 start"],
+    ["Return", `<span class="${rc}">${pct(L.ret,2)}</span>`, "paper P&L"],
+    ["Position", posTxt, `BTC ${L.price?usd(L.price):"—"}`],
+    ["Today's signal", sig, `${L.steps} day${L.steps==1?"":"s"} · ${L.trades} trades`],
+  ].map(([k,v,s])=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("");
+}
+
+function renderTable(){
+  const m=DATA.metrics, h=DATA.hold;
+  const rows=[
+    ["Total return", pct(m.total,0), pct(h.total,0), m.total>=h.total],
+    ["Annualised (CAGR)", pct(m.cagr), pct(h.cagr), m.cagr>=h.cagr],
+    ["Sharpe ratio", m.sharpe.toFixed(2), h.sharpe.toFixed(2), m.sharpe>=h.sharpe],
+    ["Max drawdown", pct(m.maxdd), pct(h.maxdd), m.maxdd>=h.maxdd],
+    ["Calmar (ret / drawdown)", (m.cagr/Math.abs(m.maxdd)).toFixed(2), (h.cagr/Math.abs(h.maxdd)).toFixed(2), true],
+    ["Trades / year", (m.trades/8).toFixed(0), "0", null],
+  ];
+  $("#mtable").innerHTML =
+    `<thead><tr><th>Metric</th><th>Strategy</th><th>Buy &amp; hold</th></tr></thead><tbody>`+
+    rows.map(([k,a,b,win])=>`<tr><td>${k}</td><td class="num ${win?"win":""}">${a}</td><td class="num">${b}</td></tr>`).join("")+
+    `</tbody>`;
+}
+
+function niceLogTicks(lo,hi){
+  const out=[]; for(const b of [500,1000,2000,5000,10000,20000,50000]) if(b>=lo*.9&&b<=hi*1.1) out.push(b); return out;
+}
+
+function chart(hostId, cfg){
+  const host=$("#"+hostId); const W=host.clientWidth||680, H=cfg.h||250;
+  const m={t:10,r:cfg.rpad||54,b:22,l:cfg.lpad||46}, iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const n=DATA.dates.length, X=i=> m.l+(n<=1?0:i/(n-1)*iw);
+  let Y;
+  if(cfg.type==="log"){const lo=Math.log10(cfg.dom[0]),hi=Math.log10(cfg.dom[1]);
+    Y=v=> m.t+ih-(Math.log10(Math.max(v,1))-lo)/(hi-lo)*ih;}
+  else {const[lo,hi]=cfg.dom; Y=v=> m.t+ih-(v-lo)/(hi-lo)*ih;}
+  const path=(vals,step)=>{let d="";for(let i=0;i<vals.length;i++){const x=X(i),y=Y(vals[i]);
+    if(i===0)d=`M${x} ${y}`; else d+= step?` H${x} L${x} ${y}`:` L${x} ${y}`;}return d;};
+  const gridcol=cssv("--grid"), tickcol=cssv("--faint");
+  let svg=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img">`;
+  // y grid + labels
+  for(const t of cfg.ticks){const y=Y(t.v).toFixed(1);
+    svg+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="${gridcol}"/>`;
+    svg+=`<text class="tick" x="${m.l-8}" y="${+y+3.5}" text-anchor="end">${t.l}</text>`;}
+  // x year labels
+  let py=null; DATA.dates.forEach((d,i)=>{const yr=d.slice(0,4); if(yr!==py){py=yr;
+    if(i>0||true) svg+=`<text class="tick" x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="middle">${yr}</text>`;}});
+  // series
+  for(const s of cfg.series){
+    if(s.fill){const base=Y(cfg.type==="log"?cfg.dom[0]:cfg.baseline);
+      svg+=`<path d="${path(s.vals,s.step)} L${X(n-1)} ${base} L${X(0)} ${base} Z" fill="${cssv(s.color)}" fill-opacity="${s.fillOp||.14}"/>`;}
+    svg+=`<path d="${path(s.vals,s.step)}" fill="none" stroke="${cssv(s.color)}" stroke-width="${s.w||2}" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+  // endpoint dots + labels
+  for(const s of cfg.series){ if(s.noEnd) continue; const i=n-1,x=X(i),y=Y(s.vals[i]);
+    svg+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="${cssv(s.color)}" stroke="${cssv('--chart-surface')}" stroke-width="1.5"/>`;
+    if(s.endLabel!=null) svg+=`<text class="tick" x="${x+7}" y="${+y+3.5}" text-anchor="start" fill="${cssv(s.color)}" style="font-weight:600">${s.endLabel}</text>`;
+  }
+  svg+=`<rect id="${hostId}-hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent" style="cursor:crosshair"/>`;
+  svg+=`<line id="${hostId}-cross" x1="0" x2="0" y1="${m.t}" y2="${m.t+ih}" stroke="${tickcol}" stroke-dasharray="3 3" opacity="0"/>`;
+  svg+=`</svg>`;
+  host.innerHTML=svg;
+  const hit=$("#"+hostId+"-hit"), cross=$("#"+hostId+"-cross"), tt=$("#tt");
+  const rect=()=>host.getBoundingClientRect();
+  hit.addEventListener("pointermove",e=>{
+    const r=rect(), rel=(e.clientX-r.left)/r.width*W;
+    let i=Math.round((rel-m.l)/iw*(n-1)); i=Math.max(0,Math.min(n-1,i));
+    const sx=X(i)/W*r.width;
+    cross.setAttribute("x1",X(i)); cross.setAttribute("x2",X(i)); cross.setAttribute("opacity","1");
+    tt.style.opacity="1"; tt.style.left=(r.left+window.scrollX+sx)+"px";
+    tt.style.top=(r.top+window.scrollY+m.t)+"px";
+    tt.innerHTML=`<div class="d">${DATA.dates[i]}</div>`+cfg.series.map(s=>
+      `<div class="r"><span style="color:${cssv(s.color)}">${s.name}</span><span>${s.fmt(s.vals[i])}</span></div>`).join("");
+  });
+  hit.addEventListener("pointerleave",()=>{cross.setAttribute("opacity","0"); $("#tt").style.opacity="0";});
+}
+
+function renderCharts(){
+  const eqMin=Math.min(...DATA.stratEq,...DATA.holdEq), eqMax=Math.max(...DATA.stratEq,...DATA.holdEq);
+  chart("eq",{type:"log",h:280,dom:[Math.min(eqMin,500),eqMax*1.05],
+    ticks:niceLogTicks(eqMin,eqMax).map(v=>({v,l:usd(v)})),
+    series:[
+      {name:"Buy & hold",vals:DATA.holdEq,color:"--c-hold",w:1.6,fmt:usd,endLabel:null},
+      {name:"Strategy",vals:DATA.stratEq,color:"--c-strat",w:2.4,fmt:usd,endLabel:usd(DATA.stratEq.at(-1))},
+    ]});
+  const ddMin=Math.min(...DATA.stratDD,...DATA.holdDD);
+  chart("dd",{type:"lin",h:210,dom:[ddMin*1.04,0],baseline:0,lpad:44,rpad:16,
+    ticks:[0,-.2,-.4,-.6,-.8].filter(v=>v>=ddMin*1.04).map(v=>({v,l:Math.round(v*100)+"%"})),
+    series:[
+      {name:"Buy & hold",vals:DATA.holdDD,color:"--c-hold",w:1.4,fmt:v=>pct(v),noEnd:true},
+      {name:"Strategy",vals:DATA.stratDD,color:"--c-strat",w:2,fill:true,fillOp:.16,fmt:v=>pct(v),noEnd:true},
+    ]});
+  chart("ex",{type:"lin",h:210,dom:[0,1],baseline:0,lpad:44,rpad:16,
+    ticks:[0,.5,1].map(v=>({v,l:Math.round(v*100)+"%"})),
+    series:[{name:"Exposure",vals:DATA.expo,color:"--c-strat",w:1.8,step:true,fill:true,fillOp:.16,fmt:pct0,noEnd:true}]});
+}
+
+function renderAll(){renderKpis();renderTable();renderCharts();}
+renderAll();
+let rt; addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(renderCharts,120);});
+new MutationObserver(renderCharts).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+matchMedia("(prefers-color-scheme:dark)").addEventListener("change",renderCharts);
+</script>
