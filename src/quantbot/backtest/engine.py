@@ -50,15 +50,20 @@ def run_backtest(
     fee_bps: float = 10.0,
     slippage_bps: float = 5.0,
     size: float | pd.Series = 1.0,
+    annual_cash_yield: float = 0.0,
 ) -> BacktestResult:
     """Simulate a strategy on OHLCV data.
 
     Parameters
     ----------
-    df        OHLCV frame (needs 'open' and 'close').
-    signals   target position per bar in {-1, 0, 1}, aligned to df.index.
-    size      fraction of equity to deploy when in a position (scalar or a
-              per-bar Series from the risk layer). Position exposure = signal*size.
+    df                 OHLCV frame (needs 'open' and 'close').
+    signals            target position per bar in {-1, 0, 1}, aligned to df.index.
+    size               fraction of equity to deploy when in a position (scalar or
+                       a per-bar Series from the risk layer). Exposure = signal*size.
+    annual_cash_yield  interest earned on idle cash (e.g. 0.045 for a 4.5% T-bill
+                       / money-market rate). Matters for long/flat strategies that
+                       sit in cash when out of the market — that cash isn't dead,
+                       it earns the risk-free rate. Accrued per bar on positive cash.
     """
     if not {"open", "close"}.issubset(df.columns):
         raise ValueError("df must contain 'open' and 'close' columns")
@@ -77,6 +82,14 @@ def run_backtest(
     target = target_exposure.to_numpy()
 
     cost_rate = (fee_bps + slippage_bps) / 10_000.0
+
+    # Per-bar interest factor for idle cash, from the annual yield and bar spacing.
+    per_bar_yield = 0.0
+    if annual_cash_yield:
+        from .metrics import _bars_per_year
+
+        bpy = _bars_per_year(df.index)
+        per_bar_yield = (1.0 + annual_cash_yield) ** (1.0 / bpy) - 1.0
 
     n = len(df)
     equity = np.empty(n)
@@ -112,6 +125,10 @@ def run_backtest(
                 }
             )
             prev_exposure = desired
+
+        # Idle cash held through the bar (post-trade) earns the risk-free rate.
+        if per_bar_yield and cash > 0:
+            cash *= 1.0 + per_bar_yield
 
         # Mark to market on the close.
         equity[i] = cash + units * close[i]

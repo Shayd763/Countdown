@@ -1,0 +1,35 @@
+# Equities trend-filter strategy — UK ISA oriented.
+#
+# Thesis (validated on S&P 500 total return, 1990-2026): staying invested in a
+# broad equity index while it's above its ~10-month / 200-day moving average, and
+# moving to cash (earning interest) when it's below, delivers roughly the same
+# long-run return as buy & hold with about HALF the maximum drawdown and a higher
+# Sharpe. It gives up a little upside in exchange for avoiding the -50% crashes.
+#
+# UK practicalities:
+#   * Wrap it in a Stocks & Shares ISA (£20,000/yr allowance) so gains and
+#     dividends are tax-free — no leverage, you own the real asset.
+#   * Use an accumulating UCITS index ETF (US-domiciled ETFs aren't ISA-eligible).
+#   * It's LOW frequency (a few trades a year), so platform fees barely matter and
+#     you can even execute the monthly signal by hand.
+
+data:
+  # For live signals you need the index level; for research use total-return data.
+  # (The sandbox blocks data providers, so research data is loaded from local CSV.)
+  symbol: SPX               # underlying index; trade via a UCITS ETF proxy
+  timeframe: 1mo            # monthly rebalance
+  source: local_csv
+
+strategy:
+  name: trend
+  params:
+    fast: 1                 # compare price itself...
+    slow: 10                # ...to its 10-month moving average (~200 trading days)
+    band: 0.0               # optional hysteresis to cut whipsaw near the line
+    allow_short: false      # long/flat only — no leverage, no shorting
+
+backtest:
+  initial_cash: 20000       # one ISA year
+  fee_bps: 5                # UCITS ETF round-trip is cheap; low turnover anyway
+  slippage_bps: 2
+  annual_cash_yield: 0.045  # interest earned in a money-market fund when out of stocks

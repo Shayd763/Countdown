@@ -53,6 +53,36 @@ def test_no_lookahead_execution_timing():
     assert result.final_equity == pytest.approx(11_000, rel=1e-6)
 
 
+def test_cash_yield_accrues_when_flat():
+    # 12 monthly bars, never in the market -> idle cash earns the annual yield.
+    idx = pd.date_range("2023-01-31", periods=13, freq="ME", tz="UTC")
+    df = pd.DataFrame(
+        {"open": 100.0, "high": 100.0, "low": 100.0, "close": 100.0, "volume": 1.0},
+        index=idx,
+    )
+    signals = pd.Series(0.0, index=df.index)  # always flat
+    result = run_backtest(df, signals, initial_cash=10_000,
+                          fee_bps=10, slippage_bps=5, annual_cash_yield=0.045)
+    # ~1 year of idle cash at 4.5% -> ~10,450 (small tolerance for bar-count/spacing).
+    assert result.final_equity == pytest.approx(10_450, rel=0.02)
+
+
+def test_cash_yield_ignored_while_fully_invested():
+    # If always fully long, cash is ~0, so the yield has negligible effect.
+    idx = pd.date_range("2023-01-31", periods=13, freq="ME", tz="UTC")
+    df = pd.DataFrame(
+        {"open": 100.0, "high": 100.0, "low": 100.0, "close": 100.0, "volume": 1.0},
+        index=idx,
+    )
+    signals = pd.Series(1.0, index=df.index)
+    no_yield = run_backtest(df, signals, fee_bps=0, slippage_bps=0, annual_cash_yield=0.0)
+    with_yield = run_backtest(df, signals, fee_bps=0, slippage_bps=0, annual_cash_yield=0.045)
+    # Only the unavoidable first flat bar earns yield; once invested cash is ~0,
+    # so the effect stays within a single monthly accrual (<0.5%).
+    assert with_yield.final_equity >= no_yield.final_equity
+    assert with_yield.final_equity == pytest.approx(no_yield.final_equity, rel=0.005)
+
+
 def test_summary_keys_present():
     df = synthetic_ohlcv(n=500)
     sig = pd.Series(0.0, index=df.index)

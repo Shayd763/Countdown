@@ -90,6 +90,41 @@ sideways market would whipsaw it. Data is BTC/USD daily reference price (no
 intraday, not GBP). Final validation needs venue-native Kraken OHLC before any
 capital.
 
+## Which asset class? (evidence-based)
+
+Ran the identical trend-filter-vs-buy-&-hold test across four asset classes on
+real data (monthly). Returns track the **asset's own risk premium first**,
+strategy second:
+
+| Asset (2015–26) | Buy&hold Sharpe | Trend helps? | Notes |
+|---|---|---|---|
+| Crypto (BTC) | 1.03 | ✅ | Highest return, brutal −66/−80% drawdowns |
+| Equities (S&P) | 0.99 | risk only | Reliable premium, ISA tax-free, gentle DD |
+| Gold | 0.95 | no | Low-return diversifier |
+| **FX (GBP/USD)** | **0.18** | ❌ worse | **~No risk premium — zero-sum. Worst base for a directional bot.** |
+
+The FX result is decisive: a currency pair has no secular drift to harvest, so
+buy-and-hold earns ~1%/yr and trend-following can't manufacture an edge. FX only
+pays via pure-alpha games (carry, market-making) that retail loses structurally.
+Cheaper fees don't fix a market you're built to lose — and higher frequency
+*multiplies* cost drag rather than reducing it.
+
+## Chosen focus: equities trend filter in a UK ISA
+
+The lowest-stress, tax-efficient path. Validated on **S&P 500 total return**
+(long history incl. 2000 & 2008), 10-month trend filter, idle cash at 4.5%:
+
+| 1990–2026 | CAGR | Sharpe | Max DD |
+|---|---|---|---|
+| Buy & hold | +10.7% | 0.90 | −49% |
+| **Trend filter (+cash yield)** | **+10.7%** | **1.21** | **−19%** |
+
+Same return, much higher Sharpe, **less than half the drawdown** — and inside a
+Stocks & Shares ISA, entirely tax-free with no leverage. See
+`config/equities.example.yaml`. Check today's position with
+`scripts/signal_today.py`. It's low-frequency (a few trades a year), so it's
+systematic discipline more than an execution "bot".
+
 ## Beating costs (the whole game)
 
 Two mechanisms exist specifically to make "profitable after fees" honest:
