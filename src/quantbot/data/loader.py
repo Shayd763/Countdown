@@ -183,6 +183,28 @@ def load_coinmetrics_csv(
     return pd.DataFrame(data, index=idx).sort_index()
 
 
+def load_funding_csv(path: str, time_col: str = "time", rate_col: str = "funding_rate") -> pd.Series:
+    """Load a perpetual-futures funding-rate history exported from an exchange.
+
+    Expects a CSV with a timestamp column and a per-interval funding-rate column
+    (e.g. 0.0001 = 0.01% per 8h). Most venues (Bybit, OKX, Binance) let you export
+    this. Returns a time-indexed Series of funding rates for the funding-arb
+    backtester. Auto-detects ISO strings or unix seconds/millis in the time column.
+    """
+    df = pd.read_csv(path)
+    cols = {c.lower(): c for c in df.columns}
+    tcol = cols.get(time_col.lower(), df.columns[0])
+    rcol = cols.get(rate_col.lower(), cols.get("fundingrate", df.columns[-1]))
+    t = df[tcol]
+    if np.issubdtype(t.dtype, np.number):
+        unit = "ms" if float(t.iloc[0]) > 1e12 else "s"
+        idx = pd.to_datetime(t, unit=unit, utc=True)
+    else:
+        idx = pd.to_datetime(t, utc=True)
+    s = pd.Series(df[rcol].astype(float).to_numpy(), index=idx, name="funding_rate")
+    return s[~s.index.duplicated(keep="last")].sort_index()
+
+
 def synthetic_ohlcv(
     n: int = 2000,
     timeframe: str = "1h",
