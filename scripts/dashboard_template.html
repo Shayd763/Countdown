@@ -43,6 +43,12 @@
   header .sub{color:var(--muted);font-size:13px}
   .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;
     padding:6px 11px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2)}
+  .hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .tbtn{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;
+    padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+    transition:color .12s,border-color .12s}
+  .tbtn:hover{color:var(--ink);border-color:var(--faint)}
+  .tbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--pos);
     box-shadow:0 0 0 3px color-mix(in srgb,var(--pos) 22%,transparent)}
   @media (prefers-reduced-motion:no-preference){.dot{animation:pulse 2.4s ease-in-out infinite}}
@@ -110,7 +116,10 @@
       <h1>Bitcoin Trend + Flow Bot</h1>
       <div class="sub">Ensemble signal · volatility-targeted · weekly rebalance · <span id="period" class="num"></span></div>
     </div>
-    <div class="pill"><span class="dot"></span> Live · Paper account</div>
+    <div class="hdr-right">
+      <div class="pill"><span class="dot"></span> Live · Paper account</div>
+      <button id="themeBtn" class="tbtn" type="button" aria-label="Toggle colour theme"></button>
+    </div>
   </header>
 
   <section>
@@ -288,7 +297,17 @@ function renderCharts(){
     series:[{name:"Exposure",vals:DATA.expo,color:"--c-strat",w:1.8,step:true,fill:true,fillOp:.16,fmt:pct0,noEnd:true}]});
 }
 
-function renderAll(){renderKpis();renderTable();renderCharts();}
+function currentTheme(){
+  const t=document.documentElement.getAttribute("data-theme");
+  return t || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+}
+function syncThemeBtn(){ $("#themeBtn").textContent = currentTheme()==="dark" ? "☀ Light mode" : "☾ Dark mode"; }
+$("#themeBtn").addEventListener("click",()=>{
+  document.documentElement.setAttribute("data-theme", currentTheme()==="dark" ? "light" : "dark");
+  syncThemeBtn();  // charts re-render via the data-theme MutationObserver below
+});
+
+function renderAll(){renderKpis();renderTable();renderCharts();syncThemeBtn();}
 renderAll();
 let rt; addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(renderCharts,120);});
 new MutationObserver(renderCharts).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
