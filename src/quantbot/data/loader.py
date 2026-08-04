@@ -99,6 +99,40 @@ def _read_cache(path: str) -> pd.DataFrame:
     return df[OHLCV_COLUMNS].astype(float)
 
 
+def load_kraken_csv(path: str) -> pd.DataFrame:
+    """Load a Kraken downloadable OHLCVT history CSV into the standard schema.
+
+    Kraken's free historical dumps (support.kraken.com -> "Downloadable
+    historical OHLCVT Data") ship one headerless CSV per pair/interval, named
+    like ``XBTGBP_1440.csv`` (1440 = daily, in minutes). Columns are:
+
+        timestamp(unix seconds), open, high, low, close, volume, trades
+
+    This is the deepest, rate-limit-free source for UK backtesting. Note Kraken
+    uses ``XBT`` for Bitcoin, so BTC/GBP is the ``XBTGBP`` file.
+    """
+    cols = ["time", "open", "high", "low", "close", "volume", "trades"]
+
+    # Kraken files are headerless, but be tolerant of an accidental header row.
+    with open(path) as fh:
+        first = fh.readline().split(",", 1)[0].strip()
+    has_header = not first.replace(".", "", 1).isdigit()
+
+    df = pd.read_csv(
+        path,
+        header=0 if has_header else None,
+        names=None if has_header else cols,
+    )
+    if has_header:
+        df.columns = [c.strip().lower() for c in df.columns]
+        if "time" not in df.columns and "timestamp" in df.columns:
+            df = df.rename(columns={"timestamp": "time"})
+
+    df.index = pd.to_datetime(df["time"].astype("int64"), unit="s", utc=True)
+    df.index.name = "timestamp"
+    return df[OHLCV_COLUMNS].astype(float).sort_index()
+
+
 def synthetic_ohlcv(
     n: int = 2000,
     timeframe: str = "1h",
