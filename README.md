@@ -179,6 +179,21 @@ beating it on return, at ~9 trades/year. Calmar 1.49 vs 0.27. Both levers (tight
 vol target, drawdown-scaling) push the same way, so the effect is structural, not
 a fragile fit — though the exact −18% is optimistic (parameters chosen in-sample).
 
+### Validated on real Kraken data
+
+Re-run on **real Kraken BTC/USD daily OHLC** (2018–2025), with execution at the
+genuine next-day open (a different price from the decision close on 100% of bars)
+and on-chain factors merged in by date:
+
+| Real Kraken data | CAGR | Sharpe | MaxDD |
+|---|---|---|---|
+| Buy & hold | +26% | 0.69 | −82% |
+| **Risk-first strategy** | +26% | **1.29** | **−23%** |
+
+The edge survives venue-native prices and realistic fills — Sharpe 1.34→1.29,
+drawdown −18%→−23%. **−23% is the honest max-drawdown figure.** Still ~2× the
+Sharpe of holding and under a third of its drawdown, for the same return.
+
 **Asset note:** tested on ETH too — BTC won on every metric (ETH buy-hold −94%
 drawdown vs BTC −82%; ensemble Sharpe 0.90 vs 1.23). ETH is *not* more profitable,
 though vol-targeting helps it more because it's more volatile. BTC stays the base.
