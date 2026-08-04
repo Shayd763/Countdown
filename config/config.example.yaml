@@ -4,10 +4,15 @@
 # environment variables (EXCHANGE_API_KEY / EXCHANGE_API_SECRET), not this file.
 
 data:
-  exchange: binance          # any ccxt-supported exchange id
-  symbol: BTC/USDT
-  timeframe: 1h              # 1m, 5m, 15m, 1h, 4h, 1d ...
-  since: "2023-01-01T00:00:00Z"
+  # Kraken (Payward Ltd) is FCA-registered and usable by UK retail. Binance is
+  # not cleanly usable by UK retail, so we default to Kraken here.
+  # NOTE: Kraken's OHLCV API only returns ~720 recent candles. For deep
+  # backtest history, use Kraken's free downloadable historical CSV dumps and
+  # point load_ohlcv at the cache; trade live via the API.
+  exchange: kraken           # any ccxt-supported exchange id
+  symbol: BTC/GBP            # native GBP pair avoids a USD conversion leg
+  timeframe: 1d             # daily lowers turnover -> costs shrink vs the move
+  since: "2021-01-01T00:00:00Z"
   cache_dir: .cache          # cached OHLCV parquet/csv lives here (gitignored)
 
 strategy:
@@ -16,7 +21,9 @@ strategy:
     lookback: 48             # bars in the rolling mean/std window
     entry_z: 2.0            # enter when |z-score| exceeds this
     exit_z: 0.5             # exit when |z-score| falls back inside this
-    allow_short: true       # crypto perps allow shorts; set false for spot-only
+    # UK retail = spot only (FCA banned crypto derivatives to retail, Jan 2021),
+    # so no shorting. Strategy is long/flat only.
+    allow_short: false
 
 risk:
   method: fixed_fractional   # fixed_fractional | fractional_kelly
@@ -28,6 +35,8 @@ risk:
 
 backtest:
   initial_cash: 10000
-  fee_bps: 10                # taker fee in basis points (0.10% = 10 bps)
-  slippage_bps: 5            # assumed slippage per fill in basis points
+  # Realistic Kraken entry-tier taker fee: 0.26% = 26 bps (maker is ~16 bps).
+  # Do NOT lower this to flatter a strategy — the cost hurdle is the whole point.
+  fee_bps: 26                # taker fee in basis points
+  slippage_bps: 5            # assumed slippage/spread per fill in basis points
   # Signals are computed on bar t and executed at bar t+1 open -> no lookahead.
