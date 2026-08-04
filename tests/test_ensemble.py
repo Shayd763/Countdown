@@ -5,42 +5,53 @@ import pytest
 from quantbot.strategies import MultiFactorEnsemble, build_strategy
 
 
-def _frame(n=400, with_flows=True, seed=0):
+def _frame(n=400, cols=("flow_in", "flow_out", "fee_ntv"), seed=0):
     rng = np.random.default_rng(seed)
     idx = pd.date_range("2020-01-01", periods=n, freq="1D", tz="UTC")
-    close = 100 + np.cumsum(rng.normal(0.1, 1.0, n))
-    close = np.abs(close) + 1
+    close = np.abs(100 + np.cumsum(rng.normal(0.1, 1.0, n))) + 1
     data = {"open": close, "high": close, "low": close, "close": close, "volume": 0.0}
-    if with_flows:
-        data["flow_in"] = np.abs(rng.normal(1000, 200, n))
-        data["flow_out"] = np.abs(rng.normal(1000, 200, n))
+    for c in cols:
+        data[c] = np.abs(rng.normal(1000, 200, n))
     return pd.DataFrame(data, index=idx)
 
 
-def test_registered():
-    assert isinstance(build_strategy("ensemble"), MultiFactorEnsemble)
+def test_registered_with_default_factors():
+    strat = build_strategy("ensemble")
+    assert isinstance(strat, MultiFactorEnsemble)
+    assert strat.factors == ("trend", "flow", "fee")
 
 
-def test_exposure_is_fractional_and_bounded():
+def test_three_factor_exposure_levels():
     df = _frame()
     sig = MultiFactorEnsemble(trend_ma=50).generate_signals(df)
-    # two factors -> exposure in {0, 0.5, 1.0}
-    assert set(np.unique(np.round(sig.to_numpy(), 6))) <= {0.0, 0.5, 1.0}
+    # three factors -> exposure in {0, 1/3, 2/3, 1}
+    allowed = {0.0, round(1 / 3, 6), round(2 / 3, 6), 1.0}
+    assert set(np.round(sig.to_numpy(), 6)) <= allowed
     assert sig.min() >= 0.0 and sig.max() <= 1.0
     assert sig.index.equals(df.index)
 
 
-def test_trend_only_when_flows_disabled():
-    df = _frame(with_flows=False)
-    sig = MultiFactorEnsemble(trend_ma=50, use_flow=False).generate_signals(df)
-    # single factor -> pure long/flat
+def test_two_factor_exposure_levels():
+    df = _frame()
+    sig = MultiFactorEnsemble(factors=("trend", "flow"), trend_ma=50).generate_signals(df)
+    assert set(np.round(sig.to_numpy(), 6)) <= {0.0, 0.5, 1.0}
+
+
+def test_trend_only_is_binary():
+    df = _frame(cols=())
+    sig = MultiFactorEnsemble(factors=("trend",), trend_ma=50).generate_signals(df)
     assert set(np.unique(sig.to_numpy())) <= {0.0, 1.0}
 
 
-def test_missing_flow_columns_raises():
-    df = _frame(with_flows=False)
+def test_missing_factor_columns_raises():
+    df = _frame(cols=())  # no flow/fee columns
     with pytest.raises(ValueError):
-        MultiFactorEnsemble(trend_ma=50, use_flow=True).generate_signals(df)
+        MultiFactorEnsemble(factors=("trend", "flow")).generate_signals(df)
+
+
+def test_unknown_factor_rejected():
+    with pytest.raises(ValueError):
+        MultiFactorEnsemble(factors=("trend", "bogus"))
 
 
 def test_invalid_params_rejected():
@@ -48,10 +59,11 @@ def test_invalid_params_rejected():
         MultiFactorEnsemble(trend_ma=1)
     with pytest.raises(ValueError):
         MultiFactorEnsemble(flow_long=2.0, flow_exit=1.0)
+    with pytest.raises(ValueError):
+        MultiFactorEnsemble(fee_fast=400, fee_slow=100)
 
 
 def test_warmup_is_flat():
     df = _frame()
-    sig = MultiFactorEnsemble(trend_ma=50, flow_window=90).generate_signals(df)
-    # before both factors have warmed up, exposure must be 0
+    sig = MultiFactorEnsemble(trend_ma=50).generate_signals(df)
     assert sig.iloc[:49].sum() == 0.0

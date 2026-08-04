@@ -99,6 +99,7 @@ signals** (the way real systematic funds work). Two survived walk-forward:
 
 - **trend** — price above its 200-day MA (regime / risk-on)
 - **flow** — net exchange outflows (on-chain accumulation vs sell pressure)
+- **fee** — total fees rising (blockspace-demand / network-usage momentum)
 
 The `ensemble` strategy votes long/flat per factor and scales exposure to the
 fraction agreeing. On real BTC (2016–2026, Kraken fees + 4.5% cash yield):
@@ -108,12 +109,18 @@ fraction agreeing. On real BTC (2016–2026, Kraken fees + 4.5% cash yield):
 | Buy & hold | 1.08 | −84% | 0.69 |
 | Trend only | 1.15 | −65% | 0.48 |
 | Flow only | 1.27 | −60% | 0.85 |
-| **Ensemble (trend+flow)** | **1.34** | **−57%** | 0.76 |
+| Ensemble (trend+flow) | 1.34 | −57% | 0.76 |
+| **Ensemble (trend+flow+fee)** | **1.37** | **−58%** | — |
 
-Higher Sharpe than either factor, roughly half the drawdown of buy-and-hold, and
-more stable out-of-sample. The honest edge is "beat buy-and-hold risk-adjusted
-and halve the drawdown, automatically" — real and tradeable, not a Sharpe-3
-fantasy. It runs on data a price-only bot can't see (on-chain exchange flows).
+Higher Sharpe than any single factor, roughly half the drawdown of buy-and-hold,
+more stable out-of-sample. Adding `fee` lifted the weakest historical block.
+
+**We are at diminishing returns:** marginal-contribution testing across time
+blocks showed `hash` and `mvrv` actively *hurt*, `addr` was neutral, and a
+kitchen-sink of all six factors was *worse* than three. So the default is
+deliberately just three. More factors are not more edge — the honest edge is
+"beat buy-and-hold risk-adjusted and halve the drawdown, automatically," on data
+a price-only bot can't see.
 
 ## Which asset class? (evidence-based)
 

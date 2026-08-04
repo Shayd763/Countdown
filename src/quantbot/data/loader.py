@@ -133,10 +133,22 @@ def load_kraken_csv(path: str) -> pd.DataFrame:
     return df[OHLCV_COLUMNS].astype(float).sort_index()
 
 
+# Coin Metrics column -> generic factor column used by the ensemble strategy.
+_ONCHAIN_MAP = {
+    "FlowInExNtv": "flow_in",
+    "FlowOutExNtv": "flow_out",
+    "FeeTotNtv": "fee_ntv",
+    "AdrActCnt": "addr_act",
+    "HashRate": "hash_rate",
+    "CapMVRVCur": "mvrv",
+}
+
+
 def load_coinmetrics_csv(
     path: str,
     price_col: str = "PriceUSD",
     with_flows: bool = False,
+    with_onchain: bool = False,
 ) -> pd.DataFrame:
     """Load a Coin Metrics community-network CSV (e.g. ``csv/btc.csv``).
 
@@ -148,22 +160,26 @@ def load_coinmetrics_csv(
     USD, not GBP. Good enough to research whether an edge exists; final
     validation should use venue-native OHLC (e.g. Kraken XBTGBP) before capital.
 
-    ``with_flows=True`` also carries the on-chain exchange-flow columns through
-    as ``flow_in`` / ``flow_out`` (from FlowInExNtv / FlowOutExNtv), so
-    multi-factor strategies can use them. These ride alongside the OHLCV columns;
-    the backtest engine ignores them, strategies opt in.
+    ``with_flows=True`` also carries the exchange-flow columns through as
+    ``flow_in`` / ``flow_out``. ``with_onchain=True`` carries the full on-chain
+    factor bundle used by the ensemble strategy (flow_in, flow_out, fee_ntv,
+    addr_act, hash_rate, mvrv) wherever those columns exist in the file. These
+    ride alongside the OHLCV columns; the backtest engine ignores them, strategies
+    opt in.
     """
-    use = ["time", price_col]
-    if with_flows:
-        use += ["FlowInExNtv", "FlowOutExNtv"]
-    df = pd.read_csv(path, usecols=use).dropna(subset=[price_col])
+    wanted = dict(_ONCHAIN_MAP) if with_onchain else (
+        {"FlowInExNtv": "flow_in", "FlowOutExNtv": "flow_out"} if with_flows else {}
+    )
+    available = set(pd.read_csv(path, nrows=0).columns)
+    wanted = {src: dst for src, dst in wanted.items() if src in available}
+
+    df = pd.read_csv(path, usecols=["time", price_col, *wanted]).dropna(subset=[price_col])
     idx = pd.to_datetime(df["time"], utc=True)
     idx.name = "timestamp"
     price = df[price_col].astype(float).to_numpy()
     data = {"open": price, "high": price, "low": price, "close": price, "volume": 0.0}
-    if with_flows:
-        data["flow_in"] = df["FlowInExNtv"].astype(float).to_numpy()
-        data["flow_out"] = df["FlowOutExNtv"].astype(float).to_numpy()
+    for src, dst in wanted.items():
+        data[dst] = df[src].astype(float).to_numpy()
     return pd.DataFrame(data, index=idx).sort_index()
 
 
