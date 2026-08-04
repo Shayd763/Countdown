@@ -133,6 +133,29 @@ def load_kraken_csv(path: str) -> pd.DataFrame:
     return df[OHLCV_COLUMNS].astype(float).sort_index()
 
 
+def load_coinmetrics_csv(path: str, price_col: str = "PriceUSD") -> pd.DataFrame:
+    """Load a Coin Metrics community-network CSV (e.g. ``csv/btc.csv``).
+
+    Coin Metrics publishes reputable daily reference-rate data openly on GitHub
+    (github.com/coinmetrics/data). It provides a single daily ``PriceUSD`` per
+    asset, **not** OHLC — so we set open=high=low=close=PriceUSD. That is an
+    honest approximation for *daily* strategies (decide on today's price, fill
+    on the next day's), but it carries no intraday high/low and is quoted in
+    USD, not GBP. Good enough to research whether an edge exists; final
+    validation should use venue-native OHLC (e.g. Kraken XBTGBP) before capital.
+    """
+    df = pd.read_csv(path, usecols=["time", price_col])
+    df = df.dropna(subset=[price_col])
+    idx = pd.to_datetime(df["time"], utc=True)
+    idx.name = "timestamp"
+    price = df[price_col].astype(float).to_numpy()
+    out = pd.DataFrame(
+        {"open": price, "high": price, "low": price, "close": price, "volume": 0.0},
+        index=idx,
+    )
+    return out.sort_index()
+
+
 def synthetic_ohlcv(
     n: int = 2000,
     timeframe: str = "1h",

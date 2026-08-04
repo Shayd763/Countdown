@@ -19,7 +19,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from quantbot.data import load_kraken_csv, load_ohlcv, synthetic_ohlcv  # noqa: E402
+import pandas as pd  # noqa: E402
+
+from quantbot.data import (  # noqa: E402
+    load_coinmetrics_csv,
+    load_kraken_csv,
+    load_ohlcv,
+    synthetic_ohlcv,
+)
 from quantbot.validation import walk_forward  # noqa: E402
 
 # Parameter grids searched within each training window, per strategy.
@@ -59,6 +66,8 @@ def main() -> int:
     parser.add_argument("--config", help="path to a YAML config file")
     parser.add_argument("--synthetic", action="store_true", help="use offline synthetic data")
     parser.add_argument("--kraken-csv", help="path to a Kraken OHLCVT history CSV")
+    parser.add_argument("--coinmetrics-csv", help="path to a Coin Metrics community CSV (btc.csv)")
+    parser.add_argument("--start", help="optional ISO date to start from, e.g. 2018-01-01")
     parser.add_argument("--strategy", default="mean_reversion",
                         choices=sorted(PARAM_GRIDS), help="strategy to validate")
     parser.add_argument("--train", type=int, default=365, help="train window in bars")
@@ -69,6 +78,10 @@ def main() -> int:
     if args.kraken_csv:
         df = load_kraken_csv(args.kraken_csv)
         print(f"[kraken-csv] {os.path.basename(args.kraken_csv)}: {len(df)} bars")
+    elif args.coinmetrics_csv:
+        df = load_coinmetrics_csv(args.coinmetrics_csv)
+        print(f"[coinmetrics] {os.path.basename(args.coinmetrics_csv)}: {len(df)} bars "
+              f"(BTC/USD daily reference rate)")
     elif args.config:
         cfg = _load_config(args.config)
         d = cfg["data"]
@@ -82,6 +95,10 @@ def main() -> int:
     else:
         df = synthetic_ohlcv(n=2000, timeframe="1d")
         print(f"[synthetic] {len(df)} daily bars")
+
+    if args.start:
+        df = df[df.index >= pd.Timestamp(args.start, tz="UTC")]
+        print(f"filtered from {args.start}: {len(df)} bars")
 
     grid = PARAM_GRIDS[args.strategy]
     fmt = _FMT[args.strategy]

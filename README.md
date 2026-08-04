@@ -65,6 +65,31 @@ data source, strategy params, risk method, and backtest costs. Live/paper API
 keys are read from environment variables (`EXCHANGE_API_KEY` /
 `EXCHANGE_API_SECRET`), never from the config file.
 
+## What we've actually found (real data)
+
+Tested on real Coin Metrics BTC/USD daily data (2016–2026), walk-forward,
+after Kraken fees:
+
+| Approach | OOS return | Sharpe | Max DD | Verdict |
+|---|---|---|---|---|
+| Short-horizon mean-reversion | −50% | −0.24 | −62% | ❌ rejected |
+| Naive trend crossover (per-fold fit) | −13% | ~0.00 | −43% | ❌ rejected |
+| Buy & hold BTC | +419%* | 0.63 | −82% | benchmark |
+| **Trend-filter (long/flat vs slow MA)** | **+227%** | **0.72** | **−45%** | ✅ **survives** |
+
+\*2018+ window. The lesson: trying to *predict* short-term moves loses money and
+underperforms doing nothing. The edge that survives is **low-turnover trend
+participation** — stay long BTC while it's above its slow moving average, sit in
+cash when it isn't. It captures the trend, sidesteps the worst of the crashes,
+and trades rarely enough to clear the cost hurdle. It is robust across MA
+lengths (100–300), not a single lucky parameter.
+
+**Caveats (important):** this period is largely one secular BTC bull market with
+two big crashes — precisely the regime trend filters are built for; a long
+sideways market would whipsaw it. Data is BTC/USD daily reference price (no
+intraday, not GBP). Final validation needs venue-native Kraken OHLC before any
+capital.
+
 ## Beating costs (the whole game)
 
 Two mechanisms exist specifically to make "profitable after fees" honest:
