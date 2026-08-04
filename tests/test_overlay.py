@@ -2,7 +2,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from quantbot.risk import periodic_rebalance, realized_vol, volatility_target
+from quantbot.risk import (
+    drawdown_scale,
+    periodic_rebalance,
+    realized_vol,
+    volatility_target,
+)
 
 
 def _returns(vol, n=100, seed=0):
@@ -36,6 +41,33 @@ def test_vol_target_rejects_bad_target():
     r = _returns(0.02)
     with pytest.raises(ValueError):
         volatility_target(pd.Series(1.0, index=r.index), r, target_vol=0.0)
+
+
+def test_drawdown_scale_full_at_peak_zero_at_tolerance():
+    idx = pd.date_range("2021-01-01", periods=200, freq="1D", tz="UTC")
+    # price rises to a peak then falls 50%
+    price = pd.Series(np.concatenate([np.linspace(100, 200, 100),
+                                      np.linspace(200, 100, 100)]), index=idx)
+    scale = drawdown_scale(price, tolerance=0.5, window=365, min_periods=10)
+    assert scale.iloc[99] == pytest.approx(1.0, abs=1e-6)   # at the peak -> full size
+    assert scale.iloc[-1] == pytest.approx(0.0, abs=1e-6)   # 50% down at tol=0.5 -> flat
+    assert (scale >= 0).all() and (scale <= 1).all()
+
+
+def test_drawdown_scale_monotone_in_decline():
+    idx = pd.date_range("2021-01-01", periods=150, freq="1D", tz="UTC")
+    price = pd.Series(np.concatenate([np.full(50, 200.0),
+                                      np.linspace(200, 120, 100)]), index=idx)
+    scale = drawdown_scale(price, tolerance=0.5, window=365, min_periods=10)
+    declining = scale.iloc[60:]
+    assert declining.is_monotonic_decreasing
+
+
+def test_drawdown_scale_rejects_bad_tolerance():
+    price = pd.Series(np.linspace(100, 200, 50),
+                      index=pd.date_range("2021-01-01", periods=50, freq="1D", tz="UTC"))
+    with pytest.raises(ValueError):
+        drawdown_scale(price, tolerance=0.0)
 
 
 def test_periodic_rebalance_reduces_changes():

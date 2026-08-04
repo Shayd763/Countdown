@@ -162,6 +162,23 @@ Lower drawdown, ~half the trades, less capital at risk — at essentially unchan
 Sharpe. Monthly rebalancing is too slow (Sharpe drops to 0.80); weekly is the
 sweet spot.
 
+### Pushing loss-cutting further (the best risk-adjusted result)
+
+Tightening the vol target and adding `drawdown_scale` (de-risk as the asset falls
+from its 1-year peak) — BTC 2018+:
+
+| Config | CAGR | Sharpe | MaxDD | Calmar | Trd/y |
+|---|---|---|---|---|---|
+| Buy & hold | +22% | 0.63 | −82% | 0.27 | 0.1 |
+| Weekly vol-target 0.50 | +36% | 1.19 | −46% | 0.77 | 15 |
+| Weekly vol-target 0.30 | +32% | 1.35 | −32% | 1.00 | 12 |
+| **0.35 + drawdown de-risk** | **+26%** | **1.34** | **−18%** | **1.49** | 9 |
+
+Max drawdown down to **−18%** — under a quarter of buy-and-hold's — while still
+beating it on return, at ~9 trades/year. Calmar 1.49 vs 0.27. Both levers (tighter
+vol target, drawdown-scaling) push the same way, so the effect is structural, not
+a fragile fit — though the exact −18% is optimistic (parameters chosen in-sample).
+
 **Asset note:** tested on ETH too — BTC won on every metric (ETH buy-hold −94%
 drawdown vs BTC −82%; ensemble Sharpe 0.90 vs 1.23). ETH is *not* more profitable,
 though vol-targeting helps it more because it's more volatile. BTC stays the base.
