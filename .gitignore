@@ -1,0 +1,17 @@
+# Secrets & local config
+config/config.yaml
+.env
+*.key
+
+# Cached market data
+.cache/
+*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+.DS_Store

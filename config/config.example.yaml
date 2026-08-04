@@ -1,0 +1,33 @@
+# Copy to config/config.yaml and edit. config/config.yaml is gitignored.
+#
+# NEVER commit real API keys. For live/paper trading the bot reads keys from
+# environment variables (EXCHANGE_API_KEY / EXCHANGE_API_SECRET), not this file.
+
+data:
+  exchange: binance          # any ccxt-supported exchange id
+  symbol: BTC/USDT
+  timeframe: 1h              # 1m, 5m, 15m, 1h, 4h, 1d ...
+  since: "2023-01-01T00:00:00Z"
+  cache_dir: .cache          # cached OHLCV parquet/csv lives here (gitignored)
+
+strategy:
+  name: mean_reversion
+  params:
+    lookback: 48             # bars in the rolling mean/std window
+    entry_z: 2.0            # enter when |z-score| exceeds this
+    exit_z: 0.5             # exit when |z-score| falls back inside this
+    allow_short: true       # crypto perps allow shorts; set false for spot-only
+
+risk:
+  method: fixed_fractional   # fixed_fractional | fractional_kelly
+  # fixed_fractional: risk this fraction of equity per trade (via stop distance)
+  risk_per_trade: 0.01       # 1% of equity at risk per position
+  # fractional_kelly: scale the full-Kelly fraction down by this factor
+  kelly_fraction: 0.25       # quarter-Kelly (conservative)
+  max_position: 1.0          # cap gross exposure at 1.0x equity (no leverage)
+
+backtest:
+  initial_cash: 10000
+  fee_bps: 10                # taker fee in basis points (0.10% = 10 bps)
+  slippage_bps: 5            # assumed slippage per fill in basis points
+  # Signals are computed on bar t and executed at bar t+1 open -> no lookahead.
