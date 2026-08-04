@@ -1,10 +1,12 @@
 from .base import Strategy
+from .ensemble import MultiFactorEnsemble
 from .mean_reversion import MeanReversion
 from .trend import TrendFollowing
 
 REGISTRY = {
     "mean_reversion": MeanReversion,
     "trend": TrendFollowing,
+    "ensemble": MultiFactorEnsemble,
 }
 
 
@@ -15,4 +17,7 @@ def build_strategy(name: str, **params) -> Strategy:
     return REGISTRY[name](**params)
 
 
-__all__ = ["Strategy", "MeanReversion", "TrendFollowing", "REGISTRY", "build_strategy"]
+__all__ = [
+    "Strategy", "MeanReversion", "TrendFollowing", "MultiFactorEnsemble",
+    "REGISTRY", "build_strategy",
+]

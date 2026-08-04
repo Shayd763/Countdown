@@ -133,7 +133,11 @@ def load_kraken_csv(path: str) -> pd.DataFrame:
     return df[OHLCV_COLUMNS].astype(float).sort_index()
 
 
-def load_coinmetrics_csv(path: str, price_col: str = "PriceUSD") -> pd.DataFrame:
+def load_coinmetrics_csv(
+    path: str,
+    price_col: str = "PriceUSD",
+    with_flows: bool = False,
+) -> pd.DataFrame:
     """Load a Coin Metrics community-network CSV (e.g. ``csv/btc.csv``).
 
     Coin Metrics publishes reputable daily reference-rate data openly on GitHub
@@ -143,17 +147,24 @@ def load_coinmetrics_csv(path: str, price_col: str = "PriceUSD") -> pd.DataFrame
     on the next day's), but it carries no intraday high/low and is quoted in
     USD, not GBP. Good enough to research whether an edge exists; final
     validation should use venue-native OHLC (e.g. Kraken XBTGBP) before capital.
+
+    ``with_flows=True`` also carries the on-chain exchange-flow columns through
+    as ``flow_in`` / ``flow_out`` (from FlowInExNtv / FlowOutExNtv), so
+    multi-factor strategies can use them. These ride alongside the OHLCV columns;
+    the backtest engine ignores them, strategies opt in.
     """
-    df = pd.read_csv(path, usecols=["time", price_col])
-    df = df.dropna(subset=[price_col])
+    use = ["time", price_col]
+    if with_flows:
+        use += ["FlowInExNtv", "FlowOutExNtv"]
+    df = pd.read_csv(path, usecols=use).dropna(subset=[price_col])
     idx = pd.to_datetime(df["time"], utc=True)
     idx.name = "timestamp"
     price = df[price_col].astype(float).to_numpy()
-    out = pd.DataFrame(
-        {"open": price, "high": price, "low": price, "close": price, "volume": 0.0},
-        index=idx,
-    )
-    return out.sort_index()
+    data = {"open": price, "high": price, "low": price, "close": price, "volume": 0.0}
+    if with_flows:
+        data["flow_in"] = df["FlowInExNtv"].astype(float).to_numpy()
+        data["flow_out"] = df["FlowOutExNtv"].astype(float).to_numpy()
+    return pd.DataFrame(data, index=idx).sort_index()
 
 
 def synthetic_ohlcv(
