@@ -139,6 +139,33 @@ aggregate is carried by a few strong folds (per-fold Sharpe ranged −1.8 to
 underperformance, not a smooth outperformer. Size and expectations accordingly —
 anyone showing you a smooth Sharpe-3 crypto curve is hiding this.
 
+## Risk overlays: cut losses, frequency, and volume
+
+The honest edge here is risk reduction, so the biggest wins come from managing
+risk, not predicting direction. Two overlays (`quantbot.risk.overlay`) transform
+any strategy's exposure:
+
+- **volatility_target** — scale exposure down when realised vol is high (crashes
+  cluster there). Cuts the left tail.
+- **periodic_rebalance** — only change position every N bars (+ optional quantise).
+  Cuts trade frequency and turnover.
+
+Ensemble + weekly-rebalanced vol-target on BTC (2018+):
+
+| | Sharpe | MaxDD | Trades/yr | Avg exposure |
+|---|---|---|---|---|
+| Buy & hold | 0.63 | −82% | 0.1 | 100% |
+| Ensemble | 1.23 | −53% | 26 | 51% |
+| **+ vol-target, weekly** | 1.19 | **−46%** | **15** | 44% |
+
+Lower drawdown, ~half the trades, less capital at risk — at essentially unchanged
+Sharpe. Monthly rebalancing is too slow (Sharpe drops to 0.80); weekly is the
+sweet spot.
+
+**Asset note:** tested on ETH too — BTC won on every metric (ETH buy-hold −94%
+drawdown vs BTC −82%; ensemble Sharpe 0.90 vs 1.23). ETH is *not* more profitable,
+though vol-targeting helps it more because it's more volatile. BTC stays the base.
+
 ## Which asset class? (evidence-based)
 
 Ran the identical trend-filter-vs-buy-&-hold test across four asset classes on
