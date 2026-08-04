@@ -77,12 +77,12 @@ def run_funding_arb(
     held = pos.shift(1).fillna(0.0)                 # decide at t, hold through t+1
     gross = held * funding                          # short perp collects funding
 
-    switch = pos.diff().abs().fillna(pos.iloc[0])   # 1 on each entry/exit (and initial entry)
+    switch = pos.diff().abs().fillna(pos.iloc[0])   # 1 on each entry/exit (incl. initial entry)
     cost = switch * (2.0 * per_leg_bps / 10_000.0)  # two legs per switch
     net = (gross - cost).fillna(0.0)
 
     equity = (1.0 + net).cumprod() * initial
-    return FundingResult(equity, net, pos, funding, int((pos.diff().abs() > 0).sum()),
+    return FundingResult(equity, net, pos, funding, int((switch > 0).sum()),
                          initial, periods_per_year)
 
 
