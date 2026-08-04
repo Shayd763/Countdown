@@ -51,6 +51,39 @@ def fetch_data() -> pd.DataFrame:
     }, index=idx).sort_index()
 
 
+def build_snapshot(state: dict) -> str:
+    """A concise, phone-friendly status snapshot from the paper state."""
+    h = state["nav_history"]
+    if not h:
+        return "BTC Paper Bot — no data yet."
+    last = h[-1]
+    price, nav = last["price"], last["nav"]
+    ret = nav / state["initial_capital"] - 1.0
+    navs = [x["nav"] for x in h]
+    peak, mdd = navs[0], 0.0
+    for v in navs:
+        peak = max(peak, v)
+        mdd = min(mdd, v / peak - 1.0)
+    exposure = (state["btc"] * price) / nav if nav > 0 else 0.0
+    target = last["exposure"]
+    hold = price / h[0]["price"] - 1.0 if h[0]["price"] else 0.0
+    traded = bool(state["trades"]) and state["trades"][-1]["date"] == last["date"]
+    tt = state["trades"][-1] if traded else None
+    pos = "all cash" if exposure < 0.01 else f"{exposure:.0%} in BTC"
+    today = (f"TRADED {tt['side']} {tt['units']:.5f} BTC" if traded else "no trade")
+    return "\n".join([
+        f"📊 BTC Paper Bot · {last['date']}",
+        f"💰 Balance: ${nav:,.2f}  ({ret:+.2%} since start)",
+        f"📈 BTC: ${price:,.0f}",
+        f"📍 Position: {pos}",
+        f"🎯 Signal: {target:.0%} target ({'in' if target > 0 else 'out of'} market)",
+        f"🔁 Today: {today}",
+        f"📉 Paper max drawdown: {mdd:.1%}",
+        f"⚖️ vs buy & hold: strat {ret:+.1%}  |  hold {hold:+.1%}",
+        f"🗓️ Steps: {len(h)} · Trades: {len(state['trades'])}",
+    ])
+
+
 def load_state() -> dict:
     if os.path.exists(STATE_FILE):
         with open(STATE_FILE) as f:
@@ -68,7 +101,13 @@ def save_state(state: dict) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--reset", action="store_true", help="start a fresh paper portfolio")
+    ap.add_argument("--json", action="store_true", help="emit JSON instead of a phone snapshot")
+    ap.add_argument("--snapshot-only", action="store_true", help="print snapshot without advancing")
     args = ap.parse_args()
+
+    if args.snapshot_only:
+        print(build_snapshot(load_state()))
+        return 0
 
     strat, ex = StrategyConfig(), ExecutionConfig(mode="paper")
     if args.reset and os.path.exists(STATE_FILE):
@@ -84,7 +123,9 @@ def main() -> int:
     price = float(df["close"].iloc[-1])
 
     if state["last_data_date"] == data_date:
-        print(json.dumps({"event": "skip", "reason": f"already processed {data_date}"}))
+        # No new data — still report current status so the daily update always fires.
+        print(build_snapshot(state) if not args.json
+              else json.dumps({"event": "skip", "reason": f"already processed {data_date}"}))
         return 0
 
     pf = Portfolio(quote=state["cash"], base=state["btc"], price=price)
@@ -112,13 +153,16 @@ def main() -> int:
     save_state(state)
 
     ret = nav / state["initial_capital"] - 1.0
-    print(json.dumps({
-        "event": "paper_step", "data_date": data_date, "price": round(price, 2),
-        "target_exposure": round(decision.target_exposure, 3), "held_exposure": round(held, 3),
-        "traded": traded, "nav": round(nav, 2), "total_return": f"{ret:+.2%}",
-        "btc": round(state["btc"], 8), "cash": round(state["cash"], 2),
-        "reason": decision.reason,
-    }, indent=2))
+    if args.json:
+        print(json.dumps({
+            "event": "paper_step", "data_date": data_date, "price": round(price, 2),
+            "target_exposure": round(decision.target_exposure, 3), "held_exposure": round(held, 3),
+            "traded": traded, "nav": round(nav, 2), "total_return": f"{ret:+.2%}",
+            "btc": round(state["btc"], 8), "cash": round(state["cash"], 2),
+            "reason": decision.reason,
+        }, indent=2))
+    else:
+        print(build_snapshot(state))
     return 0
 
 
