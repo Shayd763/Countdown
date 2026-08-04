@@ -65,18 +65,33 @@ data source, strategy params, risk method, and backtest costs. Live/paper API
 keys are read from environment variables (`EXCHANGE_API_KEY` /
 `EXCHANGE_API_SECRET`), never from the config file.
 
+## Beating costs (the whole game)
+
+Two mechanisms exist specifically to make "profitable after fees" honest:
+
+* **Cost gate** — the strategy only enters when its *expected* move clears
+  round-trip cost by a safety multiple (`cost_bps`, `edge_safety`). No more
+  trading into a 0.5% hurdle for a 0.3% expected move.
+* **Walk-forward validation** (`scripts/run_walkforward.py`) — parameters are
+  chosen on each train window and scored only on the *next unseen* test window,
+  costs included. The stitched out-of-sample curve is the verdict. On the
+  synthetic fixture with Kraken fees, mean-reversion is **rejected** — as it
+  should be. That is the kill-fast loop working, not a bug.
+
 ## Roadmap
 
 - [x] **1. Data & infra** — ingestion, caching, reproducible offline fixture
 - [x] **2. Backtesting engine** — honest fills, fees, slippage, no lookahead
 - [x] **3. Strategy research** — mean-reversion v1 + metrics (Sharpe, DD, win rate)
 - [x] **4. Risk layer** — fixed-fractional & fractional-Kelly sizing
-- [ ] **5. Paper trading** — live data, fake money, backtest-vs-reality gap check
-- [ ] **6. Live (small)** — real money, tiny size, monitoring, kill-switch
-- [ ] **7. Ops** — logging, dashboards, health checks, secret management
+- [x] **5. Validation** — cost gate + walk-forward out-of-sample testing
+- [ ] **6. Real data** — Kraken BTC/GBP history; find an edge that survives OOS
+- [ ] **7. Paper trading** — live data, fake money, backtest-vs-reality gap check
+- [ ] **8. Live (small)** — real money, tiny size, monitoring, kill-switch
+- [ ] **9. Ops** — logging, dashboards, health checks, secret management
 
-We are at the end of phase 4: a validated research loop. Next up is walk-forward
-/ out-of-sample validation and a paper-trading harness — **before** any capital.
+We now have a validation loop that rejects marginal strategies cheaply. Next:
+run it on real Kraken data and search for an edge that actually survives it.
 
 ## Disclaimer
 
