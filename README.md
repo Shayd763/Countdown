@@ -118,9 +118,26 @@ more stable out-of-sample. Adding `fee` lifted the weakest historical block.
 **We are at diminishing returns:** marginal-contribution testing across time
 blocks showed `hash` and `mvrv` actively *hurt*, `addr` was neutral, and a
 kitchen-sink of all six factors was *worse* than three. So the default is
-deliberately just three. More factors are not more edge — the honest edge is
-"beat buy-and-hold risk-adjusted and halve the drawdown, automatically," on data
-a price-only bot can't see.
+deliberately just three. More factors are not more edge.
+
+### Full walk-forward (the honest expected number)
+
+Re-selecting the factor set and trend length on each 2-year train window and
+scoring on the next unseen 6 months (`scripts/ensemble_walkforward.py`):
+
+| | Walk-forward OOS |
+|---|---|
+| Ensemble Sharpe | **0.97** |
+| Buy & hold Sharpe | 0.69 |
+| Ensemble CAGR / MaxDD | +38% / −57% |
+| **Positive 6-mo folds** | **9 / 16** |
+
+A real edge over buy-and-hold on risk-adjusted terms and drawdown — **but
+violently volatile.** Nearly half of 6-month windows are negative and the
+aggregate is carried by a few strong folds (per-fold Sharpe ranged −1.8 to
++4.1). This is a regime-dependent edge that demands stomach for long
+underperformance, not a smooth outperformer. Size and expectations accordingly —
+anyone showing you a smooth Sharpe-3 crypto curve is hiding this.
 
 ## Which asset class? (evidence-based)
 
