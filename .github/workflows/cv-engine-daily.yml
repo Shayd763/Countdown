@@ -1,0 +1,60 @@
+name: CV Engine — Daily Run
+
+# Runs the CV application engine every morning, discovers inside-IR35 contract
+# roles, generates bespoke Harvard-format CVs, and uploads the whole output
+# folder (dashboard + PDFs + cover notes) as a downloadable artifact.
+#
+# Set repository secrets to enable live job boards / richer tailoring:
+#   ADZUNA_APP_ID, ADZUNA_APP_KEY   (https://developer.adzuna.com/)
+#   REED_API_KEY                    (https://www.reed.co.uk/developers)
+#   ANTHROPIC_API_KEY               (optional, for LLM-tailored summaries)
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # 06:00 UTC daily
+  workflow_dispatch: {}    # allow manual runs from the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cv-engine
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ensure a profile exists
+        # Uses your committed data/profile.yaml if present; otherwise falls back
+        # to the bundled example so the workflow always produces something.
+        run: |
+          if [ ! -f data/profile.yaml ]; then
+            echo "No data/profile.yaml committed — using the example profile."
+            cp data/profile.example.yaml data/profile.yaml
+          fi
+          [ -f config.yaml ] || cp config.example.yaml config.yaml
+
+      - name: Run the engine
+        env:
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+          REED_API_KEY: ${{ secrets.REED_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python main.py run
+
+      - name: Upload applications bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-applications-${{ github.run_id }}
+          path: cv-engine/output/
+          if-no-files-found: warn
+          retention-days: 14

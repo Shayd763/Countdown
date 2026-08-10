@@ -1,0 +1,112 @@
+# =============================================================================
+# CV DATABASE  —  your master profile
+# =============================================================================
+# This single file is the "database of your current CV and experience". The
+# engine reads it, then tailors a bespoke Harvard-format CV per job.
+#
+# Copy this to data/profile.yaml (the `init` command does that for you) and
+# replace every EXAMPLE value with your own. Keep bullets achievement-focused
+# and start them with strong action verbs (Led, Delivered, Reduced, Built...).
+# `tags` on each role help the matcher connect your experience to job adverts.
+# -----------------------------------------------------------------------------
+
+contact:
+  name: "Shailen Davdra"                 # <-- EXAMPLE: replace with your name
+  email: "shailendavdra@gmail.com"
+  phone: "+44 7XXX XXXXXX"
+  location: "London, UK"
+  linkedin: "linkedin.com/in/your-handle"
+  website: ""
+
+headline: "Interim Delivery & Programme Manager"
+
+summary: >
+  Delivery-focused programme manager with 10+ years leading complex digital
+  transformation across public and private sectors. Track record of shipping
+  GDS-aligned services, running high-performing agile teams and controlling
+  multi-million-pound budgets.
+
+# Skills drive both matching and the "Core Skills" section. List the terms that
+# appear in the adverts you want (tools, methods, domains).
+skills:
+  - Agile
+  - Scrum
+  - Kanban
+  - Delivery Management
+  - Programme Management
+  - Stakeholder Management
+  - Roadmapping
+  - Jira
+  - Confluence
+  - Risk Management
+  - Budget Management
+  - Prince2
+  - MSP
+  - Governance
+  - Public Sector
+  - GDS
+
+# Reverse-chronological. Most relevant bullets are auto-promoted per job.
+experience:
+  - organisation: "Cabinet Office (via consultancy)"
+    title: "Interim Delivery Manager"
+    location: "London / Hybrid"
+    start: "Jan 2023"
+    end: "Present"
+    tags: [agile, scrum, delivery management, gds, public sector, stakeholder management]
+    bullets:
+      - "Led a 12-person multidisciplinary team to deliver a GDS-assessed public service, passing Beta assessment first time."
+      - "Ran agile ceremonies (stand-ups, sprint planning, retros) and maintained a prioritised delivery roadmap."
+      - "Managed senior stakeholders and reported RAID, burn-up and delivery confidence to the SRO weekly."
+      - "Cut cycle time 30% by introducing WIP limits and streamlining the definition of done."
+
+  - organisation: "NHS Digital"
+    title: "Programme Manager"
+    location: "Leeds"
+    start: "Mar 2020"
+    end: "Dec 2022"
+    tags: [programme management, governance, budget management, prince2, risk management]
+    bullets:
+      - "Directed a £4m digital transformation programme spanning four workstreams and 40+ people."
+      - "Established governance, benefits realisation and supplier management from scratch."
+      - "Delivered to time and budget, realising £1.2m of annual operational savings."
+
+  - organisation: "Retail Software Co"
+    title: "Scrum Master"
+    location: "Manchester"
+    start: "Jun 2017"
+    end: "Feb 2020"
+    tags: [scrum, kanban, jira, confluence, agile]
+    bullets:
+      - "Coached three product teams through an agile transformation, improving predictability of delivery."
+      - "Facilitated Scrum events and removed impediments as a servant-leader."
+
+education:
+  - institution: "University of Manchester"
+    qualification: "BSc (Hons) Computer Science"
+    location: "Manchester, UK"
+    start: "2008"
+    end: "2011"
+    details:
+      - "First Class Honours."
+
+certifications:
+  - name: "PRINCE2 Practitioner"
+    issuer: "AXELOS"
+    year: "2019"
+  - name: "Certified Scrum Master (CSM)"
+    issuer: "Scrum Alliance"
+    year: "2017"
+
+# --- Discovery preferences (used if config.yaml doesn't override) ------------
+target_titles:
+  - "Delivery Manager"
+  - "Programme Manager"
+  - "Scrum Master"
+  - "Agile Delivery Lead"
+
+locations:
+  - "London"
+  - "Remote"
+
+min_day_rate: 450

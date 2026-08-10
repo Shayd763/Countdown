@@ -1,0 +1,15 @@
+# Local secrets and generated data
+config.yaml
+data/profile.yaml
+output/
+*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+build/
+dist/

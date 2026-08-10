@@ -1,0 +1,63 @@
+# =============================================================================
+# CV Application Engine — configuration
+# =============================================================================
+# Copy to config.yaml (the `init` command does this). Secrets (API keys) are
+# best supplied via environment variables rather than committed here.
+
+# --- Job sources -------------------------------------------------------------
+# "sample" works offline with bundled demo adverts (great for a first run).
+# Add "adzuna" and/or "reed" once you have API keys (see README).
+sources:
+  - sample
+  # - adzuna
+  # - reed
+
+# What to search for on the job boards.
+search_terms:
+  - "inside IR35"
+  - "contract"
+
+# UK-wide by default. Add towns/cities to narrow (e.g. "London", "Leeds").
+locations:
+  - "UK"
+
+# Only consider adverts posted within this many days (where the source supports it).
+max_days_old: 3
+
+# IR35 filter: inside | outside | any. You asked for inside-IR35 roles.
+ir35_filter: inside
+
+# Drop weak matches. 0 keeps everything; try 20–40 once your profile is rich.
+min_match_score: 0
+
+# Cap the number of applications generated per run.
+max_results: 50
+
+# --- CV rendering ------------------------------------------------------------
+# Section order for the (Harvard-styled) CV. Reorder to taste; "education"
+# first is the classic academic Harvard layout, but experience-first suits
+# most contractors.
+section_order:
+  - summary
+  - skills
+  - experience
+  - education
+  - certifications
+
+output_dir: output
+make_cover_note: true
+
+# --- Optional: richer tailoring via the Claude API ---------------------------
+# When true AND ANTHROPIC_API_KEY is set, the summary and bullet selection are
+# upgraded per job by the model. Falls back to deterministic tailoring on error.
+use_llm: false
+llm_model: "claude-sonnet-5"
+
+# --- Secrets (prefer environment variables) ----------------------------------
+# ADZUNA_APP_ID / ADZUNA_APP_KEY  — https://developer.adzuna.com/
+# REED_API_KEY                    — https://www.reed.co.uk/developers
+# ANTHROPIC_API_KEY               — https://console.anthropic.com/
+# You can also set them here, but do NOT commit real keys to git.
+# adzuna_app_id: ""
+# adzuna_app_key: ""
+# reed_api_key: ""
