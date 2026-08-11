@@ -1,0 +1,145 @@
+# =============================================================================
+# CV DATABASE — Shailen Davdra
+# =============================================================================
+# This is the master profile the engine tailors per job. Career content lives
+# here; sensitive contact details (phone, street address) are intentionally
+# NOT committed and are injected at runtime from environment variables:
+#   CV_CONTACT_PHONE    e.g. "07xxx xxxxxx"
+#   CV_CONTACT_LOCATION e.g. "12 Example Street, Anytown, County, AB1 2CD"
+# (also: CV_CONTACT_NAME / _EMAIL / _LINKEDIN / _WEBSITE). Set them locally or
+# as GitHub Secrets so generated CVs are complete without exposing PII publicly.
+# -----------------------------------------------------------------------------
+
+contact:
+  name: "Shailen Davdra"
+  email: "shailendavdra@gmail.com"
+  phone: ""                       # injected via CV_CONTACT_PHONE
+  location: "Gravesend, Kent, UK"  # full address injected via CV_CONTACT_LOCATION
+  linkedin: ""
+  website: ""
+
+headline: "APM PPQ-Certified Project Manager — Infrastructure, Rail, Aviation & Digital Transformation"
+
+summary: >
+  Accomplished, results-driven and APM PPQ-certified Project Manager with 7+
+  years of cross-sector success directing high-value capital investment, public
+  infrastructure and digital transformation portfolios across rail, aviation,
+  central government and advanced technology (AI/SaaS). Expert in sophisticated
+  commercial strategy, NEC3/4 contract management, public fund optimisation and
+  engineering advanced data-analytics environments (PowerBI, LLMs, Google Vertex
+  AI) to drive major operational efficiencies and organisational turnarounds.
+
+skills:
+  - Project Management
+  - Programme Delivery
+  - Portfolio Management
+  - NEC3
+  - NEC4
+  - ECC Option A
+  - ECC Option B
+  - Contract Management
+  - Commercial Management
+  - Compensation Events
+  - Cost Management
+  - Procurement
+  - Risk Management
+  - RAID
+  - Stakeholder Management
+  - Governance
+  - Public Sector
+  - RIBA
+  - Agile
+  - Waterfall
+  - PowerBI
+  - Data Analytics
+  - Data Engineering
+  - Digital Transformation
+  - Generative AI
+  - LLMs
+  - Google Vertex AI
+  - SaaS
+  - Machine Learning
+  - Assurance
+  - APM PPQ
+
+experience:
+  - organisation: "Transport for London Ltd"
+    title: "Project Management Contractor"
+    location: "London, UK"
+    start: "2025"
+    end: "Present"
+    tags: [nec, contract management, rail, public sector, risk management, powerbi, stakeholder management, commercial management, procurement]
+    bullets:
+      - "Took complete ownership of the strategic renovation of critical trackside weighbridge infrastructure at Ruislip Depot to ensure safe rolling stock asset assessment."
+      - "Managed the complex NEC contract and interface loops alongside principal contractor Axtec, directing workflows from design stage through physical engineering execution."
+      - "Engineered a customised, automated RAIDDO process mapped into interactive PowerBI dashboards, drastically improving visibility of project trends, audit readiness and commercial health for senior board review."
+      - "Headed end-to-end procurement and delivery for the Acton Works Depot heavy rail traverser system, safeguarding movement of London Underground assets into maintenance sheds."
+      - "Formulated robust commercial reviews of contractor Applications for Payment (AFP) against active contractual milestones; served as regional Carbon Champion auditing delivery against statutory carbon-reduction frameworks."
+      - "Navigated a dense public sector stakeholder landscape to manage project cost baselines and prevent budget slippage."
+
+  - organisation: "Bovis Consulting (formerly Lendlease) Europe Ltd"
+    title: "Project Manager"
+    location: "UK"
+    start: "2022"
+    end: "2025"
+    tags: [nec4, ecc option a, nec3, aviation, generative ai, llms, powerbi, saas, digital transformation, contract management, procurement, risk management, google vertex ai]
+    bullets:
+      - "Pioneered, developed and deployed BidCraftAI, a custom enterprise Large Language Model automating complex corporate tender configurations — producing drafts 85% complete out of the box and reducing proposal OpEx by 50%."
+      - "Set up and led a dedicated internal digital transformation team focused on SaaS, PowerBI reporting dashboards and data analytics using Google Vertex AI to streamline client workflows."
+      - "Directed full-lifecycle delivery of London Luton Airport's Gatehouse 5 security and capital expansion programme under an NEC4 ECC Option A contract with contractor Ryebridge, managing compensation events, KPIs and risk registers."
+      - "Introduced a rigorous 'make ready' engagement framework to eliminate programme slippage, and secured two national 'Airport Technology' awards for excellence in security and operational investment."
+      - "Managed critical utility diversions and spatial redevelopments landside and airside under live terminal operations at Manchester Airport (Terminal 3), supporting an NEC3 Option B contract with Tier-1 contractor Kier."
+      - "Led the client team through procurement and commercial filtering of main works contractor submissions at RIBA Stage 1 for Stansted Airport, designing a works-packaging strategy to unlock economies of scale."
+
+  - organisation: "HS2 — High Speed 2 Ltd"
+    title: "Associate Project Management Apprentice"
+    location: "London, UK"
+    start: "2020"
+    end: "2022"
+    tags: [public sector, governance, cost management, stakeholder management, risk management, rail, dft, change management]
+    bullets:
+      - "Acquired comprehensive public sector capital allocation and project governance experience on Europe's largest megaproject."
+      - "Managed residential and commercial spatial development projects through early-stage RIBA design lifecycles for the Euston Partnership."
+      - "Coordinated complex requirements between private contractors, local authorities, senior executives, Network Rail and the Department for Transport (DfT)."
+      - "Owned change control systems and cost estimates within the heavy civil engineering approaches team, verifying contractor cost adjustments to protect the public funding line."
+      - "Sat within the central Sponsorship Team performing macro-economic analyses and auditing cost allocations to ensure public fund optimisation."
+
+education:
+  - institution: "Gravesend Grammar School"
+    qualification: "A Levels — Chemistry, Physics, Mathematics, Geography"
+    location: "Gravesham, Kent"
+    start: ""
+    end: ""
+    details: []
+  - institution: "Gravesend Grammar School"
+    qualification: "GCSEs — 10 subjects, grades A*–B"
+    location: "Gravesham, Kent"
+    start: ""
+    end: ""
+    details: []
+
+certifications:
+  - name: "APM PPQ (Project Management Qualification)"
+    issuer: "Association for Project Management"
+    year: "2024"
+  - name: "L4 Associate Project Management Apprenticeship"
+    issuer: ""
+    year: "2022"
+  - name: "APM PMQ (Project Management Qualification)"
+    issuer: "Association for Project Management"
+    year: "2022"
+
+target_titles:
+  - "Project Manager"
+  - "Senior Project Manager"
+  - "Programme Manager"
+  - "Infrastructure Project Manager"
+  - "Rail Project Manager"
+  - "Commercial Manager"
+
+locations:
+  - "London"
+  - "Remote"
+  - "Kent"
+
+min_day_rate: 450

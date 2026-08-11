@@ -1,8 +1,9 @@
 # Local secrets and generated data
 config.yaml
-data/profile.yaml
 output/
 *.pdf
+# NOTE: data/profile.yaml IS committed (career content only). Personal contact
+# details are injected at runtime via CV_CONTACT_* env vars, never committed.
 
 # Python
 __pycache__/

@@ -8,6 +8,12 @@ name: CV Engine — Daily Run
 #   ADZUNA_APP_ID, ADZUNA_APP_KEY   (https://developer.adzuna.com/)
 #   REED_API_KEY                    (https://www.reed.co.uk/developers)
 #   ANTHROPIC_API_KEY               (optional, for LLM-tailored summaries)
+#
+# Personal contact details are NOT committed to this public repo. Provide them
+# as secrets so generated CVs are complete (they are injected at runtime):
+#   CV_CONTACT_PHONE                e.g. "07xxx xxxxxx"
+#   CV_CONTACT_LOCATION             e.g. "12 Example Street, Anytown, County, AB1 2CD"
+#   CV_CONTACT_LINKEDIN             (optional)
 
 on:
   schedule:
@@ -49,6 +55,9 @@ jobs:
           ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
           REED_API_KEY: ${{ secrets.REED_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CV_CONTACT_PHONE: ${{ secrets.CV_CONTACT_PHONE }}
+          CV_CONTACT_LOCATION: ${{ secrets.CV_CONTACT_LOCATION }}
+          CV_CONTACT_LINKEDIN: ${{ secrets.CV_CONTACT_LINKEDIN }}
         run: python main.py run
 
       - name: Upload applications bundle

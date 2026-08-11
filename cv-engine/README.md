@@ -33,10 +33,26 @@ open output/<today>/dashboard.html     # macOS (use xdg-open on Linux)
 The first run uses a bundled **sample** job source so you can see the whole
 flow immediately. Then make it yours:
 
-1. Edit **`data/profile.yaml`** — your name, summary, skills, experience,
-   education, certifications. This is the "database of your CV and experience".
+1. Edit **`data/profile.yaml`** — your summary, skills, experience, education,
+   certifications. This is the "database of your CV and experience".
 2. Add a real job source in **`config.yaml`** (see below).
 3. Re-run `python main.py run`.
+
+### Keeping personal contact details private
+
+`data/profile.yaml` is committed, so **sensitive contact fields are kept out of
+it** and injected at runtime from environment variables. Set these locally (or
+as GitHub Secrets for the daily workflow) and they override the YAML:
+
+```bash
+export CV_CONTACT_PHONE="07xxx xxxxxx"
+export CV_CONTACT_LOCATION="12 Example Street, Anytown, County, AB1 2CD"
+export CV_CONTACT_LINKEDIN="linkedin.com/in/your-handle"   # optional
+# CV_CONTACT_NAME / CV_CONTACT_EMAIL / CV_CONTACT_WEBSITE also supported
+```
+
+Without them, generated CVs simply omit those lines — nothing breaks, and your
+phone/address never touch the public repo.
 
 ---
 
