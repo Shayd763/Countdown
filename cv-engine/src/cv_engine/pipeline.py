@@ -23,6 +23,7 @@ from .cover import cover_note
 from .discovery import discover
 from .models import Job, Profile
 from .render import render_html, render_pdf
+from .standalone import render_standalone_dashboard
 from .tailor import tailor
 
 log = logging.getLogger("cv_engine.pipeline")
@@ -73,6 +74,17 @@ def run_pipeline(profile: Profile, config: Config, run_date: str | None = None) 
     _write_csv(root / "applications.csv", applications)
     _write_manifest(root / "jobs.json", applications, date_str)
     dashboard = _write_dashboard(root / "dashboard.html", applications, date_str, config)
+    # Self-contained, shareable page with the CVs embedded (no file paths needed).
+    live_data = any(s not in ("sample",) for s in config.sources)
+    render_standalone_dashboard(
+        applications,
+        root / "dashboard_standalone.html",
+        candidate_name=profile.contact.name,
+        target_titles=profile.target_titles,
+        ir35_filter=config.ir35_filter,
+        live_data=live_data,
+        run_date=date_str,
+    )
     _update_index(Path(config.output_dir))
     log.info("done -> %s", dashboard)
     return dashboard
