@@ -32,7 +32,9 @@ import trimesh
 # Small math helpers
 # --------------------------------------------------------------------------- #
 def _smoothstep(edge0, edge1, x):
-    t = np.clip((x - edge0) / max(edge1 - edge0, 1e-9), 0.0, 1.0)
+    d = edge1 - edge0
+    d = d if abs(d) > 1e-9 else 1e-9      # sign-preserving guard (edges may descend)
+    t = np.clip((x - edge0) / d, 0.0, 1.0)
     return t * t * (3 - 2 * t)
 
 
@@ -135,29 +137,32 @@ def top_height(x, y, p):
     # ---- heel cup: low centre, rims rise medial + lateral + posterior ------ #
     depth = p["heel_cup_depth"]
     if depth > 0:
-        cup_win = _window(t, -0.05, 0.0, p["heel_cup_end"])   # strongest at heel
-        cup_win = np.clip(cup_win, 0, 1)
-        side = np.clip((np.abs(med) - 0.22) / 0.78, 0, 1) ** 1.5   # rims
-        post = _smoothstep(0.10, 0.0, t)                          # back wall
-        rim = np.maximum(side, post * 0.9)
+        cup_win = np.clip(_window(t, -0.05, 0.0, p["heel_cup_end"]), 0, 1)
+        # rims begin outside the calcaneus footprint (|med|>0.35) and ramp
+        # gently to the edge so the wall is comfortable and printable
+        side = np.clip((np.abs(med) - 0.35) / 0.65, 0, 1) ** 1.15
+        post = _smoothstep(0.06, 0.0, t) * 0.9                    # short back wall
+        rim = np.maximum(side, post)
         z += depth * cup_win * rim
 
-    # ---- medial longitudinal arch: broad dome flowing out of the heel ------ #
+    # ---- medial longitudinal arch: broad ramp, highest near medial border -- #
     ah = p["arch_height"]
     if ah > 0:
         arch_win = _window(t, p["arch_start"], p["arch_peak"], p["arch_end"])
-        # cross-section: near 0 on the lateral side, broad plateau on medial
-        cross = 0.5 * (1 + np.tanh((med + 0.10) / 0.33))
-        cross *= 1.0 - 0.30 * np.clip((med - 0.65) / 0.35, 0, 1)  # ease rim
-        # a little lateral arch support too (much lower)
-        lateral = 0.18 * np.clip((-med - 0.2) / 0.8, 0, 1) ** 1.5
-        z += ah * arch_win * cross + ah * arch_win * lateral
+        # lateral(0) -> medial(1) ramp: matches the plantar arch, which is
+        # highest by the medial edge. Gentle smoothstep keeps slopes low.
+        ramp = np.clip((med + 0.2) / 1.2, 0, 1)
+        ramp = ramp * ramp * (3 - 2 * ramp)
+        ramp *= 1.0 - 0.15 * np.clip((med - 0.80) / 0.20, 0, 1)   # tiny rim ease
+        # mild lateral support only on the far lateral side
+        lateral = 0.12 * np.clip((-med - 0.25) / 0.75, 0, 1) ** 1.5
+        z += ah * arch_win * (ramp + lateral)
 
     # ---- metatarsal dome: just behind the ball, central-lateral ------------ #
     mh = p["metatarsal_height"]
     if mh > 0:
-        mpos = p.get("metatarsal_pos") or (ball - 0.05)
-        wy = _bump(t, mpos, 0.075)
+        mpos = p.get("metatarsal_pos") or (ball - 0.08)   # clearly behind ball
+        wy = _bump(t, mpos, 0.06)
         wx = np.exp(-((med + 0.12) / 0.60) ** 2)
         z += mh * wy * wx
 
@@ -213,14 +218,16 @@ def _prepare(p):
     # otherwise a typical anatomical position.
     apk = p.get("arch_peak_mm")
     if apk and "arch_peak" not in p:
-        p["arch_peak"] = float(np.clip(apk / length, 0.20, 0.48))
+        # honour a measured apex, but keep it in the anatomically sane band so
+        # arch fill never intrudes into the heel-strike zone
+        p["arch_peak"] = float(np.clip(apk / length, 0.28, 0.46))
     p.setdefault("arch_peak", 0.34)
-    p.setdefault("arch_start", max(0.10, p["arch_peak"] - 0.16))
+    p.setdefault("arch_start", max(0.18, p["arch_peak"] - 0.14))
     p.setdefault("arch_end", ball - 0.06)
     p.setdefault("heel_cup_depth", 12.0)
     p.setdefault("heel_cup_end", 0.30)
     p.setdefault("metatarsal_height", 5.0)
-    p.setdefault("toe_crest_height", 6.0)
+    p.setdefault("toe_crest_height", 5.0)
     p.setdefault("resolution", 2.5)
 
     p["_half"] = _width_profile(length, heel_w, mid_w, fore_w, ball)

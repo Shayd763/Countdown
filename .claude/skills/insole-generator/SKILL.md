@@ -54,10 +54,17 @@ orthotic footbed", "turn this footprint into a printable STL".
    (outline + arch height map + cross-sections) is the fastest way for them to
    confirm the arch is on the right side and the right height before printing.
 
-5. **Sanity-check the report.** The script prints a JSON report. Confirm
-   `watertight: true` before handing over the file — a non-watertight mesh may
-   not slice cleanly. Check the bounding box matches the foot (length and width
-   in mm, height ≈ `base_thickness + arch_height`).
+5. **Audit the design.** Run the validator before handing over a file:
+   ```bash
+   python scripts/audit.py --params my_params.json --out audit --figure
+   ```
+   It checks the footbed against the acceptance spec in `AUDIT.md` (mesh
+   integrity, weight-bearing zones staying low, arch contour vs an anatomical
+   target, smoothness/no pressure points, heel-cup sanity, shoe-fit,
+   printability) and exits non-zero if anything fails. Only deliver a design
+   that passes. If you changed the geometry, re-audit across several foot sizes
+   and arch types, not just one — see AUDIT.md. `audit_figure.png` is also the
+   clearest thing to show the user.
 
 6. **Deliver.** Give the user the `.stl` (universally supported by slicers) and
    `.3mf` (preserves units/metadata), the preview PNG, and a one-line summary
