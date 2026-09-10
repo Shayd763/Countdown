@@ -12,10 +12,14 @@ description: >-
 
 # Insole Generator
 
-Turn a handful of foot measurements into a watertight, 3D-printable insole with
-a contoured top surface (a supportive medial arch, and optional heel cup /
-metatarsal pad) and a flat bottom that sits in the shoe. Output is STL and/or
-3MF plus an optional PNG preview.
+Turn a handful of foot measurements into a watertight, 3D-printable orthotic
+footbed with the features a real supportive insole has — a **cupped heel**, a
+**broad medial longitudinal arch**, a **metatarsal dome**, and a **toe crest** —
+on a flat bottom that sits in the shoe. Output is STL and/or 3MF plus an
+optional PNG preview.
+
+These support features are **on by default** (that is what makes the insole
+usable); each can be tuned or turned off by setting its height/depth to 0.
 
 ## When to use this
 
@@ -89,32 +93,55 @@ Required:
 - `forefoot_width` (mm) — width across the ball of the foot (the widest point).
 - `side` — `left` or `right` (decides which side the arch goes on).
 
+Strongly recommended (these place the support features correctly):
+- `heel_to_ball` (mm) — heel to the ball of the foot. Sets where the widest
+  point, arch end, metatarsal pad and toe crest sit. If omitted, a typical
+  ratio (0.72 × length) is assumed.
+- `arch_height` (mm) — peak height of the medial arch above the base
+  (default 16). Higher = more aggressive support. See the reference file.
+- `arch_peak_mm` (mm) — measured "arch peak from heel", if the capture app
+  provides it; positions the arch apex. Otherwise a typical apex (~0.34 of
+  length) is used.
+
 Common:
-- `arch_height` (mm) — peak height of the medial arch support (default 16).
-  Higher = more aggressive support. See the reference file for guidance.
 - `midfoot_width` (mm) — waist width; if omitted, estimated from forefoot width.
 - `base_thickness` (mm) — flat floor thickness under the whole insole
   (default 3.5).
+- `heel_cup_depth` (mm) — how high the heel rims rise above the base to cradle
+  the heel (default 12; set 0 for a flat heel).
+- `metatarsal_height` (mm) — metatarsal dome behind the ball (default 5).
+- `toe_crest_height` (mm) — transverse ridge just ahead of the ball that the
+  toes curl over (default 6).
 
-Advanced / optional (default off or auto):
+Advanced / optional:
 - `arch_start`, `arch_peak`, `arch_end` — where along the foot (0=heel, 1=toe)
-  the arch support ramps up, peaks and ramps down. Defaults 0.16 / 0.40 / 0.63.
-- `heel_cup_depth` (mm) — raised rim around the heel to cradle it (default 0).
-- `metatarsal_height` (mm) + `metatarsal_pos` — a pad behind the ball of the
-  foot (default 0 / 0.66).
+  the arch ramps up, peaks and ramps down. Auto-derived from `heel_to_ball`
+  and `arch_peak_mm`; override only for fine control.
+- `metatarsal_pos`, `toe_crest_pos` — longitudinal positions (0..1) of the pad
+  and crest; auto-derived from the ball position.
 - `resolution` (mm) — interior mesh spacing; smaller = smoother + heavier file
-  (default 3.0). 2.0 gives a finer surface; 4.0 a lighter file.
+  (default 2.5). 2.0 gives a finer surface; 4.0 a lighter file.
 
 ## Notes on the geometry
 
 - The **bottom is flat** (z=0) so the insole rests stably in the shoe; the
   **top is the contoured surface** the foot sits on. Total height at any point
   is the thickness there.
-- The **arch is on the medial (inner) side**, automatically mirrored for left
-  vs right feet. The apex sits just inside the medial border around the
-  midfoot, which is where the longitudinal arch needs support.
-- The outline is derived from the width measurements with a naturally
-  straighter medial edge and rounded heel/toe — a foot shape, not an ellipse.
+- **Heel cup**: the heel centre sits at the base thickness and the medial,
+  lateral and posterior rims rise around it (`heel_cup_depth`), cradling the
+  heel and controlling it at strike.
+- **Medial longitudinal arch**: a *broad* dome (not a narrow spike) that is low
+  on the lateral side and fills the whole medial arch, flowing forward out of
+  the heel cup and easing down before the ball. On the medial (inner) side,
+  automatically mirrored for left vs right feet.
+- **Metatarsal dome**: a rise just *behind* the ball to spread load off the
+  metatarsal heads.
+- **Toe crest**: a transverse ridge just *ahead* of the ball that the toes
+  rest over.
+- The forefoot and toes stay near the base thickness so the shoe still fits.
+- The outline is derived from the width measurements (widest point placed at
+  the measured `heel_to_ball`) with a naturally straighter medial edge and
+  rounded heel/toe — a foot shape, not an ellipse.
 - Meshes are made watertight (top surface + flat bottom + side walls) and
   normals are fixed, so they drop straight into a slicer.
 

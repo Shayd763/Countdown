@@ -78,6 +78,23 @@ Guidance to give the user:
   `arch_height` or widen the arch by moving `arch_start`/`arch_end` further
   apart.
 
+## Tuning the support features
+
+All four features are on by default. Sensible starting heights (mm above the
+base), and when to change them:
+
+| Feature             | Param                | Default | Tune when…                                   |
+|---------------------|----------------------|---------|----------------------------------------------|
+| Heel cup rim        | `heel_cup_depth`     | 12      | 8–10 for a shallow cup / low-volume shoe; 14–18 to control the heel more. 0 = flat heel. |
+| Medial arch         | `arch_height`        | 16      | Set from the user's arch (see above). 22+ for high arches. |
+| Metatarsal dome     | `metatarsal_height`  | 5       | 3–4 subtle; 6–8 for forefoot/metatarsal pain. 0 = none. |
+| Toe crest           | `toe_crest_height`   | 6       | 4–5 subtle; 7–9 for claw/hammer toes. 0 = none. |
+
+Placement of the arch end, met dome and toe crest is derived from
+`heel_to_ball`, so supplying that measurement matters more than tuning the
+positions by hand. If the user reports a pressure point, lower the offending
+feature a couple of mm rather than moving it.
+
 ## Print settings
 
 The generated bottom is flat, which is the ideal print orientation.

@@ -1,18 +1,18 @@
 {
   "side": "right",
-  "foot_length": 260,
-  "heel_width": 62,
-  "forefoot_width": 98,
-  "midfoot_width": 60,
+  "foot_length": 258.6,
+  "forefoot_width": 92.7,
+  "heel_width": 57.5,
+  "midfoot_width": 57,
+  "heel_to_ball": 202.5,
 
-  "arch_height": 18,
-  "arch_start": 0.16,
-  "arch_peak": 0.40,
-  "arch_end": 0.63,
+  "arch_height": 22,
+  "arch_peak_mm": 63.8,
 
   "base_thickness": 3.5,
-  "resolution": 3.0,
+  "heel_cup_depth": 12,
+  "metatarsal_height": 5,
+  "toe_crest_height": 6,
 
-  "heel_cup_depth": 0,
-  "metatarsal_height": 0
+  "resolution": 2.5
 }
