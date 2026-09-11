@@ -4,11 +4,16 @@
 Turns a handful of foot measurements into a watertight, 3D-printable insole
 with the features a real supportive footbed has:
 
+  * a handed, foot-shaped outline (straight-ish medial border with the big toe
+    forward, curved shorter lateral side) with a rounded toe and softened edges,
   * a cupped heel (low centre, raised medial + lateral rims),
   * a broad medial longitudinal arch fill that flows out of the heel cup,
-  * a metatarsal dome behind the ball to offload the metatarsal heads,
-  * a transverse toe crest just ahead of the ball,
+  * a single metatarsal/forefoot dome to offload the metatarsal heads
+    (an optional toe crest is available but off by default),
   * a flat bottom that sits stably in the shoe.
+
+The arch sits on the medial (inside) edge and mirrors correctly for left vs
+right feet.
 
 Exports STL and 3MF plus an optional PNG preview.
 
@@ -57,45 +62,46 @@ def _bump(t, center, half_width):
 # --------------------------------------------------------------------------- #
 # Foot outline
 # --------------------------------------------------------------------------- #
-def _width_profile(length, heel_w, mid_w, fore_w, ball_frac):
-    """Half-width(t) interpolator, t in [0,1] heel->toe.
+def _edge_profiles(heel_w, mid_w, fore_w):
+    """Medial and lateral edge-distance interpolators (mm from the centreline).
 
-    The widest point (ball) is placed at ``ball_frac`` so the outline matches
-    the measured heel-to-ball length.
+    A real foot is handed: the medial (big-toe) border is fuller and its ball
+    (1st metatarsal head) and toe sit further forward, while the lateral border
+    curves, with its ball (5th MTP) more posterior and a shorter little toe.
+    Encoding that asymmetry is what makes the arch unambiguously "on the inside"
+    and the whole outline read as a left or right foot.
     """
-    waist = min(0.40, ball_frac - 0.18)
-    t = [0.00, 0.06, 0.16, waist,
-         ball_frac - 0.08, ball_frac, min(ball_frac + 0.14, 0.93), 1.00]
-    w = [0.34 * heel_w, 0.78 * heel_w, 1.00 * heel_w, 1.00 * mid_w,
-         0.97 * fore_w, 1.00 * fore_w, 0.80 * fore_w, 0.42 * fore_w]
-    t = np.asarray(t)
-    # guard strict monotonicity
-    for i in range(1, len(t)):
-        if t[i] <= t[i - 1]:
-            t[i] = t[i - 1] + 1e-3
-    return PchipInterpolator(t, 0.5 * np.asarray(w))
+    hf, hh = fore_w / 2.0, heel_w / 2.0
+    hm = mid_w / 2.0
+    # medial edge (fuller, big toe forward to ~0.95)
+    tm = [0.00, 0.06, 0.16, 0.34, 0.55, 0.70, 0.82, 0.90, 0.96, 1.00]
+    me = [0.34 * hh, 0.90 * hh, 1.02 * hh, 1.06 * hm, 0.95 * hf, 1.08 * hf,
+          1.02 * hf, 0.86 * hf, 0.56 * hf, 0.14 * hf]
+    # lateral edge (5th MTP more posterior, little toe shorter)
+    tl = [0.00, 0.06, 0.16, 0.30, 0.50, 0.62, 0.72, 0.80, 0.90, 1.00]
+    le = [0.34 * hh, 0.90 * hh, 1.02 * hh, 0.92 * hm, 0.95 * hf, 0.92 * hf,
+          0.84 * hf, 0.64 * hf, 0.32 * hf, 0.10 * hf]
+    return (PchipInterpolator(np.asarray(tm), np.asarray(me)),
+            PchipInterpolator(np.asarray(tl), np.asarray(le)))
 
 
-def build_outline(p, n=400):
+def build_outline(p, n=500):
     length = p["foot_length"]
-    half = p["_half"]
-    medial_sign = p["medial_sign"]
+    ms = p["medial_sign"]
+    me, le = p["_me"], p["_le"]
     t = np.linspace(0.0, 1.0, n)
     y = t * length
-    hw = half(t)
-
-    window = np.sin(np.pi * np.clip((t - 0.10) / 0.75, 0, 1)) ** 2
-    shift = medial_sign * p["_straighten"] * hw.max() * window
-
-    x_med = shift + medial_sign * hw
-    x_lat = shift - medial_sign * hw
+    # medial edge on the ms side, lateral edge opposite; centreline at x=0
+    x_med = ms * me(t)
+    x_lat = -ms * le(t)
     pts = np.vstack([np.column_stack([x_med, y]),
                      np.column_stack([x_lat[::-1], y[::-1]])])
 
     poly = Polygon(pts)
     if not poly.is_valid:
         poly = poly.buffer(0)
-    poly = poly.buffer(1.5).buffer(-1.5)  # clean/round the perimeter
+    # round the toe, heel and edges (round joins) for a smooth, comfortable rim
+    poly = poly.buffer(2.5, join_style="round").buffer(-2.5, join_style="round")
     ext = np.asarray(poly.exterior.coords)[:-1]
     if _signed_area(ext) < 0:
         ext = ext[::-1]
@@ -158,21 +164,32 @@ def top_height(x, y, p):
         lateral = 0.12 * np.clip((-med - 0.25) / 0.75, 0, 1) ** 1.5
         z += ah * arch_win * (ramp + lateral)
 
-    # ---- metatarsal dome: just behind the ball, central-lateral ------------ #
+    # ---- metatarsal dome: the single forefoot support, behind the ball ----- #
     mh = p["metatarsal_height"]
     if mh > 0:
-        mpos = p.get("metatarsal_pos") or (ball - 0.08)   # clearly behind ball
-        wy = _bump(t, mpos, 0.06)
-        wx = np.exp(-((med + 0.12) / 0.60) ** 2)
+        mpos = p.get("metatarsal_pos") or (ball - 0.07)   # clearly behind ball
+        wy = _bump(t, mpos, 0.085)                         # one broad wave
+        wx = np.exp(-((med + 0.10) / 0.62) ** 2)
         z += mh * wy * wx
 
-    # ---- toe crest: transverse ridge just ahead of the ball ---------------- #
+    # ---- toe crest: OPTIONAL transverse ridge ahead of the ball (off by
+    #      default so the forefoot reads as a single support) ---------------- #
     ch = p["toe_crest_height"]
     if ch > 0:
-        cpos = p.get("toe_crest_pos") or (ball + 0.05)
+        cpos = p.get("toe_crest_pos") or (ball + 0.06)
         wy = _bump(t, cpos, 0.045)
-        wx = np.exp(-((med) / 0.80) ** 2)          # spans most of the width
+        wx = np.exp(-((med) / 0.80) ** 2)
         z += ch * wy * wx
+
+    # ---- soft top-edge roll: ease the surface down at the rim so the toe and
+    #      edges are rounded and smooth, not sharp 90 deg cliffs ------------- #
+    er = p.get("edge_roll", 0.0)
+    if er > 0:
+        ew = p.get("edge_roll_width", 4.5)
+        side_d = (1.0 - np.clip(np.abs(med), 0, 1)) * hw   # mm to nearest side
+        end_d = np.minimum(t, 1.0 - t) * length            # mm to heel/toe end
+        edge_dist = np.minimum(side_d, end_d)
+        z = z - er * (1.0 - _smoothstep(0.0, ew, edge_dist))
 
     return z
 
@@ -226,19 +243,19 @@ def _prepare(p):
     p.setdefault("arch_end", ball - 0.06)
     p.setdefault("heel_cup_depth", 12.0)
     p.setdefault("heel_cup_end", 0.30)
-    p.setdefault("metatarsal_height", 5.0)
-    p.setdefault("toe_crest_height", 5.0)
+    # a single forefoot support (metatarsal dome). The toe crest is a distinct
+    # optional feature, OFF by default so the forefoot reads as one support.
+    p.setdefault("metatarsal_height", 6.0)
+    p.setdefault("toe_crest_height", 0.0)
+    p.setdefault("edge_roll", 0.9)          # mm the top lip eases down at the rim
+    p.setdefault("edge_roll_width", 4.5)    # mm band over which it rolls
     p.setdefault("resolution", 2.5)
 
-    p["_half"] = _width_profile(length, heel_w, mid_w, fore_w, ball)
-    p["_straighten"] = 0.12
-    ms = 0.12 * p["_half"](np.linspace(0, 1, 400)).max()
-
-    def shift(t):
-        window = np.sin(np.pi * np.clip((t - 0.10) / 0.75, 0, 1)) ** 2
-        return p["medial_sign"] * ms * window
-
-    p["_shift"] = shift
+    me, le = _edge_profiles(heel_w, mid_w, fore_w)
+    p["_me"], p["_le"] = me, le
+    ms_sign = p["medial_sign"]
+    p["_half"] = lambda t: 0.5 * (me(t) + le(t))
+    p["_shift"] = lambda t: ms_sign * 0.5 * (me(t) - le(t))
     return p
 
 

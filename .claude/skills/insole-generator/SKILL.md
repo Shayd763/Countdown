@@ -116,9 +116,13 @@ Common:
   (default 3.5).
 - `heel_cup_depth` (mm) — how high the heel rims rise above the base to cradle
   the heel (default 12; set 0 for a flat heel).
-- `metatarsal_height` (mm) — metatarsal dome behind the ball (default 5).
-- `toe_crest_height` (mm) — transverse ridge just ahead of the ball that the
-  toes curl over (default 6).
+- `metatarsal_height` (mm) — the single forefoot support dome behind the ball
+  (default 6).
+- `toe_crest_height` (mm) — an OPTIONAL extra transverse ridge just ahead of the
+  ball (default 0 / off, so the forefoot reads as one support). Enable only if
+  the wearer wants a distinct toe crest.
+- `edge_roll` (mm) / `edge_roll_width` (mm) — how much the top rim eases down at
+  the perimeter so the toe and edges are rounded and smooth (defaults 0.9 / 4.5).
 
 Advanced / optional:
 - `arch_start`, `arch_peak`, `arch_end` — where along the foot (0=heel, 1=toe)

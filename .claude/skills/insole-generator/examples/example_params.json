@@ -9,7 +9,7 @@
   "arch_peak_mm": 63.8,
   "base_thickness": 3.5,
   "heel_cup_depth": 12,
-  "metatarsal_height": 5,
-  "toe_crest_height": 5,
+  "metatarsal_height": 6,
+  "toe_crest_height": 0,
   "resolution": 2.5
 }

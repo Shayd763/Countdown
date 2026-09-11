@@ -34,7 +34,7 @@ TH = dict(
     slope_max_deg=45.0,          # weight-bearing + arch surface
     heel_rim_slope_max_deg=68.0, # steeper allowed on the cup rim
     curvature_max=6.0,           # mm/mm^2-ish, peak |laplacian| (pressure spike)
-    heel_rim_min=8.0,            # mm, rim height above cup centre
+    heel_rim_min=7.0,            # mm, rim height above cup centre (after rim rounding)
     heel_rim_max=20.0,
     width_margin_max=6.0,        # mm, footbed width - forefoot_width
     min_thickness=2.5,           # mm anywhere on the top surface
@@ -95,6 +95,15 @@ def _sample(p):
     MED = (gx - p["_shift"](T.ravel()).reshape(T.shape)) * p["medial_sign"] / hw
     return dict(poly=poly, ext=ext, gx=gx, gy=gy, Z=Z, T=T, MED=MED,
                 inside=inside, step=step, bounds=(minx, miny, maxx, maxy))
+
+
+def _count_peaks(z, prominence):
+    """Count strict local maxima above ``prominence``."""
+    peaks = 0
+    for i in range(1, len(z) - 1):
+        if z[i] > z[i - 1] and z[i] >= z[i + 1] and z[i] > prominence:
+            peaks += 1
+    return peaks
 
 
 def _zone_stat(s, tmask, medmask, base):
@@ -217,6 +226,33 @@ def audit(params):
         f">= {TH['min_thickness']}")
     add("heightfield_no_overhang", True, "n/a", True,
         "flat bottom + single-valued top => no support needed by construction")
+
+    # -- H. handedness, single support, rounded toe ------------------------ #
+    band = inside & (T > 0.20) & (T < ball - 0.05)
+    hi = band & (MED > 0.4)
+    lo = band & (MED < -0.4)
+    med_hi = float(np.nanmean(Z[hi])) if hi.any() else base
+    med_lo = float(np.nanmean(Z[lo])) if lo.any() else base
+    # the medial-vs-lateral gap scales with arch height; require a clear,
+    # arch-proportional bias to the medial (inside) edge
+    med_thr = max(1.5, 0.20 * p["arch_height"])
+    add("arch_on_medial_side", (med_hi - med_lo) >= med_thr,
+        round(med_hi - med_lo, 2), f">= {med_thr:.1f} mm (medial higher than lateral)",
+        "arch must be on the inside (medial) edge, not the outside")
+
+    # count forefoot support waves along a lateral-ish line (arch ~absent there)
+    ts = np.linspace(0.55, 0.99, 220)
+    hwl = p["_half"](ts)
+    xs = p["_shift"](ts) + (-0.10) * hwl * p["medial_sign"]
+    zl = I.top_height(xs, ts * p["foot_length"], p) - base
+    n_waves = _count_peaks(zl, prominence=1.5)
+    add("single_forefoot_support", n_waves <= 1, n_waves, "<= 1 wave",
+        "metatarsal + toe crest reading as two ridges")
+
+    toe_edge = inside & (T > 0.93)
+    tmin = float(np.nanmin(Z[toe_edge])) if toe_edge.any() else base
+    add("toe_edge_rounded", tmin <= base - 0.4, round(tmin, 2),
+        f"<= {base - 0.4:.1f}", "toe rim should roll down, not be a vertical cliff")
 
     hard_fail = [r for r in results if not r["ok"]]
     summary = dict(

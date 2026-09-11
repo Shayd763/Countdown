@@ -84,6 +84,15 @@ own homework.
 | `min_thickness` | ≥ 2.5 mm everywhere on the top surface |
 | `heightfield_no_overhang` | flat bottom + single-valued top ⇒ no supports needed (by construction) |
 
+### H. Handedness, single support, rounded toe
+These guard the defects a numeric-only audit first missed (found by looking at
+the printed shape).
+| Check | Requirement | Rationale |
+|---|---|---|
+| `arch_on_medial_side` | medial side higher than lateral by ≥ 0.20 × `arch_height` (min 1.5 mm) | the arch must be on the inside edge; the gap scales with arch height |
+| `single_forefoot_support` | ≤ 1 support wave along the forefoot | metatarsal dome + toe crest must not read as two ridges |
+| `toe_edge_rounded` | toe-tip rim eases ≥ 0.4 mm below base | the toe rolls down smoothly instead of a vertical cliff |
+
 ## Reading the audit figure
 
 `audit_figure.png` has four panels:
