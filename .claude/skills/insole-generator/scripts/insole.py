@@ -28,7 +28,8 @@ from __future__ import annotations
 import numpy as np
 from scipy.interpolate import PchipInterpolator
 from scipy.spatial import Delaunay
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, LineString
+from shapely.affinity import scale as _scale
 from shapely import contains_xy
 import trimesh
 
@@ -62,46 +63,83 @@ def _bump(t, center, half_width):
 # --------------------------------------------------------------------------- #
 # Foot outline
 # --------------------------------------------------------------------------- #
-def _edge_profiles(heel_w, mid_w, fore_w):
-    """Medial and lateral edge-distance interpolators (mm from the centreline).
+def _mono(vals):
+    v = list(vals)
+    for i in range(1, len(v)):
+        if v[i] <= v[i - 1]:
+            v[i] = v[i - 1] + 1e-3
+    return np.asarray(v)
 
-    A real foot is handed: the medial (big-toe) border is fuller and its ball
-    (1st metatarsal head) and toe sit further forward, while the lateral border
-    curves, with its ball (5th MTP) more posterior and a shorter little toe.
-    Encoding that asymmetry is what makes the arch unambiguously "on the inside"
-    and the whole outline read as a left or right foot.
+
+def _foot_polygon(length, heel_w, mid_w, fore_w, ball_frac, medial_sign, n=400):
+    """Smooth, foot-shaped silhouette.
+
+    A clean, symmetric body (rounded heel, waist, ball, taper) - which reads
+    unmistakably as a foot - made handed by an angled toe: the medial (big-toe)
+    border stays full and long while the lateral (little-toe) border tapers
+    earlier. Built with the medial border on -x, then mirrored for a left foot.
+    The arch (added later) sits on this same medial side, so the big toe and the
+    arch are always together - the reliable "this is the inside" cue.
     """
-    hf, hh = fore_w / 2.0, heel_w / 2.0
-    hm = mid_w / 2.0
-    # medial edge (fuller, big toe forward to ~0.95)
-    tm = [0.00, 0.06, 0.16, 0.34, 0.55, 0.70, 0.82, 0.90, 0.96, 1.00]
-    me = [0.34 * hh, 0.90 * hh, 1.02 * hh, 1.06 * hm, 0.95 * hf, 1.08 * hf,
-          1.02 * hf, 0.86 * hf, 0.56 * hf, 0.14 * hf]
-    # lateral edge (5th MTP more posterior, little toe shorter)
-    tl = [0.00, 0.06, 0.16, 0.30, 0.50, 0.62, 0.72, 0.80, 0.90, 1.00]
-    le = [0.34 * hh, 0.90 * hh, 1.02 * hh, 0.92 * hm, 0.95 * hf, 0.92 * hf,
-          0.84 * hf, 0.64 * hf, 0.32 * hf, 0.10 * hf]
-    return (PchipInterpolator(np.asarray(tm), np.asarray(me)),
-            PchipInterpolator(np.asarray(tl), np.asarray(le)))
+    # symmetric body half-width (heel -> waist -> ball -> toe)
+    waist = min(0.42, ball_frac - 0.18)
+    tb = _mono([0.0, 0.06, 0.16, waist, ball_frac - 0.06, ball_frac, 0.80, 1.0])
+    wb = [0.34 * heel_w, 0.80 * heel_w, 1.00 * heel_w, 1.00 * mid_w,
+          0.98 * fore_w, 1.00 * fore_w, 0.90 * fore_w, 0.55 * fore_w]
+    half = PchipInterpolator(tb, 0.5 * np.asarray(wb))
 
-
-def build_outline(p, n=500):
-    length = p["foot_length"]
-    ms = p["medial_sign"]
-    me, le = p["_me"], p["_le"]
     t = np.linspace(0.0, 1.0, n)
+    hb = half(t)
+    # toe multipliers: medial stays fuller/longer, lateral tapers earlier
+    med_mult = PchipInterpolator(_mono([0.0, 0.70, 0.86, 0.94, 1.0]),
+                                 [1.0, 1.0, 1.06, 0.92, 0.55])(t)
+    lat_mult = PchipInterpolator(_mono([0.0, 0.70, 0.82, 0.90, 1.0]),
+                                 [1.0, 1.0, 0.86, 0.55, 0.42])(t)
+    # straighten the medial border and let the lateral side carry the bulge,
+    # as in a real foot: shift the centreline toward lateral in proportion to
+    # how much the body widens past the heel
+    hb0 = float(half(0.15))
+    s = 0.42 * (hb - hb0)
+    x_med = -(hb * med_mult) + s   # medial border on -x (now straighter)
+    x_lat = +(hb * lat_mult) + s   # lateral border carries the curve
     y = t * length
-    # medial edge on the ms side, lateral edge opposite; centreline at x=0
-    x_med = ms * me(t)
-    x_lat = -ms * le(t)
     pts = np.vstack([np.column_stack([x_med, y]),
                      np.column_stack([x_lat[::-1], y[::-1]])])
 
     poly = Polygon(pts)
     if not poly.is_valid:
         poly = poly.buffer(0)
-    # round the toe, heel and edges (round joins) for a smooth, comfortable rim
-    poly = poly.buffer(2.5, join_style="round").buffer(-2.5, join_style="round")
+    poly = poly.buffer(3.0, join_style="round").buffer(-3.0, join_style="round")
+    if medial_sign > 0:            # left foot: mirror so medial is on +x
+        poly = _scale(poly, xfact=-1.0, origin=(0, 0))
+    if poly.geom_type == "MultiPolygon":
+        poly = max(poly.geoms, key=lambda g: g.area)
+    return poly
+
+
+def _measure_profile(poly, length, n=180):
+    """Sample half-width hw(t) and centreline shift(t) off a polygon."""
+    minx, miny, maxx, maxy = poly.bounds
+    ys = np.linspace(miny + 0.4, maxy - 0.4, n)
+    hw, sh = [], []
+    for yy in ys:
+        inter = poly.intersection(LineString([(minx - 5, yy), (maxx + 5, yy)]))
+        if inter.is_empty:
+            hw.append(0.2)
+            sh.append(sh[-1] if sh else 0.0)
+        else:
+            x0, _, x1, _ = inter.bounds
+            hw.append(max((x1 - x0) / 2.0, 0.2))
+            sh.append((x0 + x1) / 2.0)
+    t = np.clip(ys / length, 0, 1)
+    # dedupe/monotone t for the interpolator
+    t, idx = np.unique(t, return_index=True)
+    return (PchipInterpolator(t, np.asarray(hw)[idx]),
+            PchipInterpolator(t, np.asarray(sh)[idx]))
+
+
+def build_outline(p, n=500):
+    poly = p["_poly"]
     ext = np.asarray(poly.exterior.coords)[:-1]
     if _signed_area(ext) < 0:
         ext = ext[::-1]
@@ -251,11 +289,10 @@ def _prepare(p):
     p.setdefault("edge_roll_width", 4.5)    # mm band over which it rolls
     p.setdefault("resolution", 2.5)
 
-    me, le = _edge_profiles(heel_w, mid_w, fore_w)
-    p["_me"], p["_le"] = me, le
-    ms_sign = p["medial_sign"]
-    p["_half"] = lambda t: 0.5 * (me(t) + le(t))
-    p["_shift"] = lambda t: ms_sign * 0.5 * (me(t) - le(t))
+    poly = _foot_polygon(length, heel_w, mid_w, fore_w, ball, p["medial_sign"])
+    p["_poly"] = poly
+    half, shift = _measure_profile(poly, length)
+    p["_half"], p["_shift"] = half, shift
     return p
 
 
