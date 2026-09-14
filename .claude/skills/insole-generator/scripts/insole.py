@@ -181,11 +181,14 @@ def top_height(x, y, p):
     # ---- heel cup: low centre, rims rise medial + lateral + posterior ------ #
     depth = p["heel_cup_depth"]
     if depth > 0:
-        cup_win = np.clip(_window(t, -0.05, 0.0, p["heel_cup_end"]), 0, 1)
-        # rims begin outside the calcaneus footprint (|med|>0.35) and ramp
-        # gently to the edge so the wall is comfortable and printable
-        side = np.clip((np.abs(med) - 0.35) / 0.65, 0, 1) ** 1.15
-        post = _smoothstep(0.06, 0.0, t) * 0.9                    # short back wall
+        # smooth (C1-continuous) fore-aft envelope: full at the heel, easing to
+        # zero by heel_cup_end with no kink
+        cup_win = _smoothstep(p["heel_cup_end"], 0.0, t)
+        # rims begin inside the calcaneus footprint and rise with a smoothstep
+        # (no corner where the ramp starts) so the bowl is a gentle sweep, not a
+        # sharp wall -- comfortable and printable
+        side = _smoothstep(0.28, 0.78, np.abs(med))
+        post = _smoothstep(0.10, 0.0, t) * 0.9                    # short back wall
         rim = np.maximum(side, post)
         z += depth * cup_win * rim
 
