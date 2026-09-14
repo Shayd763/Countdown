@@ -208,9 +208,9 @@ def top_height(x, y, p):
     # ---- metatarsal dome: the single forefoot support, behind the ball ----- #
     mh = p["metatarsal_height"]
     if mh > 0:
-        mpos = p.get("metatarsal_pos") or (ball - 0.07)   # clearly behind ball
-        wy = _bump(t, mpos, 0.085)                         # one broad wave
-        wx = np.exp(-((med + 0.10) / 0.62) ** 2)
+        mpos = p.get("metatarsal_pos") or (ball - 0.05)   # just behind the ball
+        wy = _bump(t, mpos, 0.14)                          # broad, gentle pad
+        wx = np.exp(-((med + 0.10) / 0.72) ** 2)           # spread across forefoot
         z += mh * wy * wx
 
     # ---- toe crest: OPTIONAL transverse ridge ahead of the ball (off by
