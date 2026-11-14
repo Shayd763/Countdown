@@ -28,6 +28,11 @@ class Storage:
             path.parent.mkdir(parents=True, exist_ok=True)
         self.db = sqlite_utils.Database(str(path) if str(path) != ":memory:" else None,
                                         memory=str(path) == ":memory:")
+        if str(path) != ":memory:":
+            # The UI reads while a scan writes (and the scheduled run is another process).
+            self.db.conn.execute("PRAGMA busy_timeout = 15000")
+            if self.db.journal_mode != "wal":
+                self.db.enable_wal()
         self._init_schema()
 
     def _init_schema(self) -> None:
@@ -59,6 +64,25 @@ class Storage:
             db["audit_log"].create(
                 {"id": int, "ts": str, "event": str, "listing_id": str, "detail": str}, pk="id"
             )
+        if "deal_status" not in db.table_names():
+            db["deal_status"].create(
+                {"listing_id": str, "status": str, "notes": str, "updated_at": str}, pk="listing_id"
+            )
+        if "market" not in db.table_names():
+            # Every for-sale / to-rent listing the portal collector sees → local comps.
+            db["market"].create({
+                "key": str, "portal": str, "channel": str, "outcode": str, "property_type": str,
+                "bedrooms": int, "price": float, "address": str, "url": str,
+                "first_seen": str, "last_seen": str,
+            }, pk="key")
+            db["market"].create_index(["outcode", "channel", "property_type", "bedrooms"])
+        if "kv" not in db.table_names():
+            db["kv"].create({"key": str, "value": str, "updated_at": str}, pk="key")
+        if "runs" not in db.table_names():
+            db["runs"].create({
+                "id": int, "started_at": str, "finished_at": str, "trigger": str,
+                "sources": str, "status": str, "summary": str,
+            }, pk="id")
 
     # -- listings ---------------------------------------------------------
 
@@ -140,22 +164,28 @@ class Storage:
         self.db["deals"].update(listing_id, {"alerted_at": _now()})
         self.audit("alerted", listing_id, "")
 
-    def query_deals(
+    def query_deals(self, **filters: Any) -> list[Deal]:
+        return [row["deal"] for row in self.query_deal_rows(**filters)]
+
+    def query_deal_rows(
         self, *, outcodes: list[str] | None = None, categories: list[str] | None = None,
         property_types: list[str] | None = None, passed_only: bool = False,
         include_ineligible: bool = False, min_roce: float | None = None,
         max_price: float | None = None, min_yield: float | None = None,
+        statuses: list[str] | None = None, hide_rejected: bool = False,
+        new_since: str | None = None, search: str | None = None,
         sort: str = "roce_pct", limit: int = 500,
-    ) -> list[Deal]:
+    ) -> list[dict[str, Any]]:
+        """Deals plus pipeline status, notes and first-seen date."""
         where, params = ["1=1"], []
         if outcodes:
-            where.append(f"outcode in ({','.join('?' * len(outcodes))})")
+            where.append(f"d.outcode in ({','.join('?' * len(outcodes))})")
             params += [o.upper() for o in outcodes]
         if categories:
-            where.append(f"category in ({','.join('?' * len(categories))})")
+            where.append(f"d.category in ({','.join('?' * len(categories))})")
             params += categories
         if property_types:
-            where.append(f"property_type in ({','.join('?' * len(property_types))})")
+            where.append(f"d.property_type in ({','.join('?' * len(property_types))})")
             params += property_types
         if passed_only:
             where.append("passed = 1")
@@ -170,17 +200,68 @@ class Storage:
         if min_yield is not None:
             where.append("gross_yield >= ?")
             params.append(min_yield)
+        if statuses:
+            where.append(f"coalesce(s.status, 'new') in ({','.join('?' * len(statuses))})")
+            params += statuses
+        if hide_rejected:
+            where.append("coalesce(s.status, 'new') != 'rejected'")
+        if new_since:
+            where.append("l.first_seen >= ?")
+            params.append(new_since)
+        if search:
+            where.append("(l.address like ? or l.postcode like ?)")
+            params += [f"%{search}%", f"%{search}%"]
         sort_cols = {
             "roce_pct": "roce_pct desc", "gross_yield": "gross_yield desc",
             "net_monthly_cashflow": "net_monthly_cashflow desc",
             "asking_price": "asking_price asc", "discount": "(conservative_arv - asking_price) desc",
             "price_drop_pct": "coalesce(price_drop_pct, 0) desc",
+            "newest": "l.first_seen desc",
         }
-        rows = self.db["deals"].rows_where(
-            " and ".join(where), params, order_by=f"passed desc, {sort_cols.get(sort, 'roce_pct desc')}",
-            limit=limit,
-        )
-        return [Deal.model_validate_json(r["deal_json"]) for r in rows]
+        sql = f"""
+            select d.deal_json, coalesce(s.status, 'new') as status, s.notes, l.first_seen
+            from deals d
+            left join deal_status s on s.listing_id = d.listing_id
+            left join listings l on l.listing_id = d.listing_id
+            where {" and ".join(where)}
+            order by passed desc, {sort_cols.get(sort, 'roce_pct desc')}
+            limit {int(limit)}"""
+        return [
+            {"deal": Deal.model_validate_json(r["deal_json"]), "status": r["status"],
+             "notes": r["notes"], "first_seen": r["first_seen"]}
+            for r in self.db.query(sql, params)
+        ]
+
+    def set_status(self, listing_id: str, status: str | None = None, notes: str | None = None) -> dict:
+        cur = {"status": "new", "notes": ""}
+        with contextlib.suppress(sqlite_utils.db.NotFoundError):
+            cur = self.db["deal_status"].get(listing_id)
+        row = {"listing_id": listing_id, "status": status or cur["status"],
+               "notes": cur["notes"] if notes is None else notes, "updated_at": _now()}
+        self.db["deal_status"].upsert(row, pk="listing_id")
+        self.audit("status", listing_id, {"status": row["status"]})
+        return row
+
+    def get_status(self, listing_id: str) -> dict[str, Any]:
+        try:
+            return self.db["deal_status"].get(listing_id)
+        except sqlite_utils.db.NotFoundError:
+            return {"listing_id": listing_id, "status": "new", "notes": ""}
+
+    def first_seen(self, listing_id: str) -> str | None:
+        try:
+            return self.db["listings"].get(listing_id)["first_seen"]
+        except sqlite_utils.db.NotFoundError:
+            return None
+
+    def listing_price(self, listing_id: str) -> float | None:
+        rows = list(self.db.query(
+            "select current_price from listings where listing_id = ? limit 1", [listing_id]))
+        return rows[0]["current_price"] if rows else None
+
+    def has_listing(self, listing_id: str) -> bool:
+        return bool(list(self.db.query(
+            "select 1 from listings where listing_id = ? limit 1", [listing_id])))
 
     def get_deal(self, listing_id: str) -> Deal | None:
         try:
@@ -195,6 +276,69 @@ class Storage:
                    max(case when passed = 1 and roce_infinite = 0 then roce_pct end) as best_roce_pct,
                    sum(roce_infinite * passed) as infinite_roce_deals
             from deals where eligible = 1 group by outcode order by passing desc, outcode"""))
+
+    # -- market snapshot (local comps) --------------------------------------
+
+    def record_market(self, rows: list[dict[str, Any]]) -> int:
+        """Upsert portal-seen listings. Each row: key, portal, channel, outcode, property_type,
+        bedrooms, price, address, url. Returns how many were new."""
+        now, new = _now(), 0
+        table = self.db["market"]
+        for r in rows:
+            try:
+                existing = table.get(r["key"])
+                table.update(r["key"], {**r, "last_seen": now, "first_seen": existing["first_seen"]})
+            except sqlite_utils.db.NotFoundError:
+                table.insert({**r, "first_seen": now, "last_seen": now})
+                new += 1
+        return new
+
+    def market_prices(self, outcode: str, channel: str, property_type: str | None,
+                      bedrooms: int | None, since: str) -> list[float]:
+        where = ["outcode = ?", "channel = ?", "last_seen >= ?", "price > 0"]
+        params: list[Any] = [outcode.upper(), channel, since]
+        if property_type:
+            types = {"terraced": ["terraced", "end-terrace"], "end-terrace": ["terraced", "end-terrace"],
+                     "flat": ["flat", "maisonette"], "maisonette": ["flat", "maisonette"]}.get(
+                property_type, [property_type])
+            where.append(f"property_type in ({','.join('?' * len(types))})")
+            params += types
+        if bedrooms is not None:
+            where.append("bedrooms = ?")
+            params.append(bedrooms)
+        return [r["price"] for r in self.db.query(
+            f"select price from market where {' and '.join(where)}", params)]
+
+    def market_stats(self) -> list[dict[str, Any]]:
+        return list(self.db.query("""
+            select outcode, channel, count(*) as n, max(last_seen) as last_seen
+            from market group by outcode, channel order by outcode, channel"""))
+
+    # -- key/value + runs ---------------------------------------------------
+
+    def kv_get(self, key: str, default: Any = None) -> Any:
+        try:
+            return json.loads(self.db["kv"].get(key)["value"])
+        except sqlite_utils.db.NotFoundError:
+            return default
+
+    def kv_set(self, key: str, value: Any) -> None:
+        self.db["kv"].upsert({"key": key, "value": json.dumps(value, default=str),
+                              "updated_at": _now()}, pk="key")
+
+    def start_run(self, trigger: str, sources: list[str]) -> int:
+        return self.db["runs"].insert({"started_at": _now(), "trigger": trigger,
+                                       "sources": ",".join(sources), "status": "running"}).last_pk
+
+    def finish_run(self, run_id: int, status: str, summary: dict[str, Any]) -> None:
+        self.db["runs"].update(run_id, {"finished_at": _now(), "status": status,
+                                        "summary": json.dumps(summary, default=str)})
+
+    def recent_runs(self, limit: int = 30) -> list[dict[str, Any]]:
+        rows = list(self.db["runs"].rows_where(order_by="id desc", limit=limit))
+        for r in rows:
+            r["summary"] = json.loads(r["summary"]) if r.get("summary") else None
+        return rows
 
     # -- audit ------------------------------------------------------------
 

@@ -4,261 +4,532 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kent BRRR Scout</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b6e6e'/%3E%3Cpath d='M8 17l8-7 8 7v7H8z' fill='white'/%3E%3C/svg%3E" />
 <style>
 :root {
-  --bg: #f6f7f9; --panel: #ffffff; --ink: #14181f; --muted: #5d6676; --line: #e2e6ec;
-  --accent: #0b6e6e; --accent-ink: #ffffff; --pass: #18794e; --pass-bg: #e6f4ec;
-  --fail: #c0392b; --fail-bg: #fbeceb; --warn: #9a6700; --warn-bg: #fff4d6; --chip: #eef1f5;
-  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
+  --bg: #f5f6f8; --panel: #ffffff; --ink: #14181f; --muted: #5d6676; --line: #e1e5eb;
+  --accent: #0b6e6e; --accent-ink: #ffffff; --accent-soft: #e3f2f1;
+  --pass: #18794e; --pass-bg: #e6f4ec; --fail: #b42318; --fail-bg: #fdecea;
+  --warn: #8a5a00; --warn-bg: #fff3d1; --chip: #eef1f5; --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0f1216; --panel: #171b21; --ink: #e8ebf0; --muted: #98a2b3; --line: #2a3039;
-    --accent: #2bb3a8; --accent-ink: #062523; --pass: #4cc38a; --pass-bg: #14301f;
-    --fail: #ff7b6b; --fail-bg: #3a1a17; --warn: #f2c14e; --warn-bg: #3a2f12; --chip: #222830;
-    --shadow: none;
+    --accent: #2bb3a8; --accent-ink: #062523; --accent-soft: #11302e;
+    --pass: #4cc38a; --pass-bg: #14301f; --fail: #ff7b6b; --fail-bg: #3a1a17;
+    --warn: #f2c14e; --warn-bg: #3a2f12; --chip: #222830; --shadow: none;
   }
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink);
   font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-header { display: flex; align-items: center; gap: 16px; padding: 14px 24px;
-  background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
-header h1 { font-size: 17px; margin: 0; letter-spacing: -.01em; }
-header .sub { color: var(--muted); font-size: 12px; }
-header .spacer { flex: 1; }
-button { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line);
-  background: var(--panel); color: var(--ink); padding: 7px 12px; }
+a { color: var(--accent); }
+h2 { font-size: 18px; margin: 0 0 4px; }
+h3.sec { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
+h3.sec:first-child { margin-top: 0; }
+.small { font-size: 12px; color: var(--muted); }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+button, .btn { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--ink); padding: 7px 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
 button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
-button:disabled { opacity: .6; cursor: progress; }
-.layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; padding: 20px 24px; }
-aside { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px;
-  box-shadow: var(--shadow); align-self: start; position: sticky; top: 76px; max-height: calc(100vh - 96px); overflow: auto; }
-aside h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 0 8px; }
-aside h3:first-child { margin-top: 0; }
+button.danger { color: var(--fail); }
+button:disabled { opacity: .55; cursor: not-allowed; }
+input[type=number], input[type=text], input[type=password], input[type=time], input[type=search], select, textarea {
+  width: 100%; padding: 7px 9px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); font: inherit; }
+textarea { min-height: 70px; resize: vertical; }
+label.row { display: flex; align-items: center; gap: 8px; margin: 6px 0; cursor: pointer; }
+.field { margin: 8px 0; } .field > span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+.panel + .panel { margin-top: 16px; }
+
+/* header */
+header { display: flex; align-items: center; gap: 18px; padding: 10px 24px; background: var(--panel);
+  border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 6; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .logo { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); font-weight: 800; }
+.brand b { font-size: 15px; }
+nav { display: flex; gap: 4px; }
+nav button { border: none; background: transparent; color: var(--muted); font-weight: 600; }
+nav button.on { background: var(--accent-soft); color: var(--accent); }
+.spacer { flex: 1; }
+.jobpill { display: none; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); max-width: 420px; }
+.jobpill.on { display: flex; }
+.jobpill .msg { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spin { width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.9s linear infinite; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.view { display: none; } .view.on { display: block; }
+.wrap { padding: 20px 24px; max-width: 1600px; margin: 0 auto; }
+.banner { display: flex; gap: 14px; align-items: center; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px;
+  background: var(--accent-soft); border: 1px solid var(--line); flex-wrap: wrap; }
+.banner.warn { background: var(--warn-bg); }
+.banner .grow { flex: 1; min-width: 220px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; width: 100%; }
+.step { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.step b { display: block; margin-bottom: 4px; }
+
+/* deals layout */
+.layout { display: grid; grid-template-columns: 270px 1fr; gap: 20px; }
+aside.filters { align-self: start; position: sticky; top: 68px; max-height: calc(100vh - 88px); overflow: auto; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { border: 1px solid var(--line); background: var(--chip); border-radius: 999px; padding: 4px 10px;
-  font-size: 12px; cursor: pointer; user-select: none; }
+.chip { border: 1px solid var(--line); background: var(--chip); border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer; user-select: none; }
 .chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .group-label { font-size: 12px; color: var(--muted); margin: 6px 0 4px; display: flex; justify-content: space-between; }
-.group-label a { color: var(--accent); cursor: pointer; font-size: 11px; }
+.group-label a { cursor: pointer; font-size: 11px; }
 .seg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
 .seg .chip { text-align: center; border-radius: 8px; }
-label.row { display: flex; align-items: center; gap: 8px; margin: 6px 0; cursor: pointer; }
-.field { margin: 8px 0; }
-.field span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 3px; }
-input[type=number], select { width: 100%; padding: 7px 9px; border-radius: 8px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); font: inherit; }
 main { min-width: 0; }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; cursor: pointer;
-  box-shadow: var(--shadow); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; box-shadow: var(--shadow); }
 .card.on { outline: 2px solid var(--accent); }
-.card .oc { font-weight: 700; font-size: 15px; }
-.card .n { font-size: 22px; font-weight: 700; color: var(--pass); }
+.card .oc { font-weight: 700; } .card .n { font-size: 22px; font-weight: 700; color: var(--pass); line-height: 1.2; }
 .card .m { color: var(--muted); font-size: 12px; }
+.toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.toolbar input[type=search] { max-width: 280px; }
 .table-wrap { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: auto; box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; min-width: 980px; }
-th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); position: sticky; top: 0;
-  background: var(--panel); cursor: pointer; }
+table { border-collapse: collapse; width: 100%; }
+.deals table { min-width: 1080px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); position: sticky; top: 0; background: var(--panel); z-index: 1; }
 th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
-tbody tr { cursor: pointer; }
-tbody tr:hover { background: var(--chip); }
+.deals tbody tr { cursor: pointer; } .deals tbody tr:hover { background: var(--chip); }
 tr.fail td { color: var(--muted); }
-.addr { max-width: 260px; overflow: hidden; text-overflow: ellipsis; display: block; color: var(--ink); }
-.small { font-size: 12px; color: var(--muted); }
+.thumb { width: 54px; height: 40px; border-radius: 6px; object-fit: cover; background: var(--chip); display: block; }
+.addr { max-width: 250px; overflow: hidden; text-overflow: ellipsis; display: block; color: var(--ink); font-weight: 500; }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-.b-pass { background: var(--pass-bg); color: var(--pass); }
-.b-fail { background: var(--fail-bg); color: var(--fail); }
-.b-warn { background: var(--warn-bg); color: var(--warn); }
-.b-neutral { background: var(--chip); color: var(--muted); }
-.dots { display: inline-flex; gap: 3px; }
-.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--fail); }
-.dot.ok { background: var(--pass); }
-.empty { padding: 40px; text-align: center; color: var(--muted); }
-.status { font-size: 12px; color: var(--muted); }
+.b-pass { background: var(--pass-bg); color: var(--pass); } .b-fail { background: var(--fail-bg); color: var(--fail); }
+.b-warn { background: var(--warn-bg); color: var(--warn); } .b-neutral { background: var(--chip); color: var(--muted); }
+.b-accent { background: var(--accent-soft); color: var(--accent); }
+.dots { display: inline-flex; gap: 3px; } .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--fail); } .dot.ok { background: var(--pass); }
+.empty { padding: 48px 20px; text-align: center; color: var(--muted); }
+
 /* drawer */
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; z-index: 10; }
 .overlay.open { display: block; }
-.drawer { position: fixed; right: 0; top: 0; bottom: 0; width: min(560px, 100vw); background: var(--panel);
-  border-left: 1px solid var(--line); z-index: 11; transform: translateX(100%); transition: transform .2s ease;
-  overflow: auto; padding: 20px 22px; }
+.drawer { position: fixed; right: 0; top: 0; bottom: 0; width: min(600px, 100vw); background: var(--panel);
+  border-left: 1px solid var(--line); z-index: 11; transform: translateX(100%); transition: transform .2s ease; overflow: auto; }
 .drawer.open { transform: none; }
-.drawer h2 { margin: 0 0 4px; font-size: 18px; }
-.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; margin: 8px 0 16px; }
+.drawer .inner { padding: 18px 22px 40px; }
+.drawer .hero { width: 100%; height: 200px; object-fit: cover; display: block; background: var(--chip); }
+.drawer h4 { margin: 20px 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; }
 .kv div:nth-child(odd) { color: var(--muted); }
 .kv div:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; }
 .kv .total { font-weight: 700; color: var(--ink); border-top: 1px solid var(--line); padding-top: 4px; }
 .gate { display: flex; gap: 10px; padding: 8px 10px; border-radius: 8px; margin: 6px 0; }
 .gate.ok { background: var(--pass-bg); } .gate.no { background: var(--fail-bg); }
-.drawer h4 { margin: 18px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
 .drawer ul { margin: 0; padding-left: 18px; }
-.close { float: right; }
-a { color: var(--accent); }
-@media (max-width: 820px) {
-  .layout { grid-template-columns: 1fr; padding: 12px 16px; }
-  aside { position: static; max-height: none; }
-  header { padding: 12px 16px; flex-wrap: wrap; }
+.whatif { background: var(--accent-soft); border-radius: 10px; padding: 12px; }
+.whatif .out { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+.stat { background: var(--panel); border-radius: 8px; padding: 8px; text-align: center; }
+.stat b { display: block; font-size: 16px; } .stat span { font-size: 11px; color: var(--muted); }
+.stat.ok b { color: var(--pass); } .stat.no b { color: var(--fail); }
+.statusbar { display: flex; gap: 4px; flex-wrap: wrap; }
+.statusbar .chip { text-transform: capitalize; }
+
+/* runs & settings */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.progress { height: 8px; background: var(--chip); border-radius: 999px; overflow: hidden; margin: 8px 0; }
+.progress > div { height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; max-height: 320px; overflow: auto; font-size: 12px; white-space: pre-wrap; margin: 8px 0 0; }
+.check { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.check:last-child { border: none; }
+.check .ic { width: 20px; flex: none; text-align: center; }
+.keyrow { display: grid; grid-template-columns: 210px 1fr; gap: 10px; align-items: center; margin: 8px 0; }
+.toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg);
+  padding: 10px 16px; border-radius: 10px; z-index: 20; display: none; max-width: 90vw; }
+.toast.on { display: block; }
+.modal { position: fixed; inset: 0; display: none; place-items: center; z-index: 15; background: rgba(0,0,0,.35); padding: 16px; }
+.modal.open { display: grid; }
+.modal .box { width: min(460px, 100%); }
+
+@media (max-width: 980px) {
+  .layout, .cols { grid-template-columns: 1fr; }
+  aside.filters { position: static; max-height: none; }
+  .steps, .grid3, .grid4 { grid-template-columns: 1fr 1fr; }
+  .wrap { padding: 12px 16px; }
+  header { padding: 10px 16px; }
+  .keyrow { grid-template-columns: 1fr; gap: 4px; }
 }
+@media (max-width: 560px) { .steps, .grid2, .grid3, .grid4, .whatif .out { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>Kent BRRR Scout</h1>
-    <div class="sub">Medway (ME) &amp; Thanet (CT) · deterministic 4-gate underwriting</div>
-  </div>
+  <div class="brand"><div class="logo">K</div><div><b>Kent BRRR Scout</b><div class="small">Medway &amp; Thanet</div></div></div>
+  <nav>
+    <button data-view="deals" class="on">Deals</button>
+    <button data-view="runs">Runs</button>
+    <button data-view="settings">Settings</button>
+  </nav>
   <div class="spacer"></div>
-  <span class="status" id="status"></span>
-  <label class="row small" title="Use bundled sample data instead of live APIs"><input type="checkbox" id="offline" /> Sample data</label>
-  <button class="primary" id="scanBtn">Run scan</button>
+  <div class="jobpill" id="jobpill"><div class="spin"></div><span class="msg" id="jobmsg"></span></div>
+  <span class="small" id="lastRun"></span>
+  <button class="primary" id="scanBtn">Scan now</button>
 </header>
 
-<div class="layout">
-  <aside>
-    <h3>Postcodes</h3>
-    <div id="outcodeGroups"></div>
-
-    <h3>Category</h3>
-    <div class="seg" id="categories"></div>
-
-    <h3>Property type</h3>
-    <div class="chips" id="ptypes"></div>
-
-    <h3>Deal filters</h3>
-    <label class="row"><input type="checkbox" id="passedOnly" /> Passes all 4 gates</label>
-    <label class="row"><input type="checkbox" id="inclIneligible" /> Include ineligible stock</label>
-    <div class="field"><span>Min ROCE %</span><input type="number" id="minRoce" step="1" placeholder="any" /></div>
-    <div class="field"><span>Min gross yield %</span><input type="number" id="minYield" step="0.1" placeholder="any" /></div>
-    <div class="field"><span>Max asking price £</span><input type="number" id="maxPrice" step="5000" placeholder="any" /></div>
-    <div class="field"><span>Sort by</span>
-      <select id="sort">
-        <option value="roce_pct">ROCE</option>
-        <option value="net_monthly_cashflow">Monthly cashflow</option>
-        <option value="gross_yield">Gross yield</option>
-        <option value="discount">Discount to ARV</option>
-        <option value="price_drop_pct">Biggest price drop</option>
-        <option value="asking_price">Cheapest</option>
-      </select>
+<!-- ============================== DEALS ============================== -->
+<section class="view on" id="view-deals">
+  <div class="wrap">
+    <div id="banners"></div>
+    <div class="layout">
+      <aside class="panel filters">
+        <h3 class="sec">Postcodes</h3>
+        <div id="outcodeGroups"></div>
+        <h3 class="sec">Category</h3>
+        <div class="seg" id="categories"></div>
+        <h3 class="sec">Property type</h3>
+        <div class="chips" id="ptypes"></div>
+        <h3 class="sec">Pipeline</h3>
+        <div class="chips" id="statuses"></div>
+        <label class="row"><input type="checkbox" id="hideRejected" checked /> Hide rejected</label>
+        <label class="row"><input type="checkbox" id="newOnly" /> New since last run</label>
+        <h3 class="sec">Deal filters</h3>
+        <label class="row"><input type="checkbox" id="passedOnly" /> Passes all 4 gates</label>
+        <label class="row"><input type="checkbox" id="inclIneligible" /> Include ineligible stock</label>
+        <div class="grid2">
+          <div class="field"><span>Min ROCE %</span><input type="number" id="minRoce" step="1" placeholder="any" /></div>
+          <div class="field"><span>Min yield %</span><input type="number" id="minYield" step="0.1" placeholder="any" /></div>
+        </div>
+        <div class="field"><span>Max asking £</span><input type="number" id="maxPrice" step="5000" placeholder="any" /></div>
+        <div class="field"><span>Sort by</span>
+          <select id="sort">
+            <option value="roce_pct">ROCE</option>
+            <option value="net_monthly_cashflow">Monthly cashflow</option>
+            <option value="gross_yield">Gross yield</option>
+            <option value="discount">Discount to ARV</option>
+            <option value="price_drop_pct">Biggest price drop</option>
+            <option value="newest">Newest first</option>
+            <option value="asking_price">Cheapest</option>
+          </select>
+        </div>
+        <button id="resetFilters" style="width:100%;justify-content:center;margin-top:6px">Reset filters</button>
+      </aside>
+      <main>
+        <div class="cards" id="cards"></div>
+        <div class="toolbar">
+          <input type="search" id="q" placeholder="Search address or postcode" />
+          <span class="small" id="count"></span>
+          <span class="spacer"></span>
+          <a class="btn" id="csvBtn" href="#">Export CSV</a>
+        </div>
+        <div class="table-wrap deals">
+          <table>
+            <thead><tr>
+              <th></th><th>Status</th><th>Property</th><th>Type</th><th class="num">Asking</th><th class="num">ARV</th>
+              <th class="num">Max offer</th><th>Refurb</th><th class="num">Yield</th><th class="num">Cashflow/mo</th>
+              <th class="num">ROCE</th><th>Gates</th>
+            </tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="empty" id="empty" hidden></div>
+        </div>
+      </main>
     </div>
-  </aside>
+  </div>
+</section>
 
-  <main>
-    <div class="cards" id="cards"></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Status</th><th>Property</th><th>Type</th><th class="num">Asking</th><th class="num">ARV</th>
-          <th class="num">Max offer</th><th>Refurb</th><th class="num">Yield</th><th class="num">Cashflow/mo</th>
-          <th class="num">ROCE</th><th class="num">Left in</th><th>Gates</th>
-        </tr></thead>
-        <tbody id="rows"></tbody>
-      </table>
-      <div class="empty" id="empty" hidden>No deals match. Run a scan, or loosen the filters.</div>
+<!-- ============================== RUNS ============================== -->
+<section class="view" id="view-runs">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="panel">
+          <h3 class="sec">Current job</h3>
+          <div id="jobPanel" class="small">Nothing running.</div>
+        </div>
+        <div class="panel">
+          <h3 class="sec">Portals — last collection</h3>
+          <div id="portalHealth" class="small">No portal run yet.</div>
+        </div>
+        <div class="panel">
+          <h3 class="sec" style="display:flex;justify-content:space-between">Setup check <button id="doctorBtn">Check setup</button></h3>
+          <div id="checks" class="small">Checks your browser, the portals, API keys, Land Registry and the daily schedule.</div>
+        </div>
+      </div>
+      <div>
+        <div class="panel">
+          <h3 class="sec">Run history</h3>
+          <div class="table-wrap"><table><thead><tr><th>Started</th><th>How</th><th>Sources</th><th class="num">Fetched</th><th class="num">Pass</th><th class="num">New</th><th>Status</th></tr></thead><tbody id="runRows"></tbody></table></div>
+        </div>
+        <div class="panel">
+          <h3 class="sec">Local comps coverage</h3>
+          <div class="small">Asking prices and rents seen on the portals — used for ARV and rent when there's no PropertyData key.</div>
+          <div id="market" class="small" style="margin-top:8px"></div>
+        </div>
+        <div class="panel">
+          <h3 class="sec" style="display:flex;justify-content:space-between">Log <button id="logBtn">Refresh</button></h3>
+          <pre class="log mono" id="logText">Click refresh to load the latest log lines.</pre>
+        </div>
+      </div>
     </div>
-  </main>
-</div>
+  </div>
+</section>
 
+<!-- ============================== SETTINGS ============================== -->
+<section class="view" id="view-settings">
+  <div class="wrap" style="max-width:1100px">
+    <div class="cols">
+      <div>
+        <div class="panel">
+          <h3 class="sec">Daily run on this laptop</h3>
+          <div id="schedStatus" class="small"></div>
+          <div class="grid2" style="margin-top:10px">
+            <div class="field"><span>Time each morning</span><input type="time" id="s_time" /></div>
+            <div class="field"><span>Sources</span>
+              <label class="row"><input type="checkbox" class="s_src" value="portals" /> Rightmove / Zoopla / OnTheMarket</label>
+              <label class="row"><input type="checkbox" class="s_src" value="rss" /> Auction RSS feeds</label>
+              <label class="row"><input type="checkbox" class="s_src" value="propertydata" /> PropertyData (needs key)</label>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="primary" id="schedInstall">Install / update daily run</button>
+            <button class="danger" id="schedRemove">Remove</button>
+          </div>
+          <p class="small">The laptop needs to be on (asleep is fine on a Mac: it runs when it wakes; Windows catches up at next start). Alerts go to Telegram when a deal passes all four gates.</p>
+        </div>
+        <div class="panel">
+          <h3 class="sec">Portal collector</h3>
+          <label class="row"><input type="checkbox" class="s_portal" value="rightmove" /> Rightmove</label>
+          <label class="row"><input type="checkbox" class="s_portal" value="zoopla" /> Zoopla</label>
+          <label class="row"><input type="checkbox" class="s_portal" value="onthemarket" /> OnTheMarket</label>
+          <label class="row"><input type="checkbox" id="s_showbrowser" /> Show the browser window while collecting</label>
+          <div class="grid2">
+            <div class="field"><span>Pages per postcode (newest first)</span><input type="number" id="s_pages" min="1" max="10" /></div>
+            <div class="field"><span>Max asking price £</span><input type="number" id="s_maxprice" step="5000" /></div>
+          </div>
+          <p class="small">Runs once a day at a slow, human pace and stops at listings it has already seen. If a site shows a block or captcha page it stops using that site for the run and tells you on the Runs tab.</p>
+        </div>
+        <div class="panel">
+          <h3 class="sec">API keys &amp; alerts</h3>
+          <p class="small">Stored only in the <span class="mono">.env</span> file on this laptop. Leave a box empty to keep the current value.</p>
+          <div id="keys"></div>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button class="primary" id="saveKeys">Save keys</button>
+            <button id="testAlert">Send test alert</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="panel">
+          <h3 class="sec">Underwriting gates</h3>
+          <div class="grid2">
+            <div class="field"><span>All-in cap (% of ARV)</span><input type="number" step="0.5" data-cfg="thresholds.all_in_cap_pct_of_arv" data-pct /></div>
+            <div class="field"><span>Min gross yield %</span><input type="number" step="0.1" data-cfg="thresholds.min_gross_yield" data-pct /></div>
+            <div class="field"><span>Min net cashflow £/mo</span><input type="number" step="10" data-cfg="thresholds.min_net_monthly_cashflow" /></div>
+            <div class="field"><span>Min capital recycled %</span><input type="number" step="1" data-cfg="thresholds.min_capital_recycled_pct" data-pct /></div>
+            <div class="field"><span>Alert only if ROCE ≥ %</span><input type="number" step="1" data-cfg="thresholds.min_roce_pct" /></div>
+            <div class="field"><span>Min lease on flats (yrs)</span><input type="number" step="1" data-cfg="eligibility.min_lease_years_flats" /></div>
+          </div>
+          <label class="row"><input type="checkbox" data-cfg="eligibility.include_commercial" /> Include commercial &amp; mixed-use</label>
+          <h3 class="sec">Finance</h3>
+          <div class="grid2">
+            <div class="field"><span>Refi LTV %</span><input type="number" step="1" data-cfg="finance.refi_ltv" data-pct /></div>
+            <div class="field"><span>BTL interest %</span><input type="number" step="0.05" data-cfg="finance.btl_interest_rate" data-pct /></div>
+            <div class="field"><span>Operating costs % of rent</span><input type="number" step="1" data-cfg="finance.operating_cost_drag_pct" data-pct /></div>
+            <div class="field"><span>Corporation tax %</span><input type="number" step="1" data-cfg="finance.corporation_tax_rate" data-pct /></div>
+            <div class="field"><span>Refi fixed costs £</span><input type="number" step="100" data-cfg="finance.refi_fixed_costs" /></div>
+            <div class="field"><span>Lender fee % of loan</span><input type="number" step="0.1" data-cfg="finance.refi_fee_pct_of_loan" data-pct /></div>
+            <div class="field"><span>Bridging rate %/month</span><input type="number" step="0.05" data-cfg="finance.bridging_monthly_rate" data-pct /></div>
+            <div class="field"><span>Bridging months</span><input type="number" step="1" data-cfg="finance.bridging_months" /></div>
+          </div>
+          <label class="row"><input type="checkbox" data-cfg="finance.use_bridging" /> Use bridging finance for the purchase</label>
+          <h3 class="sec">Costs</h3>
+          <div class="grid2">
+            <div class="field"><span>Fixed acquisition costs £</span><input type="number" step="100" data-cfg="costs.fixed_acquisition_costs" /></div>
+            <div class="field"><span>Refurb contingency %</span><input type="number" step="1" data-cfg="costs.refurb_contingency_pct" data-pct /></div>
+            <div class="field"><span>ARV haircut %</span><input type="number" step="0.5" data-cfg="costs.arv_haircut_pct" data-pct /></div>
+            <div class="field"><span>Rent haircut %</span><input type="number" step="0.5" data-cfg="costs.rent_haircut_pct" data-pct /></div>
+          </div>
+          <div class="small" style="margin:6px 0 4px">Refurb £ per sq ft</div>
+          <div class="grid4">
+            <div class="field"><span>Light</span><input type="number" data-cfg="costs.refurb_per_sqft.light" /></div>
+            <div class="field"><span>Medium</span><input type="number" data-cfg="costs.refurb_per_sqft.medium" /></div>
+            <div class="field"><span>Heavy</span><input type="number" data-cfg="costs.refurb_per_sqft.heavy" /></div>
+            <div class="field"><span>Structural</span><input type="number" data-cfg="costs.refurb_per_sqft.structural" /></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="primary" id="saveRules">Save rules</button>
+            <button id="rescoreBtn">Re-score saved deals</button>
+          </div>
+          <p class="small">Saved to <span class="mono">config/user.yaml</span>. Re-scoring re-runs the four gates on every saved deal with the new numbers (no internet needed).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- drawer / modal / toast -->
 <div class="overlay" id="overlay"></div>
 <div class="drawer" id="drawer" role="dialog" aria-label="Deal detail"></div>
 
+<div class="modal" id="scanModal">
+  <div class="panel box">
+    <h2>Scan now</h2>
+    <p class="small" id="scanScope"></p>
+    <label class="row"><input type="checkbox" class="m_src" value="portals" checked /> Rightmove / Zoopla / OnTheMarket <span class="small">(takes a while)</span></label>
+    <label class="row"><input type="checkbox" class="m_src" value="rss" checked /> Auction RSS feeds</label>
+    <label class="row"><input type="checkbox" class="m_src" value="propertydata" checked /> PropertyData <span class="small" id="pdHint"></span></label>
+    <label class="row"><input type="checkbox" class="m_src" value="sample" /> Sample data instead (instant, invented listings)</label>
+    <hr style="border:none;border-top:1px solid var(--line);margin:10px 0">
+    <label class="row"><input type="checkbox" id="m_alerts" /> Send Telegram alerts for passing deals</label>
+    <label class="row"><input type="checkbox" id="m_claude" checked /> Use Claude for refurb scope <span class="small" id="claudeHint"></span></label>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button id="scanCancel">Cancel</button><button class="primary" id="scanGo">Start</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
 <script>
 const $ = (id) => document.getElementById(id);
-const gbp = (x) => x == null ? "–" : (x < 0 ? "−£" : "£") + Math.abs(Math.round(x)).toLocaleString("en-GB");
+const gbp = (x) => x == null || isNaN(x) ? "–" : (x < 0 ? "−£" : "£") + Math.abs(Math.round(x)).toLocaleString("en-GB");
 const pct = (x, d = 1) => x == null ? "–" : (x * 100).toFixed(d) + "%";
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const when = (iso) => { if (!iso) return "–"; const d = new Date(iso); return d.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); };
+const ago = (iso) => { if (!iso) return ""; const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 60 ? `${m}m ago` : m < 1440 ? `${Math.round(m/60)}h ago` : `${Math.round(m/1440)}d ago`; };
 const GATE_LABEL = { all_in_cap: "75% all-in cap", gross_yield: "Gross yield", net_cashflow: "Net cashflow", capital_recycled: "Capital recycled" };
+const SOURCE_LABEL = { portals: "Portals", rss: "Auction RSS", propertydata: "PropertyData", sample: "Sample" };
 
-const state = { outcodes: new Set(), categories: new Set(["residential"]), ptypes: new Set(), meta: null };
+async function api(path, opts = {}) {
+  const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...opts,
+    body: opts.body && typeof opts.body !== "string" ? JSON.stringify(opts.body) : opts.body });
+  const data = res.headers.get("content-type")?.includes("json") ? await res.json() : await res.text();
+  if (!res.ok) throw new Error((data && data.detail) || res.statusText);
+  return data;
+}
+function toast(msg, ms = 3500) { const t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), ms); }
 
-function save() {
-  try { localStorage.setItem("brrr-filters", JSON.stringify({
-    outcodes: [...state.outcodes], categories: [...state.categories], ptypes: [...state.ptypes],
-    passedOnly: $("passedOnly").checked, minRoce: $("minRoce").value, minYield: $("minYield").value,
-    maxPrice: $("maxPrice").value, sort: $("sort").value, offline: $("offline").checked })); } catch {}
-}
-function restore() {
-  try {
-    const f = JSON.parse(localStorage.getItem("brrr-filters") || "null"); if (!f) return;
-    state.outcodes = new Set(f.outcodes); state.categories = new Set(f.categories); state.ptypes = new Set(f.ptypes);
-    $("passedOnly").checked = f.passedOnly; $("minRoce").value = f.minRoce; $("minYield").value = f.minYield;
-    $("maxPrice").value = f.maxPrice; $("sort").value = f.sort || "roce_pct"; $("offline").checked = !!f.offline;
-  } catch {}
+const DEFAULT_FILTERS = { outcodes: [], categories: ["residential"], ptypes: [], statuses: [], hideRejected: true,
+  newOnly: false, passedOnly: false, inclIneligible: false, minRoce: "", minYield: "", maxPrice: "", sort: "roce_pct", q: "" };
+const state = { f: structuredClone(DEFAULT_FILTERS), meta: null, view: "deals", lastJobId: null, jobRunning: false };
+
+function saveFilters() { try { localStorage.setItem("brrr-f2", JSON.stringify(state.f)); } catch {} }
+function loadFilters() { try { const f = JSON.parse(localStorage.getItem("brrr-f2") || "null"); if (f) state.f = { ...DEFAULT_FILTERS, ...f }; } catch {} }
+
+/* ---------------- navigation ---------------- */
+document.querySelectorAll("nav button").forEach((b) => b.onclick = () => show(b.dataset.view));
+function show(view) {
+  state.view = view;
+  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
+  document.querySelectorAll(".view").forEach((v) => v.classList.toggle("on", v.id === "view-" + view));
+  if (view === "runs") loadRuns();
+  if (view === "settings") loadSettings();
+  if (view === "deals") refresh();
 }
 
-function chip(label, on, onClick) {
-  const el = document.createElement("span");
-  el.className = "chip" + (on ? " on" : ""); el.textContent = label;
-  el.onclick = onClick; return el;
-}
-function toggle(set, v) { set.has(v) ? set.delete(v) : set.add(v); }
+/* ---------------- filters ---------------- */
+function chip(label, on, onClick) { const el = document.createElement("span"); el.className = "chip" + (on ? " on" : ""); el.textContent = label; el.onclick = onClick; return el; }
+function toggleIn(arr, v) { const i = arr.indexOf(v); i >= 0 ? arr.splice(i, 1) : arr.push(v); }
 
 function renderFilters() {
-  const m = state.meta;
+  const m = state.meta, f = state.f;
   const g = $("outcodeGroups"); g.innerHTML = "";
   for (const [name, codes] of Object.entries(m.outcodes)) {
     const lab = document.createElement("div"); lab.className = "group-label";
-    const allOn = codes.every((c) => state.outcodes.has(c));
+    const allOn = codes.every((c) => f.outcodes.includes(c));
     lab.innerHTML = `<span>${esc(name[0].toUpperCase() + name.slice(1))}</span><a>${allOn ? "clear" : "all"}</a>`;
-    lab.querySelector("a").onclick = () => { codes.forEach((c) => allOn ? state.outcodes.delete(c) : state.outcodes.add(c)); refresh(); };
+    lab.querySelector("a").onclick = () => { codes.forEach((c) => { const i = f.outcodes.indexOf(c); if (allOn) { if (i >= 0) f.outcodes.splice(i, 1); } else if (i < 0) f.outcodes.push(c); }); refresh(); };
     const wrap = document.createElement("div"); wrap.className = "chips";
-    codes.forEach((c) => wrap.appendChild(chip(c, state.outcodes.has(c), () => { toggle(state.outcodes, c); refresh(); })));
+    codes.forEach((c) => wrap.appendChild(chip(c, f.outcodes.includes(c), () => { toggleIn(f.outcodes, c); refresh(); })));
     g.append(lab, wrap);
   }
   const cats = $("categories"); cats.innerHTML = "";
-  cats.appendChild(chip("All", state.categories.size === 0, () => { state.categories.clear(); refresh(); }));
-  m.categories.forEach((c) => cats.appendChild(chip(c[0].toUpperCase() + c.slice(1), state.categories.has(c),
-    () => { toggle(state.categories, c); refresh(); })));
+  cats.appendChild(chip("All", f.categories.length === 0, () => { f.categories = []; refresh(); }));
+  m.categories.forEach((c) => cats.appendChild(chip(c[0].toUpperCase() + c.slice(1), f.categories.includes(c), () => { toggleIn(f.categories, c); refresh(); })));
   const pt = $("ptypes"); pt.innerHTML = "";
-  m.property_types.forEach((t) => pt.appendChild(chip(t, state.ptypes.has(t), () => { toggle(state.ptypes, t); refresh(); })));
+  m.property_types.forEach((t) => pt.appendChild(chip(t, f.ptypes.includes(t), () => { toggleIn(f.ptypes, t); refresh(); })));
+  const st = $("statuses"); st.innerHTML = "";
+  m.statuses.forEach((s) => st.appendChild(chip(s, f.statuses.includes(s), () => { toggleIn(f.statuses, s); refresh(); })));
+  $("hideRejected").checked = f.hideRejected; $("newOnly").checked = f.newOnly; $("passedOnly").checked = f.passedOnly;
+  $("inclIneligible").checked = f.inclIneligible; $("minRoce").value = f.minRoce; $("minYield").value = f.minYield;
+  $("maxPrice").value = f.maxPrice; $("sort").value = f.sort; $("q").value = f.q;
 }
+const bind = [["hideRejected", "hideRejected", "checked"], ["newOnly", "newOnly", "checked"], ["passedOnly", "passedOnly", "checked"],
+  ["inclIneligible", "inclIneligible", "checked"], ["minRoce", "minRoce", "value"], ["minYield", "minYield", "value"],
+  ["maxPrice", "maxPrice", "value"], ["sort", "sort", "value"]];
+bind.forEach(([id, key, prop]) => $(id).addEventListener("change", () => { state.f[key] = $(id)[prop]; refresh(); }));
+let qTimer; $("q").addEventListener("input", () => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.f.q = $("q").value.trim(); loadDeals(); saveFilters(); }, 250); });
+$("resetFilters").onclick = () => { state.f = structuredClone(DEFAULT_FILTERS); refresh(); };
 
 function query() {
-  const q = new URLSearchParams();
-  state.outcodes.forEach((o) => q.append("outcode", o));
-  state.categories.forEach((c) => q.append("category", c));
-  state.ptypes.forEach((t) => q.append("ptype", t));
-  if ($("passedOnly").checked) q.set("passed_only", "true");
-  if ($("inclIneligible").checked) q.set("include_ineligible", "true");
-  if ($("minRoce").value) q.set("min_roce", $("minRoce").value);
-  if ($("minYield").value) q.set("min_yield", $("minYield").value / 100);
-  if ($("maxPrice").value) q.set("max_price", $("maxPrice").value);
-  q.set("sort", $("sort").value);
-  return q;
+  const f = state.f, q = new URLSearchParams();
+  f.outcodes.forEach((o) => q.append("outcode", o)); f.categories.forEach((c) => q.append("category", c));
+  f.ptypes.forEach((t) => q.append("ptype", t)); f.statuses.forEach((s) => q.append("status", s));
+  if (f.hideRejected) q.set("hide_rejected", "true"); if (f.newOnly) q.set("new_only", "true");
+  if (f.passedOnly) q.set("passed_only", "true"); if (f.inclIneligible) q.set("include_ineligible", "true");
+  if (f.minRoce) q.set("min_roce", f.minRoce); if (f.minYield) q.set("min_yield", f.minYield / 100);
+  if (f.maxPrice) q.set("max_price", f.maxPrice); if (f.q) q.set("q", f.q);
+  q.set("sort", f.sort); return q;
+}
+
+/* ---------------- deals view ---------------- */
+async function loadMeta() {
+  state.meta = await api("/api/meta");
+  const lr = state.meta.last_run;
+  $("lastRun").textContent = lr ? `Last run ${ago(lr.started_at)}${lr.status === "running" ? " (running)" : ""}` : "No runs yet";
+}
+
+function renderBanners() {
+  const m = state.meta, b = $("banners"); b.innerHTML = "";
+  if (!m.deal_count) {
+    b.innerHTML = `<div class="banner"><div class="grow"><b>Welcome.</b> Three steps to get going:
+      <div class="steps">
+        <div class="step"><b>1. Try it with sample data</b><span class="small">17 invented Kent listings so you can click around — nothing is sent anywhere.</span><br><button style="margin-top:8px" id="bSample">Load sample data</button></div>
+        <div class="step"><b>2. Add keys &amp; the daily run</b><span class="small">Telegram for alerts and Claude for refurb scope are optional. Install the 07:30 run.</span><br><button style="margin-top:8px" id="bSettings">Open settings</button></div>
+        <div class="step"><b>3. Run a live scan</b><span class="small">Opens a browser on this laptop and reads the newest Medway &amp; Thanet listings.</span><br><button class="primary" style="margin-top:8px" id="bScan">Scan now</button></div>
+      </div></div></div>`;
+    $("bSample").onclick = () => startScan({ sources: ["sample"], use_claude: false });
+    $("bSettings").onclick = () => show("settings");
+    $("bScan").onclick = openScanModal;
+    return;
+  }
+  const lr = m.last_run;
+  const ps = m.portal_status?.portals || {};
+  const blocked = Object.entries(ps).filter(([, v]) => v.state === "blocked" || v.state === "empty").map(([k, v]) => `${k} (${v.state})`);
+  if (blocked.length) b.insertAdjacentHTML("beforeend", `<div class="banner warn"><div class="grow"><b>Some portals didn't return listings last time:</b> ${esc(blocked.join(", "))}. See the Runs tab for details.</div><button onclick="show('runs')">View</button></div>`);
+  const onlySample = lr && lr.sources === "sample";
+  if (onlySample) b.insertAdjacentHTML("beforeend", `<div class="banner"><div class="grow">You're looking at <b>sample data</b> (invented listings). Run a live scan when you're ready.</div><button class="primary" onclick="openScanModal()">Scan now</button></div>`);
 }
 
 async function loadSummary() {
-  const rows = await (await fetch("/api/summary")).json();
-  const c = $("cards"); c.innerHTML = "";
+  const rows = await api("/api/summary"); const c = $("cards"); c.innerHTML = "";
   for (const r of rows) {
-    const el = document.createElement("div");
-    el.className = "card" + (state.outcodes.has(r.outcode) ? " on" : "");
+    const el = document.createElement("div"); el.className = "card" + (state.f.outcodes.includes(r.outcode) ? " on" : "");
     el.innerHTML = `<div class="oc">${esc(r.outcode)}</div><div class="n">${r.passing || 0}</div>
-      <div class="m">passing of ${r.listings} · avg yield ${r.avg_yield_pct ?? "–"}%</div>
-      <div class="m">best ROCE ${r.infinite_roce_deals ? "∞" : (r.best_roce_pct != null ? r.best_roce_pct.toFixed(1) + "%" : "–")}</div>`;
-    el.onclick = () => { state.outcodes = new Set([r.outcode]); refresh(); };
+      <div class="m">pass of ${r.listings} · yield ${r.avg_yield_pct ?? "–"}%</div>
+      <div class="m">best ROCE ${r.infinite_roce_deals ? "∞" : (r.best_roce_pct != null ? r.best_roce_pct.toFixed(0) + "%" : "–")}</div>`;
+    el.onclick = () => { state.f.outcodes = state.f.outcodes.length === 1 && state.f.outcodes[0] === r.outcode ? [] : [r.outcode]; refresh(); };
     c.appendChild(el);
   }
 }
 
 async function loadDeals() {
-  const rows = await (await fetch("/api/deals?" + query())).json();
+  const q = query();
+  $("csvBtn").href = "/api/deals.csv?" + q;
+  const rows = await api("/api/deals?" + q);
   const tb = $("rows"); tb.innerHTML = "";
-  $("empty").hidden = rows.length > 0;
+  const empty = $("empty");
+  empty.hidden = rows.length > 0;
+  empty.innerHTML = state.meta.deal_count ? "No deals match these filters." : "No deals yet — load sample data or run a scan.";
+  const lastRunStart = state.meta.last_run?.started_at;
   for (const d of rows) {
-    const tr = document.createElement("tr");
-    if (!d.passed) tr.className = "fail";
-    const status = !d.eligible ? `<span class="badge b-neutral">Ineligible</span>`
-      : d.passed ? `<span class="badge b-pass">Pass</span>` : `<span class="badge b-fail">Fail</span>`;
-    const extras = [d.is_auction ? `<span class="badge b-neutral">Auction</span>` : "",
+    const tr = document.createElement("tr"); if (!d.passed) tr.className = "fail";
+    const st = !d.eligible ? `<span class="badge b-neutral">Ineligible</span>` : d.passed ? `<span class="badge b-pass">Pass</span>` : `<span class="badge b-fail">Fail</span>`;
+    const pipe = d.status !== "new" ? ` <span class="badge b-accent">${esc(d.status)}</span>` : "";
+    const isNew = d.first_seen && lastRunStart && d.first_seen >= lastRunStart;
+    const extras = [isNew ? `<span class="badge b-accent">New</span>` : "", d.is_auction ? `<span class="badge b-neutral">Auction</span>` : "",
       d.price_drop_pct ? `<span class="badge b-warn">−${d.price_drop_pct.toFixed(0)}%</span>` : "",
       d.red_flags ? `<span class="badge b-warn">${d.red_flags} flag${d.red_flags > 1 ? "s" : ""}</span>` : ""].join(" ");
     const dots = Object.entries(d.gates).map(([k, v]) => `<span class="dot ${v ? "ok" : ""}" title="${GATE_LABEL[k]}: ${v ? "pass" : "fail"}"></span>`).join("");
     tr.innerHTML = `
-      <td>${status}</td>
-      <td><span class="addr" title="${esc(d.address)}">${esc(d.address || d.postcode)}</span>
-          <span class="small">${esc(d.postcode)}</span> ${extras}</td>
+      <td>${d.image ? `<img class="thumb" loading="lazy" referrerpolicy="no-referrer" src="${esc(d.image)}" alt="">` : `<div class="thumb"></div>`}</td>
+      <td>${st}${pipe}</td>
+      <td><span class="addr" title="${esc(d.address)}">${esc(d.address || d.postcode)}</span><span class="small">${esc(d.postcode)} · ${esc(d.source)}</span> ${extras}</td>
       <td>${esc(d.property_type)}${d.bedrooms ? " · " + d.bedrooms + "b" : ""}<div class="small">${esc(d.category)}</div></td>
       <td class="num">${gbp(d.asking_price)}</td>
       <td class="num">${gbp(d.conservative_arv)}<div class="small">${d.discount_pct != null ? d.discount_pct.toFixed(0) + "% below" : ""}</div></td>
@@ -267,94 +538,288 @@ async function loadDeals() {
       <td class="num">${pct(d.gross_yield, 2)}</td>
       <td class="num">${gbp(d.net_monthly_cashflow)}</td>
       <td class="num">${d.roce_pct == null ? "∞" : d.roce_pct.toFixed(1) + "%"}</td>
-      <td class="num">${gbp(d.money_left_in)}</td>
       <td><span class="dots">${dots}</span></td>`;
     tr.onclick = () => openDeal(d.listing_id);
     tb.appendChild(tr);
   }
-  $("status").textContent = `${rows.length} shown · ${rows.filter((r) => r.passed).length} pass`;
+  $("count").textContent = `${rows.length} shown · ${rows.filter((r) => r.passed).length} pass all gates`;
 }
 
+async function refresh() {
+  saveFilters();
+  await loadMeta();
+  renderFilters(); renderBanners();
+  await Promise.all([loadSummary(), loadDeals()]);
+}
+
+/* ---------------- deal drawer ---------------- */
+let current = null, wiTimer = null;
 async function openDeal(id) {
-  const d = await (await fetch("/api/deals/" + encodeURIComponent(id))).json();
-  const r = d.result, l = d.listing, f = d.refurb, c = d.comps;
+  const d = await api("/api/deals/" + encodeURIComponent(id)); current = d;
+  const r = d.result, l = d.listing, f = d.refurb, c = d.comps, p = d.pipeline;
   const hist = d.price_history.map((h) => `${h.seen_at.slice(0, 10)}: ${gbp(h.price)}`).join(" → ");
+  const img = (l.image_urls || [])[0];
   $("drawer").innerHTML = `
-    <button class="close" id="closeBtn">Close</button>
-    <h2>${esc(l.address || l.postcode)}</h2>
-    <div class="small">${esc(l.postcode)} · ${esc(l.property_type)}${l.bedrooms ? " · " + l.bedrooms + " bed" : ""} · ${esc(l.tenure)}${l.lease_years_remaining ? " (" + l.lease_years_remaining + "y)" : ""} · ${esc(l.source)}</div>
-    ${l.url ? `<p><a href="${esc(l.url)}" target="_blank" rel="noopener">View listing ↗</a></p>` : ""}
-    ${!r.eligible ? `<p><span class="badge b-neutral">Ineligible</span> ${esc(r.eligibility_reasons.join("; "))}</p>` : ""}
-    <h4>Gates</h4>
-    ${r.gates.map((g) => `<div class="gate ${g.passed ? "ok" : "no"}"><strong>${g.passed ? "✓" : "✗"}</strong><div><strong>${GATE_LABEL[g.name]}</strong><div class="small">${esc(g.detail)}</div></div></div>`).join("")}
-    <h4>Acquisition</h4>
-    <div class="kv">
-      <div>Asking price</div><div>${gbp(r.asking_price)}</div>
-      <div>Refurb (${esc(r.refurb_tier)}, inc. contingency)</div><div>${gbp(r.refurb_cost)}</div>
-      <div>SDLT (inc. 5% surcharge)</div><div>${gbp(r.sdlt)}</div>
-      <div>Fixed acquisition costs</div><div>${gbp(r.fixed_acquisition_costs)}</div>
-      <div class="total">All-in (gate 1 basis)</div><div class="total">${gbp(r.all_in_cost)}</div>
-      <div>Bridging finance</div><div>${gbp(r.bridging_costs)}</div>
-      <div>Refinance costs</div><div>${gbp(r.refi_costs)}</div>
-      <div class="total">Total cash deployed</div><div class="total">${gbp(r.total_cash_deployed)}</div>
-      <div>Max offer to clear 75% cap</div><div>${gbp(r.max_offer_price)}</div>
-    </div>
-    <h4>Refinance &amp; hold (SPV)</h4>
-    <div class="kv">
-      <div>Conservative ARV</div><div>${gbp(r.conservative_arv)}</div>
-      <div>Refi loan @ 75% LTV</div><div>${gbp(r.refi_loan)}</div>
-      <div>Money left in</div><div>${gbp(r.money_left_in)}</div>
-      <div>Annual rent</div><div>${gbp(r.annual_rent)}</div>
-      <div>Operating costs (22%)</div><div>−${gbp(r.annual_opex)}</div>
-      <div>Mortgage interest (5.25%)</div><div>−${gbp(r.annual_interest)}</div>
-      <div>Corporation tax (19%)</div><div>−${gbp(r.corporation_tax)}</div>
-      <div class="total">Net cashflow / year</div><div class="total">${gbp(r.net_annual_cashflow)}</div>
-      <div>ICR @ stress rate</div><div>${r.icr.toFixed(2)}x ${r.icr_pass ? "" : "⚠️"}</div>
-      <div>ROCE</div><div>${r.roce_pct == null ? "∞" : r.roce_pct.toFixed(1) + "%"}</div>
-    </div>
-    <h4>Refurb scope (${esc(f.confidence)} confidence)</h4>
-    <ul>${f.key_works.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>
-    <p class="small">${esc(f.rationale)}</p>
-    ${f.red_flags.length ? `<h4>Red flags</h4><ul>${f.red_flags.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}
-    <h4>Comparables</h4>
-    <div class="kv">
-      ${Object.entries(c.arv_estimates).map(([k, v]) => `<div>${esc(k.replaceAll("_", " "))}</div><div>${gbp(v)}</div>`).join("")}
-      <div>Sold comps used</div><div>${c.sold_comp_count}</div>
-      <div>Floor area (${esc(c.floor_area_source)})</div><div>${Math.round(c.floor_area_sqft)} sq ft</div>
-      <div>Market rent (avg)</div><div>${gbp(c.monthly_rent_average)}/mo</div>
-    </div>
-    ${hist ? `<h4>Price history</h4><p class="small">${hist}</p>` : ""}
-    <h4>Description</h4><p class="small">${esc(l.description)}</p>`;
+    ${img ? `<img class="hero" src="${esc(img)}" referrerpolicy="no-referrer" alt="">` : ""}
+    <div class="inner">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:start">
+        <div><h2>${esc(l.address || l.postcode)}</h2>
+        <div class="small">${esc(l.postcode)} · ${esc(l.property_type)}${l.bedrooms ? " · " + l.bedrooms + " bed" : ""} · ${esc(l.tenure)}${l.lease_years_remaining ? " (" + l.lease_years_remaining + "y lease)" : ""} · ${esc(l.source)}${d.first_seen ? " · first seen " + when(d.first_seen) : ""}</div></div>
+        <button id="closeBtn">Close</button>
+      </div>
+      <p style="display:flex;gap:10px;flex-wrap:wrap">
+        ${l.url ? `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">Open listing ↗</a>` : ""}
+        <a class="btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((l.address || "") + " " + l.postcode)}" target="_blank" rel="noopener">Map ↗</a>
+        ${(l.floorplan_urls || [])[0] ? `<a class="btn" href="${esc(l.floorplan_urls[0])}" target="_blank" rel="noopener">Floorplan ↗</a>` : ""}
+      </p>
+      ${!r.eligible ? `<p><span class="badge b-neutral">Ineligible</span> ${esc(r.eligibility_reasons.join("; "))}</p>` : ""}
+
+      <h4>Pipeline</h4>
+      <div class="statusbar" id="statusbar"></div>
+      <div class="field"><textarea id="notes" placeholder="Notes — viewing date, agent, offer made…">${esc(p.notes || "")}</textarea></div>
+
+      <h4>Gates</h4>
+      ${r.gates.map((g) => `<div class="gate ${g.passed ? "ok" : "no"}"><strong>${g.passed ? "✓" : "✗"}</strong><div><strong>${GATE_LABEL[g.name]}</strong><div class="small">${esc(g.detail)}</div></div></div>`).join("")}
+
+      <h4>What if…</h4>
+      <div class="whatif">
+        <div class="grid2">
+          <div class="field"><span>Offer price £</span><input type="number" id="wi_price" step="500" value="${Math.round(r.asking_price)}"></div>
+          <div class="field"><span>Refurb scope</span><select id="wi_tier">${["light","medium","heavy","structural"].map((t) => `<option ${t === r.refurb_tier ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+          <div class="field"><span>Refurb cost £ (blank = from scope)</span><input type="number" id="wi_refurb" step="500" placeholder="${Math.round(r.refurb_cost)}"></div>
+          <div class="field"><span>Rent £/month</span><input type="number" id="wi_rent" step="25" value="${Math.round(r.annual_rent / 12)}"></div>
+          <div class="field"><span>ARV £</span><input type="number" id="wi_arv" step="1000" value="${Math.round(r.conservative_arv)}"></div>
+          <div class="field"><span>&nbsp;</span><button id="wi_max" style="width:100%;justify-content:center">Use max offer (${gbp(r.max_offer_price)})</button></div>
+        </div>
+        <div class="out" id="wi_out"></div>
+      </div>
+
+      <h4>Acquisition</h4>
+      <div class="kv">
+        <div>Asking price</div><div>${gbp(r.asking_price)}</div>
+        <div>Refurb (${esc(r.refurb_tier)}, inc. contingency)</div><div>${gbp(r.refurb_cost)}</div>
+        <div>SDLT (inc. surcharge)</div><div>${gbp(r.sdlt)}</div>
+        <div>Fixed acquisition costs</div><div>${gbp(r.fixed_acquisition_costs)}</div>
+        <div class="total">All-in (gate 1 basis)</div><div class="total">${gbp(r.all_in_cost)}</div>
+        <div>Bridging finance</div><div>${gbp(r.bridging_costs)}</div>
+        <div>Refinance costs</div><div>${gbp(r.refi_costs)}</div>
+        <div class="total">Total cash deployed</div><div class="total">${gbp(r.total_cash_deployed)}</div>
+        <div>Max offer to clear the cap</div><div>${gbp(r.max_offer_price)}</div>
+      </div>
+      <h4>Refinance &amp; hold (SPV)</h4>
+      <div class="kv">
+        <div>Conservative ARV</div><div>${gbp(r.conservative_arv)}</div>
+        <div>Refi loan</div><div>${gbp(r.refi_loan)}</div>
+        <div>Money left in</div><div>${gbp(r.money_left_in)}</div>
+        <div>Annual rent</div><div>${gbp(r.annual_rent)}</div>
+        <div>Operating costs</div><div>${gbp(-r.annual_opex)}</div>
+        <div>Mortgage interest</div><div>${gbp(-r.annual_interest)}</div>
+        <div>Corporation tax</div><div>${gbp(-r.corporation_tax)}</div>
+        <div class="total">Net cashflow / year</div><div class="total">${gbp(r.net_annual_cashflow)}</div>
+        <div>ICR at stress rate</div><div>${r.icr.toFixed(2)}x ${r.icr_pass ? "" : "⚠️"}</div>
+        <div>ROCE</div><div>${r.roce_pct == null ? "∞" : r.roce_pct.toFixed(1) + "%"}</div>
+      </div>
+      <h4>Refurb scope (${esc(f.confidence)} confidence)</h4>
+      <ul>${f.key_works.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>
+      <p class="small">${esc(f.rationale)}</p>
+      ${f.red_flags.length ? `<h4>Red flags</h4><ul>${f.red_flags.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}
+      <h4>Comparables</h4>
+      <div class="kv">
+        ${Object.entries(c.arv_estimates).map(([k, v]) => `<div>${esc(k.replaceAll("_", " "))}</div><div>${gbp(v)}</div>`).join("")}
+        <div>Sold comps used</div><div>${c.sold_comp_count}</div>
+        <div>Floor area (${esc(c.floor_area_source)})</div><div>${Math.round(c.floor_area_sqft)} sq ft</div>
+        <div>Market rent (average)</div><div>${gbp(c.monthly_rent_average)}/mo</div>
+      </div>
+      <p class="small">Sources: ${esc(c.sources.join(", "))}</p>
+      ${hist ? `<h4>Price history</h4><p class="small">${hist}</p>` : ""}
+      <h4>Description</h4><p class="small" style="white-space:pre-wrap">${esc(l.description)}</p>
+    </div>`;
   $("closeBtn").onclick = closeDeal;
-  $("drawer").classList.add("open"); $("overlay").classList.add("open");
+  renderStatusbar(p.status);
+  $("notes").addEventListener("change", async () => { await api(`/api/deals/${encodeURIComponent(id)}/status`, { method: "PUT", body: { notes: $("notes").value } }); toast("Notes saved"); });
+  ["wi_price", "wi_tier", "wi_refurb", "wi_rent", "wi_arv"].forEach((k) => $(k).addEventListener("input", () => { clearTimeout(wiTimer); wiTimer = setTimeout(whatIf, 250); }));
+  $("wi_max").onclick = () => { $("wi_price").value = Math.round(r.max_offer_price); whatIf(); };
+  whatIf();
+  $("drawer").classList.add("open"); $("overlay").classList.add("open"); $("drawer").scrollTop = 0;
 }
-function closeDeal() { $("drawer").classList.remove("open"); $("overlay").classList.remove("open"); }
-$("overlay").onclick = closeDeal;
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDeal(); });
-
-async function refresh() { save(); renderFilters(); await Promise.all([loadSummary(), loadDeals()]); }
-
-$("scanBtn").onclick = async () => {
-  const btn = $("scanBtn"); btn.disabled = true; btn.textContent = "Scanning…";
+function renderStatusbar(active) {
+  const bar = $("statusbar"); bar.innerHTML = "";
+  state.meta.statuses.forEach((s) => bar.appendChild(chip(s, s === active, async () => {
+    await api(`/api/deals/${encodeURIComponent(current.listing.listing_id)}/status`, { method: "PUT", body: { status: s } });
+    renderStatusbar(s); toast(`Marked ${s}`); loadDeals();
+  })));
+}
+async function whatIf() {
+  if (!current) return;
+  const num = (id) => $(id).value === "" ? null : Number($(id).value);
+  const body = { asking_price: num("wi_price"), refurb_tier: $("wi_tier").value, refurb_cost: num("wi_refurb"), monthly_rent: num("wi_rent"), arv: num("wi_arv") };
   try {
-    const body = { offline: $("offline").checked, outcodes: state.outcodes.size ? [...state.outcodes] : null };
-    const res = await fetch("/api/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    const s = await res.json();
-    if (!res.ok) throw new Error(s.detail || res.statusText);
-    $("status").textContent = `Scan done: ${s.fetched} fetched, ${s.underwritten} underwritten, ${s.passed} pass`;
-    await refresh();
-  } catch (e) { $("status").textContent = "Scan failed: " + e.message; }
-  finally { btn.disabled = false; btn.textContent = "Run scan"; }
-};
-["passedOnly", "inclIneligible", "minRoce", "minYield", "maxPrice", "sort", "offline"].forEach((id) =>
-  $(id).addEventListener("change", refresh));
+    const r = await api(`/api/deals/${encodeURIComponent(current.listing.listing_id)}/whatif`, { method: "POST", body });
+    $("wi_refurb").placeholder = Math.round(r.tier_costs[$("wi_tier").value]);
+    const g = Object.fromEntries(r.gates.map((x) => [x.name, x.passed]));
+    $("wi_out").innerHTML = `
+      <div class="stat ${g.all_in_cap ? "ok" : "no"}"><b>${pct(r.gates[0].value, 0)}</b><span>all-in / ARV</span></div>
+      <div class="stat ${g.gross_yield ? "ok" : "no"}"><b>${pct(r.gross_yield, 2)}</b><span>gross yield</span></div>
+      <div class="stat ${g.net_cashflow ? "ok" : "no"}"><b>${gbp(r.net_monthly_cashflow)}</b><span>cashflow / mo</span></div>
+      <div class="stat ${g.capital_recycled ? "ok" : "no"}"><b>${pct(r.capital_recycled_pct, 0)}</b><span>recycled</span></div>
+      <div class="stat"><b>${gbp(r.money_left_in)}</b><span>left in</span></div>
+      <div class="stat"><b>${r.roce_pct == null ? "∞" : r.roce_pct.toFixed(1) + "%"}</b><span>ROCE</span></div>
+      <div class="stat"><b>${gbp(r.sdlt)}</b><span>SDLT</span></div>
+      <div class="stat ${r.passed ? "ok" : "no"}"><b>${r.passed ? "PASS" : "FAIL"}</b><span>all 4 gates</span></div>`;
+  } catch (e) { $("wi_out").innerHTML = `<div class="small">${esc(e.message)}</div>`; }
+}
+function closeDeal() { $("drawer").classList.remove("open"); $("overlay").classList.remove("open"); current = null; }
+$("overlay").onclick = closeDeal;
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeDeal(); $("scanModal").classList.remove("open"); } });
 
-(async () => {
-  restore();
-  state.meta = await (await fetch("/api/meta")).json();
-  if (!state.meta.live_ready && !localStorage.getItem("brrr-filters")) $("offline").checked = true;
-  await refresh();
-})();
+/* ---------------- scanning & jobs ---------------- */
+function openScanModal() {
+  const keys = state.meta.keys;
+  $("pdHint").textContent = keys.PROPERTYDATA_API_KEY ? "" : "(no key — will be skipped)";
+  $("claudeHint").textContent = keys.ANTHROPIC_API_KEY ? "" : "(no key — keyword heuristic used)";
+  $("m_alerts").disabled = !(keys.TELEGRAM_BOT_TOKEN && keys.TELEGRAM_CHAT_ID) && !keys.ALERT_WEBHOOK_URL;
+  const oc = state.f.outcodes;
+  $("scanScope").textContent = oc.length ? `Postcodes: ${oc.join(", ")} (your current selection)` : "All 11 target postcodes. Select postcodes on the left to scan fewer.";
+  $("scanModal").classList.add("open");
+}
+$("scanBtn").onclick = openScanModal;
+$("scanCancel").onclick = () => $("scanModal").classList.remove("open");
+document.querySelector(".m_src[value=sample]").addEventListener("change", (e) => {
+  document.querySelectorAll(".m_src:not([value=sample])").forEach((x) => { x.disabled = e.target.checked; });
+});
+$("scanGo").onclick = () => {
+  const srcs = [...document.querySelectorAll(".m_src:checked")].map((x) => x.value);
+  const sources = srcs.includes("sample") ? ["sample"] : srcs;
+  if (!sources.length) return toast("Pick at least one source");
+  $("scanModal").classList.remove("open");
+  startScan({ sources, outcodes: state.f.outcodes.length ? state.f.outcodes : null, send_alerts: $("m_alerts").checked, use_claude: $("m_claude").checked });
+};
+async function startScan(body) {
+  try { await api("/api/scan", { method: "POST", body }); toast("Scan started — progress shows at the top"); pollJob(true); }
+  catch (e) { toast("Couldn't start: " + e.message); }
+}
+
+let pollHandle = null;
+async function pollJob(force) {
+  clearTimeout(pollHandle);
+  let j = null; try { j = await api("/api/job"); } catch {}
+  const pill = $("jobpill");
+  if (j && j.running) {
+    pill.classList.add("on"); $("jobmsg").textContent = j.message; $("scanBtn").disabled = true;
+    state.jobRunning = true;
+  } else {
+    pill.classList.remove("on"); $("scanBtn").disabled = false;
+    if (state.jobRunning && j) {  // just finished
+      state.jobRunning = false;
+      if (j.error) toast("Job failed: " + j.error, 7000);
+      else if (j.kind === "scan" && j.result) toast(`Scan finished: ${j.result.fetched} listings, ${j.result.underwritten} underwritten, ${j.result.passed} pass all gates (${j.result.new_passing} new)` + (j.result.waiting_for_comps ? ` · ${j.result.waiting_for_comps} waiting for comps` : ""), 8000);
+      else if (j.kind === "rescore") toast(`Re-scored ${j.result.rescored} deals`);
+      if (state.view === "deals") refresh();
+    }
+  }
+  if (state.view === "runs") renderJob(j);
+  pollHandle = setTimeout(pollJob, j && j.running ? 1200 : 6000);
+}
+
+/* ---------------- runs view ---------------- */
+function renderJob(j) {
+  const el = $("jobPanel");
+  if (!j) { el.textContent = "Nothing running."; return; }
+  const p = j.total ? Math.round((j.done / j.total) * 100) : (j.running ? 8 : 100);
+  let html = `<div><b>${esc(j.kind)}</b> · ${j.running ? "running" : j.error ? "failed" : "finished"} · started ${when(j.started_at)}</div>
+    <div class="progress"><div style="width:${p}%"></div></div><div>${esc(j.message)}</div>`;
+  if (j.error) html += `<div class="badge b-fail" style="margin-top:6px">${esc(j.error)}</div>`;
+  if (j.result && j.result.checks) html += renderChecks(j.result.checks);
+  html += `<pre class="log mono">${esc(j.log.join("\n"))}</pre>`;
+  el.innerHTML = html;
+  if (j.result && j.result.checks) $("checks").innerHTML = renderChecks(j.result.checks);
+}
+function renderChecks(checks) {
+  return checks.map((c) => `<div class="check"><div class="ic">${c.ok === true ? "✅" : c.ok === false ? "❌" : "➖"}</div><div><b>${esc(c.name)}</b> — ${esc(c.detail)}${c.ok === false && c.fix ? `<div class="small">→ ${esc(c.fix)}</div>` : ""}</div></div>`).join("");
+}
+async function loadRuns() {
+  await loadMeta();
+  const ps = state.meta.portal_status;
+  $("portalHealth").innerHTML = ps ? `<div class="small">${when(ps.at)}</div><div class="table-wrap" style="margin-top:6px"><table><thead><tr><th>Portal</th><th>State</th><th class="num">Pages</th><th class="num">Listings</th><th class="num">Rentals</th><th>Note</th></tr></thead><tbody>${
+    Object.entries(ps.portals).map(([k, v]) => `<tr><td>${esc(k)}</td><td><span class="badge ${v.state === "ok" ? "b-pass" : v.state === "blocked" ? "b-fail" : "b-warn"}">${esc(v.state)}</span></td><td class="num">${v.pages}</td><td class="num">${v.listings}</td><td class="num">${v.rentals}</td><td style="white-space:normal" class="small">${esc(v.message || "")}${v.debug ? `<br><span class="mono">${esc(v.debug)}.html</span>` : ""}</td></tr>`).join("")
+  }</tbody></table></div>` : "No portal run yet.";
+  const runs = await api("/api/runs");
+  $("runRows").innerHTML = runs.map((r) => { const s = r.summary || {};
+    const note = (s.notes || []).concat(s.errors || []).slice(0, 3).join(" · ");
+    return `<tr title="${esc((s.errors || []).concat(s.notes || []).slice(0, 8).join("\n"))}"><td>${when(r.started_at)}${note ? `<div class="small" style="white-space:normal;max-width:320px">${esc(note)}</div>` : ""}</td><td>${esc(r.trigger)}</td><td>${esc((r.sources || "").split(",").map((x) => SOURCE_LABEL[x] || x).join(", "))}</td><td class="num">${s.fetched ?? "–"}</td><td class="num">${s.passed ?? "–"}</td><td class="num">${s.new_passing ?? "–"}</td><td><span class="badge ${r.status === "ok" ? "b-pass" : r.status === "running" ? "b-accent" : r.status === "partial" ? "b-warn" : "b-fail"}">${esc(r.status)}</span></td></tr>`; }).join("")
+    || `<tr><td colspan="7" class="small">No runs yet.</td></tr>`;
+  const mk = await api("/api/market");
+  const byOc = {}; mk.forEach((r) => { (byOc[r.outcode] ||= {})[r.channel] = r; });
+  $("market").innerHTML = Object.keys(byOc).length ? `<div class="table-wrap"><table><thead><tr><th>Postcode</th><th class="num">For sale seen</th><th class="num">Rentals seen</th><th>Updated</th></tr></thead><tbody>${
+    Object.entries(byOc).map(([oc, v]) => `<tr><td>${oc}</td><td class="num">${v.sale?.n ?? 0}</td><td class="num">${v.rent?.n ?? 0}</td><td>${ago((v.sale || v.rent).last_seen)}</td></tr>`).join("")}</tbody></table></div>` : "Nothing collected yet — fills up after the first portal scan.";
+  renderJob(await api("/api/job"));
+}
+$("doctorBtn").onclick = async () => { try { await api("/api/doctor", { method: "POST" }); $("checks").textContent = "Checking… (opens a browser briefly)"; pollJob(true); } catch (e) { toast(e.message); } };
+$("logBtn").onclick = async () => { const t = await api("/api/logs"); $("logText").textContent = t || "(log is empty)"; $("logText").scrollTop = 1e9; };
+
+/* ---------------- settings view ---------------- */
+const KEY_LABELS = { ANTHROPIC_API_KEY: "Claude (Anthropic) API key", PROPERTYDATA_API_KEY: "PropertyData API key",
+  TELEGRAM_BOT_TOKEN: "Telegram bot token", TELEGRAM_CHAT_ID: "Telegram chat id", ALERT_WEBHOOK_URL: "Webhook URL (optional)",
+  EPC_API_EMAIL: "EPC register email", EPC_API_TOKEN: "EPC register API key" };
+let settings = null;
+const getPath = (o, p) => p.split(".").reduce((a, k) => a?.[k], o);
+function setPath(o, p, v) { const ks = p.split("."); let cur = o; ks.slice(0, -1).forEach((k) => cur = cur[k] ||= {}); cur[ks.at(-1)] = v; }
+
+async function loadSettings() {
+  settings = await api("/api/settings");
+  const c = settings.config, sch = settings.schedule;
+  $("schedStatus").innerHTML = sch.installed ? `<span class="badge b-pass">Installed</span> ${esc(sch.platform)} · daily at <b>${esc(sch.time)}</b>${sch.next_run ? " · next " + esc(sch.next_run) : ""}`
+    : `<span class="badge b-warn">Not installed</span> ${esc(sch.platform || "")}${sch.error ? " · " + esc(sch.error) : ""}`;
+  $("s_time").value = c.schedule.time || "07:30";
+  document.querySelectorAll(".s_src").forEach((x) => x.checked = (c.schedule.sources || []).includes(x.value));
+  document.querySelectorAll(".s_portal").forEach((x) => x.checked = (c.portals.enabled || []).includes(x.value));
+  $("s_showbrowser").checked = c.portals.headless === false;
+  $("s_pages").value = c.portals.max_sale_pages_per_outcode; $("s_maxprice").value = c.ingestion.max_price;
+  $("keys").innerHTML = Object.entries(KEY_LABELS).map(([k, label]) => {
+    const s = settings.secrets[k];
+    return `<div class="keyrow"><label for="k_${k}">${label}<div class="small">${s.set ? "Saved " + esc(s.hint) : "Not set"}</div></label>
+      <input type="${k.includes("CHAT_ID") || k.includes("EMAIL") || k.includes("URL") ? "text" : "password"}" id="k_${k}" autocomplete="off" placeholder="${s.set ? "•••••• (unchanged)" : ""}"></div>`; }).join("");
+  document.querySelectorAll("[data-cfg]").forEach((el) => {
+    const v = getPath(c, el.dataset.cfg);
+    if (el.type === "checkbox") el.checked = !!v;
+    else el.value = v == null ? "" : el.hasAttribute("data-pct") ? +(v * 100).toFixed(4) : v;
+  });
+}
+$("saveKeys").onclick = async () => {
+  const secrets = {}; Object.keys(KEY_LABELS).forEach((k) => { const v = $("k_" + k).value.trim(); if (v) secrets[k] = v; });
+  if (!Object.keys(secrets).length) return toast("Nothing to save — type a new value first");
+  await api("/api/settings", { method: "PUT", body: { secrets } }); toast("Keys saved"); loadSettings(); loadMeta();
+};
+$("testAlert").onclick = async () => { try { const r = await api("/api/test-alert", { method: "POST" }); toast(r.message); } catch (e) { toast(e.message, 6000); } };
+$("saveRules").onclick = async () => {
+  const cfg = {};
+  document.querySelectorAll("[data-cfg]").forEach((el) => {
+    if (el.type === "checkbox") return setPath(cfg, el.dataset.cfg, el.checked);
+    if (el.value === "") return;
+    const n = Number(el.value); setPath(cfg, el.dataset.cfg, el.hasAttribute("data-pct") ? +(n / 100).toFixed(6) : n);
+  });
+  await api("/api/settings", { method: "PUT", body: { config: cfg } });
+  toast("Rules saved — click 'Re-score saved deals' to apply them to existing deals", 5000);
+};
+$("rescoreBtn").onclick = async () => { try { await api("/api/rescore", { method: "POST" }); pollJob(true); } catch (e) { toast(e.message); } };
+async function savePortalAndSchedule() {
+  const enabled = [...document.querySelectorAll(".s_portal:checked")].map((x) => x.value);
+  const sources = [...document.querySelectorAll(".s_src:checked")].map((x) => x.value);
+  await api("/api/settings", { method: "PUT", body: { config: {
+    portals: { enabled, headless: !$("s_showbrowser").checked, max_sale_pages_per_outcode: Number($("s_pages").value) || 3 },
+    ingestion: { max_price: Number($("s_maxprice").value) || 350000 }, schedule: { time: $("s_time").value, sources } } } });
+}
+document.querySelectorAll(".s_portal, .s_src, #s_showbrowser, #s_pages, #s_maxprice").forEach((el) =>
+  el.addEventListener("change", async () => { await savePortalAndSchedule(); toast("Saved"); }));
+$("schedInstall").onclick = async () => {
+  await savePortalAndSchedule();
+  try { const r = await api("/api/schedule/install", { method: "POST", body: { time: $("s_time").value } }); toast(r.message, 5000); loadSettings(); }
+  catch (e) { toast("Install failed: " + e.message, 7000); }
+};
+$("schedRemove").onclick = async () => { const r = await api("/api/schedule/remove", { method: "POST" }); toast(r.message); loadSettings(); };
+
+/* ---------------- boot ---------------- */
+(async () => { loadFilters(); await refresh(); pollJob(); })();
 </script>
 </body>
 </html>

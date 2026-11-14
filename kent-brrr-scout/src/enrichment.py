@@ -61,7 +61,7 @@ def _num(x: Any) -> float | None:
 def pd_sold_prices(client: DataClient, outcode: str, ptype: str, beds: int | None) -> list[float]:
     try:
         data = client.get(
-            "sold-prices", postcode=outcode, type=PD_TYPE.get(ptype), max_age=24
+            "sold-prices", postcode=outcode, type=PD_TYPE.get(ptype), max_age=24, bedrooms=beds
         ).get("data", {})
     except PropertyDataError as exc:
         log.info("sold-prices %s failed: %s", outcode, exc)
@@ -85,9 +85,11 @@ def pd_price_per_sqft(client: DataClient, outcode: str) -> float | None:
     return _num(data.get("average"))
 
 
-def pd_rent(client: DataClient, outcode: str, beds: int | None) -> tuple[float | None, float | None]:
+def pd_rent(client: DataClient, outcode: str, beds: int | None,
+            ptype: str | None = None) -> tuple[float | None, float | None]:
     try:
-        data = client.get("rents", postcode=outcode, bedrooms=beds).get("data", {})
+        data = client.get("rents", postcode=outcode, bedrooms=beds, type=PD_TYPE.get(ptype or "")
+                          ).get("data", {})
     except PropertyDataError:
         return None, None
     ll = data.get("long_let") or data
@@ -250,17 +252,18 @@ def enrich(listing: RawListing, client: DataClient, cfg: dict[str, Any], *,
 
     epc_rating = epc_rating or pd_epc(client, listing)
 
+    local = getattr(client, "provides_land_registry", False)
     sold = pd_sold_prices(client, oc, ptype, beds)
     if sold:
-        sources.append("sold:propertydata")
-    elif use_external_fallbacks:
+        sources.append("sold:land_registry" if local else "sold:propertydata")
+    elif use_external_fallbacks and not local:
         sold = land_registry_sold(oc, ptype, ing["land_registry_sparql"])
         if sold:
             sources.append("sold:land_registry")
     ppsf = pd_price_per_sqft(client, oc)
     asking = fetch_asking_prices(client, oc, beds, PD_TYPE.get(ptype))
     asking_avg = _num(asking.get("average"))
-    rent_avg, rent_low = pd_rent(client, oc, beds)
+    rent_avg, rent_low = pd_rent(client, oc, beds, ptype)
 
     estimates: dict[str, float] = {}
     if sold:
@@ -270,11 +273,11 @@ def enrich(listing: RawListing, client: DataClient, cfg: dict[str, Any], *,
         sources.append("ppsf:propertydata")
     if asking_avg:
         estimates["asking_avg_less_5pct"] = asking_avg * 0.95
-        sources.append("asking:propertydata")
+        sources.append("asking:portals" if local else "asking:propertydata")
 
     rent_basis = rent_avg or 0.0
     if rent_avg:
-        sources.append("rent:propertydata")
+        sources.append("rent:portals" if local else "rent:propertydata")
 
     return CompData(
         outcode=oc,

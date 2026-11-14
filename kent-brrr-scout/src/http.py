@@ -58,8 +58,12 @@ class PropertyDataClient:
         self._http = httpx.Client(timeout=timeout)
         self._cache: dict[str, dict[str, Any]] = {}
 
+    # Params our enrichment passes that a given PropertyData endpoint doesn't take.
+    _UNSUPPORTED = {"sold-prices": {"bedrooms"}, "sourced-properties": {"bedrooms"}}
+
     def get(self, endpoint: str, **params: Any) -> dict[str, Any]:
-        params = {k: v for k, v in params.items() if v is not None}
+        drop = self._UNSUPPORTED.get(endpoint.strip("/"), set())
+        params = {k: v for k, v in params.items() if v is not None and k not in drop}
         cache_key = endpoint + json.dumps(params, sort_keys=True)
         if cache_key in self._cache:
             return self._cache[cache_key]

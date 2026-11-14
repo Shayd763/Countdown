@@ -11,6 +11,7 @@ dependencies = [
     "pyyaml>=6.0",
     "fastapi>=0.110",
     "uvicorn>=0.29",
+    "playwright>=1.45",
 ]
 
 [project.optional-dependencies]
@@ -39,7 +40,8 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
-ignore = ["B008"]  # FastAPI Query() defaults are idiomatic
+ignore = ["B008", "SIM105"]  # FastAPI Query() defaults; explicit try/except-pass is clearer here
 
 [tool.ruff.lint.per-file-ignores]
 "scripts/*" = ["E501"]  # fixture data tables
+"tests/*" = ["E501"]

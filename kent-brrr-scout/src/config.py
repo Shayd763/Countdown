@@ -38,14 +38,67 @@ def _deep_merge(base: dict, override: dict) -> dict:
     return out
 
 
+USER_OVERRIDES = PROJECT_ROOT / "config" / "user.yaml"  # written by the UI Settings page
+ENV_PATH = PROJECT_ROOT / ".env"
+
+
 @lru_cache(maxsize=4)
+def _load_config_cached(path: str, user_mtime: float) -> dict[str, Any]:
+    with Path(path).open() as fh:
+        cfg = yaml.safe_load(fh)
+    if user_mtime and USER_OVERRIDES.exists():
+        cfg = _deep_merge(cfg, yaml.safe_load(USER_OVERRIDES.read_text()) or {})
+    return cfg
+
+
 def load_config(path: str | None = None) -> dict[str, Any]:
+    """Base YAML merged with config/user.yaml (UI-edited settings). Re-read when user.yaml changes."""
     path = path or os.environ.get("BRRR_CONFIG") or str(PROJECT_ROOT / "config" / "postcodes.yaml")
     p = Path(path)
     if not p.is_absolute():
         p = PROJECT_ROOT / p
-    with p.open() as fh:
-        return yaml.safe_load(fh)
+    mtime = USER_OVERRIDES.stat().st_mtime if USER_OVERRIDES.exists() else 0.0
+    return copy.deepcopy(_load_config_cached(str(p), mtime))
+
+
+def save_user_overrides(updates: dict[str, Any]) -> dict[str, Any]:
+    current = (yaml.safe_load(USER_OVERRIDES.read_text()) or {}) if USER_OVERRIDES.exists() else {}
+    merged = _deep_merge(current, updates)
+    USER_OVERRIDES.write_text(
+        "# Written by the Kent BRRR Scout Settings page. Overrides config/postcodes.yaml.\n"
+        + yaml.safe_dump(merged, sort_keys=False)
+    )
+    return merged
+
+
+SECRET_KEYS = [
+    "ANTHROPIC_API_KEY", "PROPERTYDATA_API_KEY", "EPC_API_EMAIL", "EPC_API_TOKEN",
+    "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "ALERT_WEBHOOK_URL",
+]
+
+
+def save_env(values: dict[str, str]) -> None:
+    """Update .env in place (keeps unrelated lines) and the live process environment."""
+    lines = ENV_PATH.read_text().splitlines() if ENV_PATH.exists() else []
+    remaining = dict(values)
+    out = []
+    for line in lines:
+        key = line.split("=", 1)[0].strip()
+        if key in remaining:
+            out.append(f"{key}={remaining.pop(key)}")
+        else:
+            out.append(line)
+    out += [f"{k}={v}" for k, v in remaining.items()]
+    ENV_PATH.write_text("\n".join(out) + "\n")
+    try:
+        ENV_PATH.chmod(0o600)
+    except OSError:
+        pass
+    for k, v in values.items():
+        if v:
+            os.environ[k] = v
+        else:
+            os.environ.pop(k, None)
 
 
 def all_outcodes(cfg: dict[str, Any]) -> list[str]:

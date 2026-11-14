@@ -113,3 +113,36 @@ claude:
   model: claude-opus-5-5
   effort: medium
   max_images: 6
+
+# Portal collector — runs in a real browser on YOUR laptop (see README "Daily laptop run").
+# Low volume and slow on purpose: one pass a day, newest listings first, stops at
+# listings it has already seen. If a site shows a block/captcha page the collector
+# stops for that site and reports it in the UI — it does not try to get around it.
+portals:
+  enabled: [rightmove, zoopla, onthemarket]
+  headless: true                # false = show the browser window while collecting
+  browser_channel: chrome       # use installed Google Chrome if present, else bundled Chromium
+  max_sale_pages_per_outcode: 3 # newest-first; stops early once pages are all already-seen
+  max_rent_pages_per_outcode: 2
+  rent_refresh_days: 7          # rental comps don't need refreshing daily
+  page_delay_seconds: [4, 9]    # random pause between page loads
+  max_detail_pages_per_run: 40  # detail pages only for listings that survive the cheap pre-gate
+  stop_after_seen_streak: 12    # consecutive already-seen listings → stop paging that outcode
+  base_urls:
+    rightmove: https://www.rightmove.co.uk
+    rightmove_typeahead: https://los.rightmove.co.uk/typeahead
+    zoopla: https://www.zoopla.co.uk
+    onthemarket: https://www.onthemarket.com
+  # Pin Rightmove location ids here if auto-lookup fails, e.g. ME4: "OUTCODE^1652"
+  rightmove_location_ids: {}
+
+# Local comps (used when no PROPERTYDATA_API_KEY): asking-price and rent medians built
+# from everything the portal collector has seen, plus HM Land Registry sold prices.
+local_comps:
+  lookback_days: 120
+  min_samples: 3
+  land_registry_cache_days: 7
+
+schedule:
+  time: "07:30"                 # local time on the laptop
+  sources: [portals, rss, propertydata]
