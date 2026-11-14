@@ -20,6 +20,7 @@ from .claude_analyst import ClaudeAnalyst, heuristic_assessment, make_analyst
 from .config import all_outcodes, config_for_outcode, load_config, load_dotenv
 from .enrichment import enrich
 from .finance import build_plan
+from .funnel import reason_bucket
 from .http import DataClient, FixtureClient, PropertyDataClient
 from .ingestion import check_eligibility, fetch_rss, fetch_sourced
 from .models import Deal, RawListing, Tenure
@@ -46,6 +47,8 @@ class RunSummary:
     areas: list[str] = field(default_factory=list)
     located: dict[str, int] = field(default_factory=dict)
     ppd: dict[str, Any] = field(default_factory=dict)
+    unchanged_skipped: int = 0
+    funnel: dict[str, Any] = field(default_factory=dict)
     alerted: int = 0
     claude_calls: int = 0
     details_fetched: int = 0
@@ -55,7 +58,18 @@ class RunSummary:
     errors: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
-        return self.__dict__.copy()
+        d = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
+        if getattr(self, "_funnel", None) is not None:
+            d["funnel"] = self._funnel.as_dict()
+        return d
+
+    @property
+    def fn(self):
+        from .funnel import Funnel
+
+        if getattr(self, "_funnel", None) is None:
+            self._funnel = Funnel()
+        return self._funnel
 
 
 def _noop(*_a: Any, **_k: Any) -> None:
@@ -79,15 +93,26 @@ def process_listing(
     comps_fetcher: Callable[[RawListing], bool] | None = None,
 ) -> Deal | None:
     ocfg = config_for_outcode(cfg, listing.outcode)
+    fn = summary.fn
+    fn.add("seen", listing)
+    # Listings found again by the reduced/stale/sweep searches: skip if the price hasn't moved
+    # and we checked them recently. New listings are always checked.
+    if listing.search_kind in ("reduced", "stale", "sweep") and recently_checked(listing, storage, cfg):
+        storage.upsert_listing(listing)
+        summary.unchanged_skipped += 1
+        fn.add("unchanged", listing)
+        return None
     track = storage.upsert_listing(listing)
 
     ok, reasons = check_eligibility(listing, ocfg, allow_unknown_lease=True)
     if not ok:
         summary.pre_screen_rejected += 1
         storage.audit("pre_screen_reject", listing.listing_id, {"reasons": reasons})
+        fn.add("excluded", listing, reasons[0] if reasons else None)
         return None
 
-    if comps_fetcher and not priced_out_by_sold(listing, ocfg, storage):
+    priced_out = priced_out_by_sold(listing, ocfg, storage)
+    if comps_fetcher and not priced_out:
         comps_fetcher(listing)  # rentals and asking prices for this district, if thin
 
     params = UnderwritingParams.from_config(ocfg)
@@ -109,6 +134,7 @@ def process_listing(
     if common is None:
         storage.audit("no_comps", listing.listing_id, {"sources": comps.sources})
         summary.waiting_for_comps += 1
+        fn.add("no_comps", listing, "Priced well above local sales" if priced_out else "Waiting for local comps")
         return None
 
     # Only listings that could still pass get a detail-page visit and a Claude call.
@@ -122,9 +148,11 @@ def process_listing(
             if not ok:
                 summary.pre_screen_rejected += 1
                 storage.audit("pre_screen_reject", listing.listing_id, {"reasons": reasons})
+                fn.add("excluded", listing, reasons[0] if reasons else None)
                 return None
             comps, common, best_case = evaluate(listing)
             if common is None:
+                fn.add("no_comps", listing, "Waiting for local comps")
                 return None
 
     if analyst and best_case.passed:
@@ -146,11 +174,37 @@ def process_listing(
                 price_drop_pct=track["drop_pct"])
     storage.save_deal(deal)
     summary.underwritten += 1
+    fn.add("checked", listing)
+    if best_case.passed:
+        fn.add("possible", listing)
+    if not eligible:
+        fn.reasons[reason_bucket(reasons[0] if reasons else "Ineligible")] += 1
     if result.passed and eligible:
         summary.passed += 1
+        fn.add("passed", listing)
         if track["is_new"]:
             summary.new_passing += 1
+    elif eligible:
+        fn.gate_failures(result.gates)
+        if result.max_offer_price > 0 and result.max_offer_price >= 0.75 * result.asking_price:
+            alt = underwrite(refurb_tier=refurb.tier, **{**common, "asking_price": result.max_offer_price})
+            if alt.passed:
+                fn.add("worth_offer", listing)
     return deal
+
+
+def recently_checked(listing: RawListing, storage: Storage, cfg: dict[str, Any]) -> bool:
+    """Seen before at the same price and underwritten within `recheck_days`."""
+    from datetime import UTC, datetime, timedelta
+
+    price = storage.listing_price(listing.listing_id)
+    if price is None or abs(price - listing.asking_price) >= 1:
+        return False
+    deal = storage.get_deal(listing.listing_id)
+    if deal is None:
+        return False
+    days = int((cfg.get("coverage") or {}).get("recheck_days", 14))
+    return deal.result.underwritten_at > datetime.now(UTC) - timedelta(days=days)
 
 
 def priced_out_by_sold(listing: RawListing, cfg: dict[str, Any], storage: Storage) -> bool:
@@ -185,6 +239,7 @@ def run_scan(
     dry_run: bool = False, use_claude: bool = True, min_roce: float | None = None,
     storage: Storage | None = None, include_rss: bool = True, config_path: str | None = None,
     progress: Progress | None = None, trigger: str = "manual", areas: list[str] | None = None,
+    kinds: list[str] | None = None,
 ) -> RunSummary:
     load_dotenv()
     cfg = load_config(config_path)
@@ -246,8 +301,17 @@ def run_scan(
                 if nationwide:
                     search_areas = areas or (cfg.get("coverage") or {}).get("search_areas") or []
                     summary.areas = search_areas
-                    listings += session.collect_areas(search_areas)
-                    summary.located = session.located
+                    run_kinds = kinds or ["new", "reduced", "stale", "sweep"]
+                    if "new" in run_kinds:
+                        listings += session.collect_areas(search_areas)
+                    first = dict(session.located)
+                    extra_kinds = [k for k in run_kinds if k != "new"]
+                    if extra_kinds:
+                        listings += session.collect_extra(search_areas, extra_kinds)
+                        second = session.located
+                        summary.located = {k: first.get(k, 0) + second.get(k, 0) for k in set(first) | set(second)}
+                    else:
+                        summary.located = first
                 else:
                     listings += session.collect(targets)
                 summary.portals = session.status
@@ -332,6 +396,7 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--outcode", action="append", help="Outcode to scan (repeatable); switches portals to "
                     "district searches. Default: England-wide county searches")
     ap.add_argument("--area", action="append", help="County to search (repeatable), e.g. --area Kent")
+    ap.add_argument("--kinds", help="Comma list of searches: new,reduced,stale,sweep (default all enabled)")
     ap.add_argument("--sources", help=f"Comma list from {', '.join(ALL_SOURCES)}")
     ap.add_argument("--daily", action="store_true",
                     help="Morning routine: sources from config schedule.sources, alerts on")
@@ -355,6 +420,7 @@ def main(argv: list[str] | None = None) -> None:
         min_roce=args.min_roce, storage=Storage(args.db) if args.db else None,
         include_rss=not args.no_rss, config_path=args.config,
         trigger="schedule" if args.daily else "cli", areas=args.area,
+        kinds=args.kinds.split(",") if args.kinds else None,
     )
     print(
         f"\nScanned {', '.join(summary.outcodes)} via {', '.join(summary.sources)} — fetched "

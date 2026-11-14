@@ -68,7 +68,36 @@ def deal_row(d: Deal, meta: dict[str, Any] | None = None) -> dict[str, Any]:
         "cash_to_buy": round(r.all_in_cost + r.bridging_costs, 2),
         "monthly_rent": round(r.annual_rent / 12, 2),
         "plan": r.plan_label, "ownership": r.ownership,
+        "listed_on": lst.listed_on, "reduced_on": lst.reduced_on, "days_on_market": days_on_market(lst),
+        "search_kind": lst.search_kind,
     }
+
+
+def days_on_market(lst) -> int | None:
+    from datetime import date
+
+    if lst.listed_on:
+        try:
+            return (date.today() - date.fromisoformat(lst.listed_on[:10])).days
+        except ValueError:
+            return lst.days_on_market
+    return lst.days_on_market
+
+
+def has_signal(d: Deal, signal: str) -> bool:
+    from datetime import date
+
+    lst = d.listing
+    if signal == "reduced":
+        if d.price_drop_pct:
+            return True
+        try:
+            return bool(lst.reduced_on) and (date.today() - date.fromisoformat(lst.reduced_on[:10])).days <= 14
+        except ValueError:
+            return False
+    if signal == "stale":
+        return (days_on_market(lst) or 0) >= 90
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -181,7 +210,8 @@ EDITABLE = {
     "costs": ["fixed_acquisition_costs", "arv_haircut_pct", "rent_haircut_pct", "refurb_contingency_pct",
               "refurb_per_sqft"],
     "ingestion": ["max_price", "max_price_commercial"],
-    "coverage": ["scope", "added_within_days", "channels", "max_pages_per_search", "search_areas", "keywords"],
+    "coverage": ["scope", "added_within_days", "channels", "max_pages_per_search", "search_areas", "keywords",
+                 "searches", "recheck_days"],
     "portals": ["enabled", "headless", "max_sale_pages_per_outcode"],
     "schedule": ["time", "sources"],
     "eligibility": ["include_commercial", "min_lease_years_flats"],
@@ -262,7 +292,8 @@ def create_app() -> FastAPI:
     def planned_rows(request: Request, plan: str | None, outcode=None, category=None, ptype=None,
                      passed_only=False, include_ineligible=False, min_roce=None, max_price=None,
                      min_yield=None, status=None, hide_rejected=False, new_only=False, q=None,
-                     sort="roce_pct", limit=500, region=None, area=None, postcode=None) -> list[dict[str, Any]]:
+                     sort="roce_pct", limit=500, region=None, area=None, postcode=None,
+                     signal=None) -> list[dict[str, Any]]:
         """Saved deals re-underwritten under a finance plan and the current settings, then
         filtered and sorted on the recalculated numbers."""
         from .finance import reunderwrite
@@ -285,6 +316,8 @@ def create_app() -> FastAPI:
             if min_roce is not None and res.roce_pct is not None and res.roce_pct < min_roce:
                 continue
             if min_yield is not None and res.gross_yield < min_yield:
+                continue
+            if signal and not all(has_signal(r["deal"], sg) for sg in signal):
                 continue
             out.append(r)
         key = SORT_KEYS.get(sort, SORT_KEYS["roce_pct"])
@@ -318,6 +351,34 @@ def create_app() -> FastAPI:
             out.append(s_)
         return sorted(out, key=lambda x: (-x["passing"], x["outcode"]))
 
+    @app.get("/api/funnel")
+    def funnel(days: int = 7) -> dict[str, Any]:
+        from collections import Counter
+        from datetime import UTC, datetime, timedelta
+
+        from .funnel import STAGES
+
+        runs = [r for r in storage().recent_runs(200) if r["status"] != "running"
+                and (r.get("summary") or {}).get("funnel")]
+        latest = runs[0] if runs else None
+        since = (datetime.now(UTC) - timedelta(days=days)).isoformat(timespec="seconds")
+        window = [r for r in runs if r["started_at"] >= since and r["trigger"] != "ui-sample"]
+        tot, reasons, by_search = Counter(), Counter(), {}
+        for r in window:
+            f = r["summary"]["funnel"]
+            tot.update(f.get("total") or {})
+            reasons.update(f.get("reasons") or {})
+            for k, v in (f.get("by_search") or {}).items():
+                by_search.setdefault(k, Counter()).update(v)
+        return {
+            "stages": STAGES,
+            "latest": {"started_at": latest["started_at"], "sources": latest["sources"],
+                       **latest["summary"]["funnel"]} if latest else None,
+            "window": {"days": days, "runs": len(window), "total": {s: tot.get(s, 0) for s in STAGES},
+                       "by_search": {k: {s: v.get(s, 0) for s in STAGES} for k, v in by_search.items()},
+                       "reasons": dict(reasons.most_common(12))},
+        }
+
     @app.get("/api/geo")
     def geo() -> dict[str, Any]:
         from .geo import REGIONS
@@ -339,10 +400,11 @@ def create_app() -> FastAPI:
         status: list[str] | None = Query(None), hide_rejected: bool = False, new_only: bool = False,
         q: str | None = None, sort: str = "roce_pct", limit: int = 500, plan: str | None = None,
         region: list[str] | None = Query(None), area: list[str] | None = Query(None), postcode: str | None = None,
+        signal: list[str] | None = Query(None),
     ) -> list[dict[str, Any]]:
         rows = planned_rows(request, plan, outcode, category, ptype, passed_only, include_ineligible,
                             min_roce, max_price, min_yield, status, hide_rejected, new_only, q, sort, limit,
-                            region, area, postcode)
+                            region, area, postcode, signal)
         return [deal_row(r["deal"], r) for r in rows]
 
     @app.get("/api/deals.csv")
@@ -523,6 +585,7 @@ def create_app() -> FastAPI:
                 "max_pages_per_search": cov.get("max_pages_per_search", 8),
                 "search_areas": cov.get("search_areas") or [], "all_areas": ENGLAND_COUNTIES,
                 "keywords": cov.get("keywords") or [],
+                "searches": cov.get("searches") or {}, "recheck_days": cov.get("recheck_days", 14),
                 "max_price_commercial": cfg["ingestion"].get("max_price_commercial", 750000),
                 "ppd": ppd_summary(storage())}
 

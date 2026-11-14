@@ -204,3 +204,68 @@ def test_api_place_filters(tmp_path, monkeypatch):
     assert {x["region"] for x in dg["best"] + dg["near_misses"]} <= {"North West"}
     cov = c.get("/api/coverage").json()
     assert cov["scope"] == "england" and len(cov["all_areas"]) == 47
+
+
+# --------------------------------------------------------------------------- reduced / stale / sweep searches
+
+
+@pytest.mark.skipif(not _browser_ok(), reason="needs Playwright + a Chromium build")
+def test_reduced_stale_sweep_searches(monkeypatch):
+    if not os.environ.get("BRRR_CHROMIUM_PATH") and Path("/opt/pw-browsers/chromium").exists():
+        monkeypatch.setenv("BRRR_CHROMIUM_PATH", "/opt/pw-browsers/chromium")
+    from src.portals.collector import PortalSession
+    from tests.portal_mock import portal_config, start
+
+    srv, base = start()
+    try:
+        cfg = load_config()
+        cfg["portals"] = {**portal_config(base), "enabled": ["rightmove"]}
+        cfg["coverage"] = {**cfg["coverage"], "searches": {
+            "reduced": {"enabled": True, "pages": 1, "within_days": 2, "portals": ["rightmove"]},
+            "stale": {"enabled": True, "pages": 1, "min_days_on_market": 90, "cycle_nights": 1, "portals": ["rightmove"]},
+            "sweep": {"enabled": True, "pages_per_search": 1, "cycle_nights": 1, "portals": ["rightmove"],
+                      "keywords": ["renovation"]},
+        }}
+        st = Storage(":memory:")
+        with PortalSession(cfg, st) as s:
+            got = {x.listing_id: x for x in s.collect_extra(["Greater Manchester"], ["reduced", "stale", "sweep"])}
+        assert set(got) == {"rm-95001", "rm-96001", "rm-97001"}
+        assert got["rm-95001"].search_kind == "reduced" and got["rm-95001"].reduced_on
+        assert got["rm-96001"].search_kind == "stale" and got["rm-96001"].days_on_market >= 199
+        assert got["rm-97001"].search_kind == "sweep" and got["rm-97001"].listed_on
+        # everything the extra searches saw also feeds local asking-price comps
+        assert len(st.market_prices("M14", "sale", None, None, "2000-01-01")) == 5
+    finally:
+        srv.shutdown()
+
+
+def test_unchanged_relisting_is_skipped_and_counted():
+    from src.http import FixtureClient
+    from src.main import RunSummary, process_listing
+
+    st = Storage(":memory:")
+    from src.main import run_scan
+
+    run_scan(sources=["sample"], storage=st, dry_run=True, use_claude=False)
+    lst = st.get_deal("pd-1001").listing.model_copy(update={"search_kind": "sweep"})
+    summary = RunSummary(outcodes=["ME4"])
+    out = process_listing(lst, client=FixtureClient(), cfg=load_config(), storage=st, analyst=None,
+                          summary=summary, use_external_fallbacks=False)
+    assert out is None and summary.unchanged_skipped == 1
+    f = summary.as_dict()["funnel"]
+    assert f["total"]["seen"] == 1 and f["total"]["unchanged"] == 1 and f["by_search"]["sweep"]["unchanged"] == 1
+    # a price cut makes it count again
+    cut = lst.model_copy(update={"asking_price": lst.asking_price - 5000})
+    assert process_listing(cut, client=FixtureClient(), cfg=load_config(), storage=st, analyst=None,
+                           summary=summary, use_external_fallbacks=False) is not None
+
+
+def test_sample_run_funnel():
+    from src.main import run_scan
+
+    s = run_scan(sources=["sample"], storage=Storage(":memory:"), dry_run=True, use_claude=False).as_dict()
+    t = s["funnel"]["total"]
+    assert t["seen"] == 17 and t["excluded"] == 5 and t["checked"] == 12 and t["passed"] == 3
+    assert t["possible"] >= t["passed"] and t["worth_offer"] >= 1
+    assert s["funnel"]["by_region"]["South East"]["seen"] == 17
+    assert any(k.startswith("Fails:") for k in s["funnel"]["reasons"])

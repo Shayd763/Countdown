@@ -208,6 +208,31 @@ def _images(d: dict) -> list[str]:
     return out[:12]
 
 
+_DATE_RE = re.compile(r"\b(added|reduced)\b[^0-9a-z]{0,12}(?:on\s+)?(\d{1,2}/\d{1,2}/\d{4}|today|yesterday)", re.I)
+
+
+def listing_dates(text: str, first_visible: str | None = None) -> tuple[str | None, str | None]:
+    """(listed_on, reduced_on) as ISO dates, from portal wording like 'Reduced on 12/11/2026'."""
+    from datetime import date, timedelta
+
+    listed = first_visible[:10] if first_visible else None
+    reduced = None
+    for kind, when in _DATE_RE.findall(text or ""):
+        w = when.lower()
+        if w == "today":
+            iso = date.today().isoformat()
+        elif w == "yesterday":
+            iso = (date.today() - timedelta(days=1)).isoformat()
+        else:
+            dd, mm, yy = w.split("/")
+            iso = f"{yy}-{int(mm):02d}-{int(dd):02d}"
+        if kind.lower() == "reduced":
+            reduced = reduced or iso
+        else:
+            listed = listed or iso
+    return listed, reduced
+
+
 def normalise_json_listing(d: dict, base_url: str, channel: str) -> dict | None:
     lid = _first(d, *_ID_KEYS)
     price, freq = parse_money(_first(d, *_PRICE_KEYS))
@@ -231,7 +256,14 @@ def normalise_json_listing(d: dict, base_url: str, channel: str) -> dict | None:
     loc = d.get("location") if isinstance(d.get("location"), dict) else {}
     summary = str(_first(d, "summary", "description", "shortDescription", "propertyDescription") or "")
     text_all = f"{type_text} {summary} {d.get('displayStatus') or ''}".lower()
+    upd = d.get("listingUpdate") if isinstance(d.get("listingUpdate"), dict) else {}
+    date_text = " ".join(str(x) for x in (d.get("addedOrReduced"), d.get("addedOn"), d.get("addedOrReducedDate")) if x)
+    reason = (upd.get("listingUpdateReason") or "").lower()
+    if reason.startswith(("price_reduced", "reduced")) and upd.get("listingUpdateDate"):
+        date_text += " reduced on " + "/".join(reversed(str(upd["listingUpdateDate"])[:10].split("-")))
+    listed_on, reduced_on = listing_dates(date_text, _first(d, "firstVisibleDate", "listedDate", "publishedOn"))
     return {
+        "listed_on": listed_on, "reduced_on": reduced_on,
         "id": str(lid),
         "url": urljoin(base_url, url) if url else None,
         "price": round(price, 2),
@@ -309,7 +341,9 @@ def parse_card_text(text: str, url: str, lid: str, channel: str) -> dict | None:
             addr = ln
             break
     low = text.lower()
+    listed_on, reduced_on = listing_dates(text)
     return {
+        "listed_on": listed_on, "reduced_on": reduced_on,
         "id": lid, "url": url, "price": round(price, 2), "address": addr,
         "bedrooms": int(beds_m.group(1)) if beds_m else None,
         "property_type": normalise_type(text),

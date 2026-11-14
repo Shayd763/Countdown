@@ -135,6 +135,28 @@ for example, rarely reaches a 6.8% yield.
 
 ---
 
+## More deals into the funnel
+
+Each daily run does four kinds of search. All of them add to the local asking-price comps.
+
+| Search | What it finds | Scope each night |
+|---|---|---|
+| New today | Listings added in the last day, residential and commercial | All counties, every portal |
+| Price cuts | Listings cut in the last two days, or cheaper than when we last saw them | All counties, Rightmove |
+| 90+ days on market | Long-listed stock, where sellers are often motivated | A seventh of the counties |
+| Backfill sweep | Existing stock matching keywords (modernisation, renovation, cash buyers, auction, probate…) | A seventh of the counties, so the full set is covered every week |
+
+If a listing is seen again at the same price, it is only re-checked after 14 days (`coverage.recheck_days`),
+so repeats don't spend comps lookups or Claude calls. The extra searches start on Rightmove. Add Zoopla or
+OnTheMarket to them in `coverage.searches` once their `residential_all` URL and sort values are confirmed.
+
+**The deal funnel.** The funnel shows every run's listings stage by stage, overall, by region and by search:
+seen → unchanged → excluded → waiting for comps → checked → possible → passed → worth an offer. It also lists
+the main reasons listings drop out. On the phone, tap the funnel line on Today. On the laptop, it's at the top
+of Runs. Use it to see whether the bottleneck is supply, comps, your filters or the gates themselves.
+
+---
+
 ## Financing plans
 
 Every deal can be costed under different ways of funding it. Pick one at the top of Today or
@@ -232,7 +254,7 @@ browser (on your laptop)
 
 ```bash
 pip install -e ".[dev]"
-pytest                                         # 97 tests incl. real-browser portal run, push encryption vs RFC 8291
+pytest                                         # 100 tests incl. real-browser portal run, push encryption vs RFC 8291
 python -m src.main --sample --dry-run          # sample data, prints deal memos
 python -m src.main --sources portals --outcode ME4 --dry-run
 python -m src.main --daily                     # what the schedule runs

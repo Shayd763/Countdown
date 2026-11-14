@@ -173,6 +173,18 @@ input[type=range].slider::-moz-range-thumb { width: 28px; height: 28px; border: 
 .unit { color: var(--label-3); font-size: 15px; margin-left: 4px; min-width: 22px; }
 .sugg { font-size: 12px; color: var(--label-2); letter-spacing: 0; display: block; margin-top: 2px; }
 
+/* ---------- funnel ---------- */
+.funnel-line { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px 14px; border-top: .5px solid var(--sep); font-size: 13px; color: var(--label-2); letter-spacing: 0; width: 100%; text-align: left; }
+.funnel-line b { color: var(--label); font-weight: 600; }
+.fbar { padding: 9px 16px; }
+.fbar .top { display: flex; justify-content: space-between; font-size: 15px; }
+.fbar .track { height: 6px; border-radius: 3px; background: var(--fill); margin-top: 6px; overflow: hidden; }
+.fbar .track i { display: block; height: 100%; border-radius: 3px; background: var(--tint); }
+.fbar.good .track i { background: var(--green); } .fbar.warn .track i { background: var(--orange); }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0; padding: 1px 6px; border-radius: 6px; margin-left: 4px; vertical-align: 1px; }
+.tag.cut { background: color-mix(in srgb, var(--orange) 18%, transparent); color: var(--orange-text); }
+.tag.old { background: var(--fill); color: var(--label-2); }
+
 /* ---------- deal cards ---------- */
 .card { display: block; background: var(--cell); border-radius: var(--r-xl); overflow: hidden; color: var(--label); margin-bottom: 14px;
   transition: transform .14s var(--ease); }
@@ -389,7 +401,7 @@ function bindPlanBar(rerender) {
     rerender();
   };
 }
-const DEFAULT_FILTERS = { regions: [], areas: [], postcode: "", ptypes: [], category: "residential", passOnly: true, sort: "roce_pct", q: "", maxCash: "", minRoce: "" };
+const DEFAULT_FILTERS = { regions: [], areas: [], postcode: "", ptypes: [], signals: [], category: "residential", passOnly: true, sort: "roce_pct", q: "", maxCash: "", minRoce: "" };
 const PTYPES = [["terraced", "Terrace"], ["end-terrace", "End terrace"], ["semi-detached", "Semi"], ["detached", "Detached"], ["bungalow", "Bungalow"], ["flat", "Flat"], ["maisonette", "Maisonette"], ["commercial", "Commercial unit"], ["mixed-use", "Shop and flat"]];
 let GEO = null;
 async function geo() { if (!GEO) { try { GEO = await api("/api/geo"); } catch { GEO = { regions: [], tree: [] }; } } return GEO; }
@@ -400,7 +412,7 @@ function placeLabel(f) {
 try { state.filters = { ...DEFAULT_FILTERS, ...JSON.parse(localStorage.getItem("brrr-mf") || "{}") }; } catch { state.filters = { ...DEFAULT_FILTERS }; }
 if (Array.isArray(state.filters.outcodes) && state.filters.outcodes.length && !state.filters.postcode) state.filters.postcode = state.filters.outcodes.join(", ");
 delete state.filters.outcodes;
-["regions", "areas", "ptypes"].forEach((k) => { if (!Array.isArray(state.filters[k])) state.filters[k] = []; });
+["regions", "areas", "ptypes", "signals"].forEach((k) => { if (!Array.isArray(state.filters[k])) state.filters[k] = []; });
 const saveFilters = () => { try { localStorage.setItem("brrr-mf", JSON.stringify(state.filters)); } catch {} };
 
 async function api(path, opts = {}) {
@@ -516,7 +528,7 @@ function listRow(d) {
     <div class="thumb" ${d.image ? `style="background-image:url('${esc(d.image)}')"` : ""}>${d.image ? "" : ic("house")}</div>
     <div class="grow">
       <div class="a"><i class="dot ${dot}"></i><span style="overflow:hidden;text-overflow:ellipsis">${esc(d.address || d.postcode)}</span></div>
-      <div class="b">${esc(what(d))} · ${esc(d.outcode)} · ${esc(d.refurb_tier)} refurb${d.status !== "new" ? " · " + esc(d.status) : ""}</div>
+      <div class="b">${esc(what(d))} · ${esc(d.outcode)} · ${esc(d.refurb_tier)} refurb${d.status !== "new" ? " · " + esc(d.status) : ""}${d.price_drop_pct || d.reduced_on ? `<span class="tag cut">Cut${d.price_drop_pct ? " " + d.price_drop_pct.toFixed(0) + "%" : ""}</span>` : ""}${d.days_on_market >= 90 ? `<span class="tag old">${d.days_on_market}d</span>` : ""}</div>
       <div class="c num">${gk(d.cash_to_buy)} in · refi ${gk(d.refi_loan)} · <b class="${d.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(d.net_monthly_cashflow)}</b>/mo</div>
     </div>
     <div class="p"><b>${gk(d.asking_price)}</b><span>${roce(d.roce_pct)} ROCE</span></div>
@@ -550,12 +562,33 @@ async function viewToday() {
     ${planBar(fin, dg.plan ? dg.plan.id : myPlan())}
     <div style="height:12px"></div>
     ${offlineNotice()}
-    <div class="group"><div class="summary"><div class="lead">${lead}</div><p>${scanned}${!n && dg.counts.matching ? ` ${dg.counts.matching} listings match your filters.` : ""}</p></div>${totals}</div>
+    <div class="group"><div class="summary"><div class="lead">${lead}</div><p>${scanned}${!n && dg.counts.matching ? ` ${dg.counts.matching} listings match your filters.` : ""}</p></div>${totals}
+      ${dg.funnel && dg.funnel.seen ? `<button class="funnel-line" id="funnelBtn"><span class="num"><b>${dg.funnel.seen.toLocaleString("en-GB")}</b> seen · <b>${dg.funnel.checked}</b> checked · <b>${dg.funnel.possible}</b> possible · <b class="green">${dg.funnel.passed}</b> passed</span>${ic("chev", "i chev")}</button>` : ""}</div>
     ${dg.best.length ? `<h2 class="gh">Best return<a href="#/deals">See all</a></h2>${dg.best.map((d) => dealCard(d)).join("")}` : ""}
     ${dg.near_misses.length ? `<h2 class="gh">Worth an offer</h2>${dg.near_misses.map((d) => dealCard(d, true)).join("")}` : ""}
     ${!dg.best.length && !dg.near_misses.length ? `<div class="empty">${ic("search")}Nothing to act on with ${esc(dg.plan ? dg.plan.label.toLowerCase() : "this plan")}.<br>Try another way of financing above, or<br>loosen your filters in Alerts.<div style="margin-top:16px"><a class="btn tinted" href="#/deals">Browse deals</a></div></div>` : ""}
   </div>`);
   bindPlanBar(viewToday);
+  if ($("#funnelBtn")) $("#funnelBtn").onclick = openFunnel;
+}
+
+const STAGE_LABEL = { seen: "Seen on the portals", unchanged: "Seen before, price unchanged", excluded: "Excluded by your filters",
+  no_comps: "Waiting for local comps", checked: "Fully checked", possible: "Possible with a light refurb", passed: "Pass all four gates",
+  worth_offer: "Work at a lower offer" };
+const KIND_LABEL = { new: "New today", reduced: "Price cuts", stale: "On the market 90+ days", sweep: "Backfill sweep", sample: "Sample data", feed: "Feeds" };
+async function openFunnel() {
+  let f; try { f = await api("/api/funnel?days=7"); } catch (e) { return toast(e.message, "info"); }
+  const L = f.latest; if (!L) return toast("No run with a funnel yet", "info");
+  const max = Math.max(1, L.total.seen);
+  const bar = (k, n) => `<div class="fbar ${k === "passed" ? "good" : k === "worth_offer" ? "warn" : ""}"><div class="top"><span>${STAGE_LABEL[k]}</span><b class="num">${n.toLocaleString("en-GB")}</b></div><div class="track"><i style="width:${Math.max(2, n / max * 100)}%"></i></div></div>`;
+  const W = f.window;
+  openSheet(`<h2>Deal funnel<button class="gbtn glass" id="fnx" aria-label="Close">${ic("x")}</button></h2>
+    <p class="gf" style="margin:0 4px 10px">Latest run, ${esc(when(L.started_at))}</p>
+    <div class="group">${f.stages.map((k) => bar(k, L.total[k] || 0)).join("")}</div>
+    ${Object.keys(L.by_search || {}).length > 1 ? `<p class="gh-sm">By search</p><div class="group">${Object.entries(L.by_search).map(([k, v]) => `<div class="cell"><span class="grow">${esc(KIND_LABEL[k] || k)}</span><span class="val num">${v.seen} seen · ${v.passed} pass</span></div>`).join("")}</div>` : ""}
+    ${Object.keys(L.reasons || {}).length ? `<p class="gh-sm">Why listings dropped out</p><div class="group">${Object.entries(L.reasons).slice(0, 8).map(([k, v]) => `<div class="cell"><span class="grow sub">${esc(k)}</span><span class="val num">${v}</span></div>`).join("")}</div>` : ""}
+    <p class="gf">Last ${W.days} days, ${W.runs} run${W.runs === 1 ? "" : "s"}: ${W.total.seen.toLocaleString("en-GB")} seen, ${W.total.checked.toLocaleString("en-GB")} checked, ${W.total.passed} passed, ${W.total.worth_offer} worth an offer.</p>`);
+  $("#fnx").onclick = closeSheet;
 }
 
 /* ======================= deals ======================= */
@@ -568,12 +601,13 @@ async function viewDeals() {
     ${planBar(fin, myPlan())}
     <label class="search" style="margin-top:12px">${ic("search")}<input type="search" id="q" placeholder="Street, town or postcode" value="${esc(f.q)}" aria-label="Search"></label>
     <div class="seg" id="seg" style="margin-bottom:10px"><button data-p="1" class="${f.passOnly ? "on" : ""}">Passing</button><button data-p="0" class="${f.passOnly ? "" : "on"}">Everything</button></div>
-    <div class="rowx" id="cats">${cats.map(([v, l]) => `<button class="capsule ${f.category === v ? "on" : ""}" data-c="${v}">${l}</button>`).join("")}${placeLabel(f) ? `<button class="capsule on" data-oc="1">${esc(placeLabel(f))} ${ic("x", "i")}</button>` : ""}${f.ptypes.length ? `<button class="capsule on" data-pt="1">${esc(f.ptypes.map((t) => (PTYPES.find((x) => x[0] === t) || [t, t])[1]).join(", "))} ${ic("x", "i")}</button>` : ""}</div>
+    <div class="rowx" id="cats">${[["reduced", "Price cuts"], ["stale", "90+ days"]].map(([v, l]) => `<button class="capsule ${f.signals.includes(v) ? "on" : ""}" data-sig="${v}">${l}</button>`).join("")}${cats.map(([v, l]) => `<button class="capsule ${f.category === v ? "on" : ""}" data-c="${v}">${l}</button>`).join("")}${placeLabel(f) ? `<button class="capsule on" data-oc="1">${esc(placeLabel(f))} ${ic("x", "i")}</button>` : ""}${f.ptypes.length ? `<button class="capsule on" data-pt="1">${esc(f.ptypes.map((t) => (PTYPES.find((x) => x[0] === t) || [t, t])[1]).join(", "))} ${ic("x", "i")}</button>` : ""}</div>
     <div id="list" style="margin-top:14px"><div class="skel" style="height:260px"></div></div>
   </div>`);
   $$("#cats svg").forEach((s) => { s.style.cssText = "width:14px;height:14px"; });
   $("#seg").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; f.passOnly = b.dataset.p === "1"; saveFilters(); $$("#seg button").forEach((x) => x.classList.toggle("on", x === b)); loadList(); };
-  $("#cats").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.oc) { f.regions = []; f.areas = []; f.postcode = ""; } else if (b.dataset.pt) f.ptypes = []; else f.category = b.dataset.c; saveFilters(); viewDeals(); };
+  $("#cats").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.sig) { const i = f.signals.indexOf(b.dataset.sig); i >= 0 ? f.signals.splice(i, 1) : f.signals.push(b.dataset.sig); }
+    else if (b.dataset.oc) { f.regions = []; f.areas = []; f.postcode = ""; } else if (b.dataset.pt) f.ptypes = []; else f.category = b.dataset.c; saveFilters(); viewDeals(); };
   let t; $("#q").oninput = (e) => { clearTimeout(t); t = setTimeout(() => { f.q = e.target.value.trim(); saveFilters(); loadList(); }, 250); };
   $("#fbtn").onclick = openFilters;
   bindPlanBar(loadList);
@@ -585,6 +619,7 @@ async function loadList() {
   f.areas.forEach((a) => p.append("area", a));
   if (f.postcode) p.set("postcode", f.postcode);
   f.ptypes.forEach((t) => p.append("ptype", t));
+  f.signals.forEach((sg) => p.append("signal", sg));
   if (f.category) p.append("category", f.category);
   if (f.passOnly) p.set("passed_only", "true");
   if (f.q) p.set("q", f.q);

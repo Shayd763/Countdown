@@ -51,6 +51,9 @@ class RawListing(BaseModel):
     lat: float | None = None
     lng: float | None = None
     search_area: str = ""  # the county the portal search covered
+    search_kind: str = "new"  # new | reduced | stale | sweep | sample | feed
+    listed_on: str | None = None  # date the portal first showed it (ISO)
+    reduced_on: str | None = None  # date of the latest price cut the portal shows (ISO)
     fetched_at: datetime = Field(default_factory=_now)
 
     @property

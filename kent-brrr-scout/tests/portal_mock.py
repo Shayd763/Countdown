@@ -62,6 +62,31 @@ RM_REGION_SALE = [
     {"id": 92003, "bedrooms": 3, "displayAddress": "9 Border Row, Cardiff CF10 1AA", "propertySubType": "Terraced",
      "summary": "Terrace for renovation.", "price": {"amount": 90000}, "propertyUrl": "/properties/92003"},
 ]
+_TODAY = __import__("datetime").date.today()
+_D = lambda days: (_TODAY - __import__("datetime").timedelta(days=days))  # noqa: E731
+# County search without the one-day filter, newest first: one fresh price cut, one not reduced
+RM_REGION_NEWEST_ALL = [
+    {"id": 95001, "bedrooms": 3, "displayAddress": "5 Cut Lane, Manchester M14 6AA", "propertySubType": "Terraced",
+     "summary": "Price reduced for a quick sale, needs updating.", "price": {"amount": 95000},
+     "addedOrReduced": f"Reduced on {_D(0):%d/%m/%Y}", "propertyUrl": "/properties/95001"},
+    {"id": 95002, "bedrooms": 3, "displayAddress": "6 Same Lane, Manchester M14 6AB", "propertySubType": "Terraced",
+     "summary": "Three bed terrace.", "price": {"amount": 140000},
+     "addedOrReduced": f"Added on {_D(20):%d/%m/%Y}", "propertyUrl": "/properties/95002"},
+]
+# Oldest first: one listed 200 days ago, one only 30 days ago
+RM_REGION_OLDEST = [
+    {"id": 96001, "bedrooms": 2, "displayAddress": "1 Old Road, Manchester M14 7AA", "propertySubType": "Terraced",
+     "summary": "Two bed terrace, still available.", "price": {"amount": 89000},
+     "firstVisibleDate": f"{_D(200).isoformat()}T09:00:00Z", "propertyUrl": "/properties/96001"},
+    {"id": 96002, "bedrooms": 2, "displayAddress": "2 Old Road, Manchester M14 7AB", "propertySubType": "Terraced",
+     "summary": "Two bed terrace.", "price": {"amount": 91000},
+     "firstVisibleDate": f"{_D(30).isoformat()}T09:00:00Z", "propertyUrl": "/properties/96002"},
+]
+RM_REGION_KEYWORD = [
+    {"id": 97001, "bedrooms": 3, "displayAddress": "9 Sweep Street, Manchester M14 8AA", "propertySubType": "Semi-Detached",
+     "summary": "Semi requiring renovation throughout.", "price": {"amount": 120000},
+     "addedOrReduced": f"Added on {_D(60):%d/%m/%Y}", "propertyUrl": "/properties/97001"},
+]
 RM_REGION_COMMERCIAL = [
     {"id": 93001, "displayAddress": "Unit 2, Sample Parade, Leeds LS6 2AA", "propertySubType": "Retail",
      "summary": "Ground floor retail unit, 900 sq ft.", "price": {"amount": 120000}, "propertyUrl": "/properties/93001"},
@@ -120,7 +145,14 @@ class Handler(BaseHTTPRequestHandler):
         if p.startswith("/rm/property-for-sale/find.html") or p.startswith("/rm/property-to-rent/find.html"):
             rent = "to-rent" in p
             region = q.get("locationIdentifier", "").startswith("REGION")
-            if region:
+            if region and "maxDaysSinceAdded" not in q and not rent:
+                if q.get("sortType") == "10":
+                    props = RM_REGION_OLDEST
+                elif q.get("keywords"):
+                    props = RM_REGION_KEYWORD
+                else:
+                    props = RM_REGION_NEWEST_ALL
+            elif region:
                 props = RM_REGION_SALE
             elif rent and Handler.district_rent:
                 props = RM_DISTRICT_RENT
@@ -185,6 +217,8 @@ def portal_config(base: str) -> dict:
             "rightmove": {
                 "residential": "{base}/property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType=6&index={index}&maxDaysSinceAdded={days}",
                 "commercial": "{base}/commercial-property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType=6&index={index}",
+                "residential_all": "{base}/property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType={sort}&index={index}{kw}",
+                "sorts": {"newest": "6", "oldest": "10"},
             },
         },
         "comps_max_districts_per_run": 10, "comps_rent_cache_days": 30, "comps_sale_cache_days": 14,

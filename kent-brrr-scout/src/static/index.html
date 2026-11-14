@@ -187,6 +187,8 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
         <div class="group-label" style="margin-top:10px"><span>Postcode area</span></div>
         <div class="chips" id="areas"></div>
         <div class="field" style="margin-top:10px"><span>Postcode starts with</span><input type="text" id="pcPrefix" placeholder="M, LS6, ME4 6" style="text-transform:uppercase" /></div>
+        <h3 class="sec">Signals</h3>
+        <div class="chips" id="signals"></div>
         <h3 class="sec">Category</h3>
         <div class="seg" id="categories"></div>
         <h3 class="sec">Property type</h3>
@@ -246,6 +248,10 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
   <div class="wrap">
     <div class="cols">
       <div>
+        <div class="panel">
+          <h3 class="sec" style="display:flex;justify-content:space-between">Deal funnel <span class="small" id="funnelWhen"></span></h3>
+          <div id="funnel" class="small">No run with a funnel yet.</div>
+        </div>
         <div class="panel">
           <h3 class="sec">Current job</h3>
           <div id="jobPanel" class="small">Nothing running.</div>
@@ -317,6 +323,12 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
           <label class="row"><input type="checkbox" class="cov_ch" value="residential" /> Residential</label>
           <label class="row"><input type="checkbox" class="cov_ch" value="commercial" /> Commercial</label>
           <div class="field"><span>Commercial max asking £</span><input type="number" id="cov_maxcom" step="25000" /></div>
+          <h3 class="sec">Extra searches</h3>
+          <label class="row"><input type="checkbox" class="cov_x" value="reduced" /> Price cuts in the last two days</label>
+          <label class="row"><input type="checkbox" class="cov_x" value="stale" /> On the market 90+ days (a seventh of the counties each night)</label>
+          <label class="row"><input type="checkbox" class="cov_x" value="sweep" /> Backfill sweep of existing stock by keyword (a seventh each night)</label>
+          <div class="field"><span>Sweep keywords</span><input type="text" id="cov_kw" /></div>
+          <p class="small">These start on Rightmove only. Listings seen again at the same price are re-checked after <span id="cov_recheck"></span> days, so repeats don't cost comps lookups or Claude calls.</p>
           <details style="margin-top:6px"><summary class="small">Counties searched (<span id="cov_n"></span>)</summary><div id="cov_areas" class="grid3" style="margin-top:8px"></div></details>
           <h3 class="sec">Land Registry sold prices</h3>
           <div id="ppdStatus" class="small">Loading…</div>
@@ -442,7 +454,7 @@ async function api(path, opts = {}) {
 }
 function toast(msg, ms = 3500) { const t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), ms); }
 
-const DEFAULT_FILTERS = { regions: [], areas: [], postcode: "", categories: ["residential"], ptypes: [], statuses: [], hideRejected: true,
+const DEFAULT_FILTERS = { regions: [], areas: [], postcode: "", signals: [], categories: ["residential"], ptypes: [], statuses: [], hideRejected: true,
   newOnly: false, passedOnly: false, inclIneligible: false, minRoce: "", minYield: "", maxPrice: "", sort: "roce_pct", q: "" };
 const state = { f: structuredClone(DEFAULT_FILTERS), meta: null, view: "deals", lastJobId: null, jobRunning: false };
 
@@ -487,6 +499,9 @@ function renderFilters() {
   if (!areas.length) ar.innerHTML = `<span class="small">No saved deals in these regions yet.</span>`;
   areas.forEach((a) => ar.appendChild(chip(`${a.area} · ${a.n}`, f.areas.includes(a.area), () => { toggleIn(f.areas, a.area); refresh(); })));
   $("pcPrefix").value = f.postcode;
+  if (!Array.isArray(f.signals)) f.signals = [];
+  const sg = $("signals"); sg.innerHTML = "";
+  [["reduced", "Price cut"], ["stale", "On market 90+ days"]].forEach(([v, l]) => sg.appendChild(chip(l, f.signals.includes(v), () => { toggleIn(f.signals, v); refresh(); })));
   const cats = $("categories"); cats.innerHTML = "";
   cats.appendChild(chip("All", f.categories.length === 0, () => { f.categories = []; refresh(); }));
   m.categories.forEach((c) => cats.appendChild(chip(c[0].toUpperCase() + c.slice(1), f.categories.includes(c), () => { toggleIn(f.categories, c); refresh(); })));
@@ -510,6 +525,7 @@ function query() {
   const f = state.f, q = new URLSearchParams();
   f.regions.forEach((r) => q.append("region", r)); f.areas.forEach((a) => q.append("area", a));
   if (f.postcode) q.set("postcode", f.postcode);
+  (f.signals || []).forEach((v) => q.append("signal", v));
   f.categories.forEach((c) => q.append("category", c));
   f.ptypes.forEach((t) => q.append("ptype", t)); f.statuses.forEach((s) => q.append("status", s));
   if (f.hideRejected) q.set("hide_rejected", "true"); if (f.newOnly) q.set("new_only", "true");
@@ -815,7 +831,26 @@ function renderJob(j) {
 function renderChecks(checks) {
   return checks.map((c) => `<div class="check"><div class="ic">${c.ok === true ? "✅" : c.ok === false ? "❌" : "➖"}</div><div><b>${esc(c.name)}</b> — ${esc(c.detail)}${c.ok === false && c.fix ? `<div class="small">→ ${esc(c.fix)}</div>` : ""}</div></div>`).join("");
 }
+const STAGE_LABEL = { seen: "Seen", unchanged: "Unchanged, skipped", excluded: "Excluded by filters", no_comps: "Waiting for comps",
+  checked: "Checked", possible: "Possible (light refurb)", passed: "Passed all gates", worth_offer: "Worth an offer" };
+const KIND_LABEL = { new: "New today", reduced: "Price cuts", stale: "90+ days on market", sweep: "Backfill sweep", sample: "Sample", feed: "Feeds" };
+async function loadFunnel() {
+  let f; try { f = await api("/api/funnel?days=7"); } catch { return; }
+  const L = f.latest; if (!L) return;
+  $("funnelWhen").textContent = "latest run " + when(L.started_at);
+  const max = Math.max(1, L.total.seen);
+  const bars = f.stages.map((k) => `<div style="display:grid;grid-template-columns:170px 1fr 70px;gap:10px;align-items:center;margin:5px 0">
+    <span>${STAGE_LABEL[k]}</span><div class="progress" style="margin:0"><div style="width:${Math.max(1, (L.total[k] || 0) / max * 100)}%;background:${k === "passed" ? "var(--pass)" : k === "worth_offer" ? "var(--warn)" : "var(--accent)"}"></div></div>
+    <b class="num" style="text-align:right">${(L.total[k] || 0).toLocaleString("en-GB")}</b></div>`).join("");
+  const tbl = (obj, label) => `<div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>${label}</th>${["seen", "excluded", "no_comps", "checked", "possible", "passed", "worth_offer"].map((k) => `<th class="num">${STAGE_LABEL[k].split(" (")[0]}</th>`).join("")}</tr></thead><tbody>
+    ${Object.entries(obj).slice(0, 12).map(([k, v]) => `<tr><td>${esc(KIND_LABEL[k] || k)}</td>${["seen", "excluded", "no_comps", "checked", "possible", "passed", "worth_offer"].map((s2) => `<td class="num">${v[s2] || 0}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  const W = f.window;
+  $("funnel").innerHTML = bars + tbl(L.by_search || {}, "Search") + tbl(L.by_region || {}, "Region")
+    + (Object.keys(L.reasons || {}).length ? `<h3 class="sec" style="margin-top:14px">Why listings dropped out</h3>${Object.entries(L.reasons).map(([k, v]) => `<div style="display:flex;justify-content:space-between"><span>${esc(k)}</span><b class="num">${v}</b></div>`).join("")}` : "")
+    + `<p class="small" style="margin-top:10px">Last ${W.days} days, ${W.runs} runs: ${W.total.seen.toLocaleString("en-GB")} seen · ${W.total.checked.toLocaleString("en-GB")} checked · ${W.total.passed} passed · ${W.total.worth_offer} worth an offer.</p>`;
+}
 async function loadRuns() {
+  loadFunnel();
   await loadMeta();
   const ps = state.meta.portal_status;
   $("portalHealth").innerHTML = ps ? `<div class="small">${when(ps.at)}</div><div class="table-wrap" style="margin-top:6px"><table><thead><tr><th>Portal</th><th>State</th><th class="num">Pages</th><th class="num">Listings</th><th class="num">Rentals</th><th>Note</th></tr></thead><tbody>${
@@ -850,6 +885,10 @@ async function loadCoverage() {
   $("cov_maxcom").value = c.max_price_commercial; $("cov_pages").value = c.max_pages_per_search;
   $("cov_areas").innerHTML = c.all_areas.map((a) => `<label class="row small"><input type="checkbox" class="cov_a" value="${esc(a)}" ${c.search_areas.includes(a) ? "checked" : ""}> ${esc(a)}</label>`).join("");
   $("cov_n").textContent = `${c.search_areas.length} of ${c.all_areas.length}`;
+  const srch = c.searches || {};
+  document.querySelectorAll(".cov_x").forEach((x) => x.checked = !!(srch[x.value] || {}).enabled);
+  $("cov_kw").value = ((srch.sweep || {}).keywords || []).join(", ");
+  $("cov_recheck").textContent = c.recheck_days;
   const p = c.ppd;
   $("ppdStatus").innerHTML = p.rows ? `${p.rows.toLocaleString("en-GB")} sales across ${p.districts.toLocaleString("en-GB")} postcode districts, ${esc(p.from)} to ${esc(p.to)}. Updated ${when(p.refreshed_at)}.`
     : "Not downloaded yet. The first portal scan downloads about 300 MB of sold prices (a few minutes), then a small monthly update.";
@@ -857,11 +896,14 @@ async function loadCoverage() {
     const body = { config: { coverage: { scope: $("cov_scope").value, added_within_days: Number($("cov_days").value),
       channels: [...document.querySelectorAll(".cov_ch:checked")].map((x) => x.value),
       max_pages_per_search: Number($("cov_pages").value) || 8,
-      search_areas: [...document.querySelectorAll(".cov_a:checked")].map((x) => x.value) },
+      search_areas: [...document.querySelectorAll(".cov_a:checked")].map((x) => x.value),
+      searches: Object.fromEntries(["new", "reduced", "stale", "sweep"].map((k) => [k, { ...(srch[k] || {}),
+        enabled: k === "new" ? true : !!document.querySelector(`.cov_x[value="${k}"]`)?.checked,
+        ...(k === "sweep" ? { keywords: $("cov_kw").value.split(",").map((x) => x.trim()).filter(Boolean) } : {}) }])) },
       ingestion: { max_price_commercial: Number($("cov_maxcom").value) || 750000 } } };
     try { await api("/api/settings", { method: "PUT", body }); toast("Coverage saved"); $("cov_n").textContent = `${body.config.coverage.search_areas.length} of ${c.all_areas.length}`; } catch (e) { toast(e.message, 5000); }
   };
-  document.querySelectorAll("#cov_scope, #cov_days, .cov_ch, #cov_maxcom, #cov_pages, .cov_a").forEach((el) => el.onchange = save);
+  document.querySelectorAll("#cov_scope, #cov_days, .cov_ch, #cov_maxcom, #cov_pages, .cov_a, .cov_x, #cov_kw").forEach((el) => el.onchange = save);
   $("ppdBtn").onclick = async () => { try { await api("/api/ppd/refresh", { method: "POST" }); toast("Downloading Land Registry data. Progress is on the Runs tab."); pollJob(true); } catch (e) { toast(e.message, 5000); } };
 }
 

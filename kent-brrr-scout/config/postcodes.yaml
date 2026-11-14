@@ -19,6 +19,19 @@ coverage:
   added_within_days: 1          # only listings the portal says were added in the last day
   max_pages_per_search: 8       # per county, per channel, per portal (25 listings a page)
   keywords: []                  # e.g. [renovation, modernisation]: narrows residential searches if set
+  recheck_days: 14              # a listing seen again at the same price is re-checked after this long
+  # Extra searches beyond "new today". reduced/stale/sweep are residential and start on Rightmove only;
+  # add a portal to `portals` once its residential_all URL template and sort values are confirmed.
+  searches:
+    new: {enabled: true}
+    reduced: {enabled: true, pages: 2, within_days: 2, portals: [rightmove]}
+    stale: {enabled: true, pages: 2, min_days_on_market: 90, cycle_nights: 7, portals: [rightmove]}
+    sweep:
+      enabled: true
+      cycle_nights: 7             # each night searches a different seventh of the counties
+      pages_per_search: 4
+      portals: [rightmove]
+      keywords: [modernisation, renovation, refurbishment, "cash buyers", auction, investment, repossessed, probate]
   search_areas:
     - Bedfordshire
     - Berkshire
@@ -221,6 +234,8 @@ portals:
     rightmove:
       residential: "{base}/property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType=6&index={index}&maxDaysSinceAdded={days}&dontShow=retirement%2CsharedOwnership&includeSSTC=false{kw}"
       commercial: "{base}/commercial-property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType=6&index={index}&maxDaysSinceAdded={days}"
+      residential_all: "{base}/property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType={sort}&index={index}&dontShow=retirement%2CsharedOwnership&includeSSTC=false{kw}"
+      sorts: {newest: "6", oldest: "10"}
     zoopla:
       residential: "{base}/for-sale/property/{slug}/?q={name}&results_sort=newest_listings&search_source=refine&price_max={max_price}&added={zoopla_added}&is_retirement_home=false&is_shared_ownership=false&pn={page1}{kw}"
       commercial: "{base}/for-sale/commercial/{slug}/?q={name}&results_sort=newest_listings&price_max={max_price}&added={zoopla_added}&pn={page1}"

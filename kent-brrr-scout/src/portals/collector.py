@@ -27,7 +27,7 @@ def _noop(*_a: Any, **_k: Any) -> None:
 
 
 def to_raw_listing(item: dict, portal: Portal, outcode: str, *, channel: str = "residential",
-                   search_area: str = "") -> RawListing:
+                   search_area: str = "", search_kind: str = "new") -> RawListing:
     from ..geo import parse_postcode
 
     full, oc = parse_postcode(item.get("address") or "")
@@ -53,8 +53,19 @@ def to_raw_listing(item: dict, portal: Portal, outcode: str, *, channel: str = "
         tenure=tenure, lease_years_remaining=lease, bedrooms=item.get("bedrooms"),
         description=item.get("summary") or "", image_urls=item.get("images") or [],
         is_auction=bool(item.get("is_auction")), lat=item.get("lat"), lng=item.get("lng"),
-        search_area=search_area,
+        search_area=search_area, search_kind=search_kind,
+        listed_on=item.get("listed_on"), reduced_on=item.get("reduced_on"),
+        days_on_market=_days_since(item.get("listed_on")),
     )
+
+
+def _days_since(iso: str | None) -> int | None:
+    from datetime import date
+
+    try:
+        return (date.today() - date.fromisoformat(iso[:10])).days if iso else None
+    except ValueError:
+        return None
 
 
 def _address_key(lst: RawListing) -> str:
@@ -100,7 +111,7 @@ class PortalSession:
         log.warning("%s blocked (%s) — skipping it for this run", name, reason)
 
     def _pages(self, portal: Portal, outcode: str, channel: str, max_pages: int,
-               url_for=None, label: str | None = None) -> list[dict]:
+               url_for=None, label: str | None = None, stop_at_seen: bool = True) -> list[dict]:
         """Fetch search pages newest-first. `channel` is the extraction channel (sale/rent);
         `url_for(page)` overrides the outcode URL (county searches)."""
         st = self.status[portal.name]
@@ -139,7 +150,7 @@ class PortalSession:
                 for f in fresh:
                     known = self.storage.listing_price(f"{portal.prefix}-{f['id']}")
                     seen_streak = seen_streak + 1 if known and abs(known - f["price"]) < 1 else 0
-                if seen_streak >= int(self.pc.get("stop_after_seen_streak", 12)):
+                if stop_at_seen and seen_streak >= int(self.pc.get("stop_after_seen_streak", 12)):
                     break
             if len(found) < portal.page_size // 2:
                 break  # last page
@@ -228,7 +239,7 @@ class PortalSession:
                         for item in items:
                             if item.get("sstc"):
                                 continue
-                            lst = to_raw_listing(item, portal, "", channel=ch, search_area=area)
+                            lst = to_raw_listing(item, portal, "", channel=ch, search_area=area, search_kind="new")
                             key = _address_key(lst)
                             if lst.listing_id in listings or (lst.address and key in by_address):
                                 continue
@@ -236,8 +247,96 @@ class PortalSession:
                             listings[lst.listing_id] = lst
             if st["state"] == "running":
                 st["state"] = "ok" if st["listings"] else "empty"
+        self._found = listings
+        self._by_address = by_address
         out = self.locate(list(listings.values()))
         return out
+
+    def collect_extra(self, areas: list[str], kinds: list[str]) -> list[RawListing]:
+        """Reduced-price, long-on-market and rolling-backfill searches (residential)."""
+        from datetime import date
+
+        cov = self.cfg.get("coverage") or {}
+        searches = cov.get("searches") or {}
+        max_price = int(self.cfg["ingestion"].get("max_price", 350000))
+        found: dict[str, RawListing] = {}
+        seen_ids = set(getattr(self, "_found", {}))
+        by_address = set(getattr(self, "_by_address", set()))
+        market: list[dict] = []
+
+        def tonight(spec: dict) -> list[str]:
+            n = max(1, int(spec.get("cycle_nights", 7)))
+            ordered = sorted(areas)
+            return ordered[date.today().toordinal() % n::n]
+
+        plan: list[tuple[str, list[str], list[str], str, int]] = []  # (kind, areas, keywords, sort, pages)
+        if "reduced" in kinds and (searches.get("reduced") or {}).get("enabled"):
+            s = searches["reduced"]
+            plan.append(("reduced", areas, [""], "newest", int(s.get("pages", 2))))
+        if "stale" in kinds and (searches.get("stale") or {}).get("enabled"):
+            s = searches["stale"]
+            plan.append(("stale", tonight(s), [""], "oldest", int(s.get("pages", 2))))
+        if "sweep" in kinds and (searches.get("sweep") or {}).get("enabled"):
+            s = searches["sweep"]
+            plan.append(("sweep", tonight(s), list(s.get("keywords") or [""]), "newest",
+                         int(s.get("pages_per_search", 4))))
+
+        today = date.today()
+        for kind, kind_areas, keywords, sort_name, pages in plan:
+            spec = searches.get(kind) or {}
+            for name in spec.get("portals") or list(self.portals):
+                portal = self.portals.get(name)
+                if not portal:
+                    continue
+                st = self.status[name]
+                urls = (self.cfg["portals"].get("area_urls") or {}).get(name) or {}
+                tpl, sort_val = urls.get("residential_all"), (urls.get("sorts") or {}).get(sort_name)
+                if not tpl or not sort_val:
+                    continue
+                st.setdefault("extra", {}).setdefault(kind, 0)
+                for area in kind_areas:
+                    if st["state"] == "blocked":
+                        break
+                    if not portal.prepare_area(self.browser, area, self.cfg, self.storage):
+                        continue
+                    for kw in keywords:
+                        if st["state"] == "blocked":
+                            break
+
+                        def url_for(pg, a=area, k=kw, t=tpl, sv=sort_val, pt=portal):
+                            from urllib.parse import quote, quote_plus
+
+                            return t.format(base=pt.base_url, loc=quote(pt.area_loc(a), safe=""),
+                                            max_price=max_price, sort=sv, index=pg * pt.page_size,
+                                            page1=pg + 1, kw=f"&keywords={quote_plus(k)}" if k else "")
+
+                        items = self._pages(portal, "", "sale", pages, url_for=url_for, stop_at_seen=False,
+                                            label=f"{area} {kind}{' ' + kw if kw else ''}")
+                        for item in items:
+                            if item.get("sstc"):
+                                continue
+                            lst = to_raw_listing(item, portal, "", search_area=area, search_kind=kind)
+                            if lst.outcode:
+                                market.append(self._market_row(portal, lst.outcode, "sale", lst))
+                            if kind == "reduced":
+                                known = self.storage.listing_price(lst.listing_id)
+                                window = int(spec.get("within_days", 2))
+                                cut_age = (today - date.fromisoformat(lst.reduced_on)).days if lst.reduced_on else None
+                                recent_cut = cut_age is not None and cut_age <= window
+                                if not (recent_cut or (known and lst.asking_price < known - 1)):
+                                    continue
+                            if kind == "stale" and (lst.days_on_market or 0) < int(spec.get("min_days_on_market", 90)):
+                                continue
+                            key = _address_key(lst)
+                            dup = lst.listing_id in seen_ids or lst.listing_id in found
+                            if dup or (lst.address and key in by_address):
+                                continue
+                            by_address.add(key)
+                            found[lst.listing_id] = lst
+                            st["extra"][kind] += 1
+        if market:
+            self.storage.record_market(market)
+        return self.locate(list(found.values()))
 
     def locate(self, listings: list[RawListing]) -> list[RawListing]:
         """Give every listing a postcode district (from its address, else its map position) and

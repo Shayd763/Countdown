@@ -53,6 +53,7 @@ def card(d: Deal, meta: dict[str, Any] | None = None, **extra: Any) -> dict[str,
         "passed": r.passed and r.eligible, "eligible": r.eligible,
         "gates": {g.name: g.passed for g in r.gates}, "status": meta.get("status", "new"),
         "first_seen": meta.get("first_seen"), "price_drop_pct": d.price_drop_pct,
+        "reduced_on": lst.reduced_on, "listed_on": lst.listed_on, "search_kind": lst.search_kind,
         **money(d), **extra,
     }
 
@@ -114,6 +115,7 @@ def build_digest(st: Storage, prefs: dict[str, Any]) -> dict[str, Any]:
     plan = build_plan(cfg, plan_id)
     return {
         "plan": {"id": plan.id, "label": plan.label},
+        "funnel": ((summary or {}).get("funnel") or {}).get("total"),
         "run": {"started_at": last["started_at"], "finished_at": last.get("finished_at"),
                 "status": last["status"], "sources": last.get("sources"),
                 "fetched": (summary or {}).get("fetched"),
