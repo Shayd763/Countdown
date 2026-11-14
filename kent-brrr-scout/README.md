@@ -50,6 +50,56 @@ The daily run doesn't need the app window open. It runs by itself at the time yo
 
 ---
 
+## Phone app (iPhone & Android)
+
+The phone app is installed from your browser. It doesn't come from the App Store (that would need a
+$99/year Apple developer account). Once installed it opens full-screen from its own home-screen icon and
+sends notifications like any other app.
+
+It has four screens:
+- **Today:** this morning's deals that pass all four gates, sorted by return. Each card shows cash to
+  buy, refinance amount, money left in and monthly cashflow. Below them is a list of "negotiable" deals
+  that would pass at a lower offer, with the offer price.
+- **Deals:** search and filter every deal by postcode, category, sort order, the most cash you can put
+  in, and minimum ROCE.
+- **Deal page:**
+  - The full numbers: cost to purchase, refinance and cash back, and monthly cashflow once the deal is
+    complete.
+  - An offer slider that re-runs the four gates as you drag it.
+  - The four gates, refurb notes and risks.
+  - Your pipeline status and notes, and links to share, open the listing or see it on a map.
+- **Alerts & me:**
+  - Notifications on or off, and whether to get the digest every morning or only when a deal passes.
+  - The scan time.
+  - Your own filters (postcodes, categories, maximum cash in, minimum ROCE, new listings only).
+  - Your profile and password.
+
+### Setup (once, about 10 minutes)
+
+1. Start the app on your laptop as above. The first screen asks you to **create your profile** (name,
+   email, password). That becomes the owner account.
+2. Install **Tailscale** (free) on the laptop and on your phone, and sign in to both with the same
+   account. Tailscale creates a private, encrypted link between your own devices. Nothing is put on the
+   public internet.
+3. On the laptop, go to **Settings → Phone app** and click **Turn on the secure phone address**. If
+   Tailscale asks you to enable HTTPS certificates, click its link, approve, then click the button
+   again. A QR code appears.
+4. Scan the QR code with your phone's camera.
+   - **iPhone:** open it in **Safari**, sign in, then tap **Share → Add to Home Screen**.
+   - **Android:** open it in **Chrome**, sign in, then choose **Install app**.
+5. Open the app from your home screen, go to **Alerts & me**, and switch on **Notifications on this
+   phone**. Tap **Send me today's digest now** to check that notifications arrive.
+
+Each morning the laptop scans, then pushes the digest to your phone. The digest is personalised to each
+person's own filters. Notifications reach you anywhere, even when you're out of the house. Tapping one
+opens Today, which shows that morning's results even if the laptop has gone back to sleep. Browsing
+further and the offer slider need the laptop to be awake and online.
+
+To add another person (for example a partner), use **Settings → People** on the laptop. They sign in
+on their own phone with their own profile, filters and notifications.
+
+---
+
 ## What the daily run does
 
 ```
@@ -113,7 +163,7 @@ browser (on your laptop)
 
 ```bash
 pip install -e ".[dev]"
-pytest                                         # 62 tests incl. a real-browser run against mock portals
+pytest                                         # 69 tests incl. real-browser portal run, push encryption vs RFC 8291
 python -m src.main --sample --dry-run          # sample data, prints deal memos
 python -m src.main --sources portals --outcode ME4 --dry-run
 python -m src.main --daily                     # what the schedule runs

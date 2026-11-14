@@ -267,6 +267,14 @@ def run_scan(
             status = "partial"
         storage.finish_run(run_id, status, summary.as_dict())
         storage.audit("run_end", None, summary.as_dict())
+        if trigger == "schedule" and status != "error" and not dry_run:
+            try:
+                from .digest import send_daily_digests
+
+                progress("notify", "Sending phone notifications")
+                send_daily_digests(storage)
+            except Exception:  # noqa: BLE001 — notifications must never fail the run
+                log.exception("Daily digest notifications failed")
         progress("done", "Finished")
     return summary
 

@@ -78,6 +78,18 @@ class Storage:
             db["market"].create_index(["outcode", "channel", "property_type", "bedrooms"])
         if "kv" not in db.table_names():
             db["kv"].create({"key": str, "value": str, "updated_at": str}, pk="key")
+        if "users" not in db.table_names():
+            db["users"].create({
+                "id": int, "email": str, "name": str, "pw_hash": str, "is_admin": int,
+                "prefs": str, "created_at": str,
+            }, pk="id")
+            db["users"].create_index(["email"], unique=True)
+        if "sessions" not in db.table_names():
+            db["sessions"].create({"token_hash": str, "user_id": int, "created_at": str,
+                                   "expires_at": str, "user_agent": str}, pk="token_hash")
+        if "push_subs" not in db.table_names():
+            db["push_subs"].create({"endpoint": str, "user_id": int, "p256dh": str, "auth": str,
+                                    "user_agent": str, "created_at": str, "last_ok": str}, pk="endpoint")
         if "runs" not in db.table_names():
             db["runs"].create({
                 "id": int, "started_at": str, "finished_at": str, "trigger": str,

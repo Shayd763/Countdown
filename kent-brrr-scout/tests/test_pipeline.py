@@ -128,6 +128,10 @@ def test_web_api(tmp_path, monkeypatch):
     from src import web
     c = TestClient(web.create_app())
 
+    assert c.get("/api/meta").status_code == 401  # signed out
+    assert c.get("/api/auth/status").json()["setup_needed"] is True
+    r = c.post("/api/auth/setup", json={"email": "me@example.com", "password": "correct-horse", "name": "Me"})
+    assert r.status_code == 200 and r.json()["user"]["is_admin"]
     assert c.get("/api/meta").json()["deal_count"] == 0
     assert c.post("/api/scan", json={"sources": ["sample"], "use_claude": False}).status_code == 200
     job = _wait_job(c)

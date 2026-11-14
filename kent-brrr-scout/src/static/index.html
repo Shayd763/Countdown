@@ -169,7 +169,9 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
   <div class="spacer"></div>
   <div class="jobpill" id="jobpill"><div class="spin"></div><span class="msg" id="jobmsg"></span></div>
   <span class="small" id="lastRun"></span>
+  <a class="btn" href="#" id="phoneBtn" title="Set up the phone app">📱 Phone app</a>
   <button class="primary" id="scanBtn">Scan now</button>
+  <button id="logoutBtn" title="Sign out">Sign out</button>
 </header>
 
 <!-- ============================== DEALS ============================== -->
@@ -273,7 +275,11 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
 <!-- ============================== SETTINGS ============================== -->
 <section class="view" id="view-settings">
   <div class="wrap" style="max-width:1100px">
-    <div class="cols">
+    <div class="panel" id="phonePanel">
+      <h3 class="sec">Phone app</h3>
+      <div id="phoneBody" class="small">Loading…</div>
+    </div>
+    <div class="cols" style="margin-top:16px">
       <div>
         <div class="panel">
           <h3 class="sec">Daily run on this laptop</h3>
@@ -303,6 +309,18 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
             <div class="field"><span>Max asking price £</span><input type="number" id="s_maxprice" step="5000" /></div>
           </div>
           <p class="small">Runs once a day at a slow, human pace and stops at listings it has already seen. If a site shows a block or captcha page it stops using that site for the run and tells you on the Runs tab.</p>
+        </div>
+        <div class="panel">
+          <h3 class="sec">People</h3>
+          <div id="people" class="small"></div>
+          <details style="margin-top:8px"><summary class="small">Add a person (e.g. a partner)</summary>
+            <div class="grid2" style="margin-top:8px">
+              <div class="field"><span>Name</span><input type="text" id="nu_name"></div>
+              <div class="field"><span>Email</span><input type="text" id="nu_email"></div>
+              <div class="field"><span>Temporary password (8+ chars)</span><input type="password" id="nu_pw"></div>
+              <div class="field"><span>&nbsp;</span><button id="nu_add" style="width:100%;justify-content:center">Add</button></div>
+            </div>
+          </details>
         </div>
         <div class="panel">
           <h3 class="sec">API keys &amp; alerts</h3>
@@ -398,6 +416,7 @@ const SOURCE_LABEL = { portals: "Portals", rss: "Auction RSS", propertydata: "Pr
 async function api(path, opts = {}) {
   const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...opts,
     body: opts.body && typeof opts.body !== "string" ? JSON.stringify(opts.body) : opts.body });
+  if (res.status === 401) { location.href = "/app/#/login?next=%2F"; throw new Error("Sign in required"); }
   const data = res.headers.get("content-type")?.includes("json") ? await res.json() : await res.text();
   if (!res.ok) throw new Error((data && data.detail) || res.statusText);
   return data;
@@ -418,7 +437,7 @@ function show(view) {
   document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
   document.querySelectorAll(".view").forEach((v) => v.classList.toggle("on", v.id === "view-" + view));
   if (view === "runs") loadRuns();
-  if (view === "settings") loadSettings();
+  if (view === "settings") { loadSettings(); loadPhone(); loadPeople(); }
   if (view === "deals") refresh();
 }
 
@@ -817,6 +836,44 @@ $("schedInstall").onclick = async () => {
   catch (e) { toast("Install failed: " + e.message, 7000); }
 };
 $("schedRemove").onclick = async () => { const r = await api("/api/schedule/remove", { method: "POST" }); toast(r.message); loadSettings(); };
+
+/* ---------------- phone app & people ---------------- */
+async function loadPhone() {
+  const el = $("phoneBody");
+  let info; try { info = await api("/api/phone"); } catch (e) { el.textContent = e.message; return; }
+  const ts = info.tailscale;
+  const ready = ts.installed && ts.logged_in && ts.serving && ts.url;
+  const step = (n, done, html) => `<div class="check"><div class="ic">${done ? "✅" : n}</div><div>${html}</div></div>`;
+  el.innerHTML = `<div class="cols" style="grid-template-columns:1fr auto;align-items:start">
+    <div>
+      <p style="margin:0 0 8px">Your phone opens this app privately over <b>Tailscale</b> (free) — a secure link between your own devices, with an https address so it can be installed and send notifications. Nothing is published on the internet.</p>
+      ${step("1", ts.installed, `Install Tailscale on this laptop and sign in — <a href="https://tailscale.com/download" target="_blank" rel="noopener">tailscale.com/download</a>${ts.installed && !ts.logged_in ? " <span class='badge b-warn'>installed, not signed in</span>" : ""}`)}
+      ${step("2", false, `Install the <b>Tailscale</b> app on your phone and sign in with the same account.`)}
+      ${step("3", ts.serving, ts.installed && ts.logged_in ? (ts.serving ? `Secure address is on: <span class="mono">${esc(ts.url)}</span>` : `<button class="primary" id="tsEnable">Turn on the secure phone address</button> <span class="small">(if Tailscale asks you to enable HTTPS certificates, click its link, then press this again)</span>`) : "Turn on the secure phone address (after steps 1–2)")}
+      ${step("4", false, `On your phone, open the address (or scan the QR code) in <b>Safari</b> (iPhone) or <b>Chrome</b> (Android), sign in, then <b>Share → Add to Home Screen</b> / <b>Install app</b>. Open it from the home screen and switch on notifications under <b>Alerts &amp; me</b>.`)}
+      <div id="tsOut" class="mono small" style="white-space:pre-wrap"></div>
+    </div>
+    <div style="text-align:center">${ready ? `<img src="/api/phone/qr.svg?url=${encodeURIComponent(ts.url)}" alt="QR code" style="width:180px;height:180px;background:#fff;border-radius:10px;padding:6px"><div class="small">Scan with your phone camera</div>` : `<div class="small" style="width:180px">The QR code appears here once step 3 is done.</div>`}</div>
+  </div>
+  <p class="small">On the same Wi-Fi you can also browse at this laptop's address, but installing and notifications need the https address above. Notifications arrive even when you're out; tapping one shows the morning's deals even if the laptop has gone to sleep.</p>`;
+  if ($("tsEnable")) $("tsEnable").onclick = async () => {
+    $("tsOut").textContent = "Working…";
+    try { const r = await api("/api/phone/enable", { method: "POST" }); $("tsOut").textContent = r.output || ""; loadPhone(); }
+    catch (e) { $("tsOut").textContent = e.message; }
+  };
+}
+async function loadPeople() {
+  let users; try { users = await api("/api/users"); } catch { $("people").textContent = "Only the owner can manage people."; return; }
+  $("people").innerHTML = users.map((u) => `<div class="check"><div class="ic">${u.is_admin ? "👑" : "👤"}</div><div style="flex:1"><b>${esc(u.name)}</b> <span class="small">${esc(u.email)}</span></div>${u.is_admin ? "" : `<button class="danger" data-del="${u.id}">Remove</button>`}</div>`).join("");
+  $("people").querySelectorAll("[data-del]").forEach((b) => b.onclick = async () => { if (!confirm("Remove this person?")) return; await api("/api/users/" + b.dataset.del, { method: "DELETE" }); loadPeople(); });
+}
+$("nu_add").onclick = async () => {
+  try { await api("/api/users", { method: "POST", body: { name: $("nu_name").value, email: $("nu_email").value, password: $("nu_pw").value } });
+    toast("Added — they can sign in on their phone with that email and password"); ["nu_name","nu_email","nu_pw"].forEach((i) => $(i).value = ""); loadPeople(); }
+  catch (e) { toast(e.message, 5000); }
+};
+$("phoneBtn").onclick = (e) => { e.preventDefault(); show("settings"); setTimeout(() => $("phonePanel").scrollIntoView({ behavior: "smooth" }), 100); };
+$("logoutBtn").onclick = async () => { await api("/api/auth/logout", { method: "POST" }).catch(() => {}); location.href = "/app/#/login?next=%2F"; };
 
 /* ---------------- boot ---------------- */
 (async () => { loadFilters(); await refresh(); pollJob(); })();

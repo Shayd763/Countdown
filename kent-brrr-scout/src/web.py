@@ -19,7 +19,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, PlainTextResponse, Response
 from pydantic import BaseModel
 
@@ -62,6 +62,10 @@ def deal_row(d: Deal, meta: dict[str, Any] | None = None) -> dict[str, Any]:
         "price_drop_pct": d.price_drop_pct, "image": (lst.image_urls or [None])[0],
         "status": meta.get("status", "new"), "notes": meta.get("notes") or "",
         "first_seen": meta.get("first_seen"),
+        "total_cash_deployed": r.total_cash_deployed, "refi_loan": r.refi_loan,
+        "net_refi_proceeds": r.net_refi_proceeds, "sdlt": r.sdlt,
+        "cash_to_buy": round(r.all_in_cost + r.bridging_costs, 2),
+        "monthly_rent": round(r.annual_rent / 12, 2),
     }
 
 
@@ -176,6 +180,10 @@ def create_app() -> FastAPI:
 
     def storage() -> Storage:
         return Storage(os.environ.get("BRRR_DB_PATH"))
+
+    from .web_account import install_account_routes, require_admin
+
+    install_account_routes(app, storage)
 
     def filters(outcode, category, ptype, passed_only, include_ineligible, min_roce, max_price,
                 min_yield, status, hide_rejected, new_only, q, sort, limit) -> dict[str, Any]:
@@ -364,7 +372,8 @@ def create_app() -> FastAPI:
         }
 
     @app.put("/api/settings")
-    def put_settings(body: SettingsUpdate) -> dict[str, Any]:
+    def put_settings(body: SettingsUpdate, request: Request) -> dict[str, Any]:
+        require_admin(request)
         secrets = {k: ("" if v == "__clear__" else v.strip()) for k, v in body.secrets.items()
                    if k in SECRET_KEYS and v and v.strip()}
         if secrets:
@@ -382,9 +391,10 @@ def create_app() -> FastAPI:
         return {"saved_secrets": sorted(secrets), "saved_config": cleaned}
 
     @app.post("/api/schedule/install")
-    def schedule_install(body: dict[str, Any] | None = None) -> dict[str, Any]:
+    def schedule_install(request: Request, body: dict[str, Any] | None = None) -> dict[str, Any]:
         from .scheduler import install, status
 
+        require_admin(request)
         t = (body or {}).get("time") or load_config().get("schedule", {}).get("time", "07:30")
         try:
             msg = install(t)
@@ -394,9 +404,10 @@ def create_app() -> FastAPI:
         return {"message": msg, "status": status()}
 
     @app.post("/api/schedule/remove")
-    def schedule_remove() -> dict[str, Any]:
+    def schedule_remove(request: Request) -> dict[str, Any]:
         from .scheduler import remove, status
 
+        require_admin(request)
         return {"message": remove(), "status": status()}
 
     @app.post("/api/test-alert")
@@ -428,6 +439,7 @@ def main() -> None:
     ap.add_argument("--open", action="store_true", help="Open the app in your browser")
     args = ap.parse_args()
     setup_logging()
+    os.environ["BRRR_PORT"] = str(args.port)
     if args.open:
         threading.Timer(1.5, lambda: webbrowser.open(f"http://{args.host}:{args.port}/")).start()
     uvicorn.run(create_app(), host=args.host, port=args.port, log_level="warning")
