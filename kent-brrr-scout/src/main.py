@@ -43,6 +43,9 @@ class RunSummary:
     passed: int = 0
     new_passing: int = 0
     waiting_for_comps: int = 0
+    areas: list[str] = field(default_factory=list)
+    located: dict[str, int] = field(default_factory=dict)
+    ppd: dict[str, Any] = field(default_factory=dict)
     alerted: int = 0
     claude_calls: int = 0
     details_fetched: int = 0
@@ -73,6 +76,7 @@ def process_listing(
     listing: RawListing, *, client: DataClient, cfg: dict[str, Any], storage: Storage,
     analyst: ClaudeAnalyst | None, summary: RunSummary, use_external_fallbacks: bool,
     detail_fetcher: Callable[[RawListing], RawListing] | None = None,
+    comps_fetcher: Callable[[RawListing], bool] | None = None,
 ) -> Deal | None:
     ocfg = config_for_outcode(cfg, listing.outcode)
     track = storage.upsert_listing(listing)
@@ -82,6 +86,9 @@ def process_listing(
         summary.pre_screen_rejected += 1
         storage.audit("pre_screen_reject", listing.listing_id, {"reasons": reasons})
         return None
+
+    if comps_fetcher and not priced_out_by_sold(listing, ocfg, storage):
+        comps_fetcher(listing)  # rentals and asking prices for this district, if thin
 
     params = UnderwritingParams.from_config(ocfg)
     plan = build_plan(ocfg)  # the configured default finance plan
@@ -146,6 +153,24 @@ def process_listing(
     return deal
 
 
+def priced_out_by_sold(listing: RawListing, cfg: dict[str, Any], storage: Storage) -> bool:
+    """Cheap check before spending page loads on comps: with Land Registry sold prices for
+    this district, could the listing clear the all-in cap even if its value came in 25% above
+    the median sale? If not, it can't pass and needs no more data."""
+    from .category_ok import is_residential
+    from .ppd import median_sold
+
+    if not is_residential(listing):
+        return False
+    med = median_sold(storage, listing.outcode, listing.property_type,
+                      int((cfg.get("local_comps") or {}).get("sold_lookback_months", 24)))
+    if med is None:
+        return False
+    p = UnderwritingParams.from_config(cfg)
+    cap = p.all_in_cap_pct_of_arv * med * 1.25
+    return listing.asking_price + p.refurb_minimum["light"] + p.fixed_acquisition_costs > cap
+
+
 def resolve_sources(sources: list[str] | None, cfg: dict[str, Any]) -> list[str]:
     chosen = [s.strip().lower() for s in (sources or cfg.get("schedule", {}).get(
         "sources", ["portals", "rss", "propertydata"])) if s.strip()]
@@ -159,7 +184,7 @@ def run_scan(
     outcodes: list[str] | None = None, *, sources: list[str] | None = None, offline: bool = False,
     dry_run: bool = False, use_claude: bool = True, min_roce: float | None = None,
     storage: Storage | None = None, include_rss: bool = True, config_path: str | None = None,
-    progress: Progress | None = None, trigger: str = "manual",
+    progress: Progress | None = None, trigger: str = "manual", areas: list[str] | None = None,
 ) -> RunSummary:
     load_dotenv()
     cfg = load_config(config_path)
@@ -201,6 +226,15 @@ def run_scan(
             summary.notes.append("Claude not configured — refurb tier from keyword heuristic")
         notifier = Notifier(dry_run=dry_run)
 
+        nationwide = (cfg.get("coverage") or {}).get("scope", "england") == "england" and not outcodes
+        if not sample and not has_pd and ("portals" in srcs):
+            try:  # sold-price comps for anywhere in England
+                from .ppd import refresh as ppd_refresh
+
+                summary.ppd = ppd_refresh(storage, cfg, progress)
+            except Exception as exc:  # noqa: BLE001 — comps can fall back to SPARQL
+                summary.notes.append(f"Land Registry refresh failed: {exc}")
+
         with ExitStack() as stack:
             session = None
             listings: list[RawListing] = []
@@ -209,7 +243,13 @@ def run_scan(
 
                 progress("collect", "Starting browser…")
                 session = stack.enter_context(PortalSession(cfg, storage, progress))
-                listings += session.collect(targets)
+                if nationwide:
+                    search_areas = areas or (cfg.get("coverage") or {}).get("search_areas") or []
+                    summary.areas = search_areas
+                    listings += session.collect_areas(search_areas)
+                    summary.located = session.located
+                else:
+                    listings += session.collect(targets)
                 summary.portals = session.status
             if sample or ("propertydata" in srcs and has_pd):
                 for oc in targets:
@@ -220,7 +260,10 @@ def run_scan(
                 summary.notes.append("PropertyData skipped — no PROPERTYDATA_API_KEY")
             if "rss" in srcs:
                 progress("collect", "Auction RSS feeds")
-                listings += fetch_rss(cfg, set(targets))
+                from .geo import in_coverage
+
+                listings += [x for x in fetch_rss(cfg, set() if nationwide else set(targets))
+                             if in_coverage(x.outcode, cfg)]
 
             # de-duplicate across sources
             uniq: dict[str, RawListing] = {}
@@ -237,7 +280,8 @@ def run_scan(
                     deal = process_listing(
                         listing, client=client, cfg=cfg, storage=storage, analyst=analyst,
                         summary=summary, use_external_fallbacks=not sample,
-                        detail_fetcher=session.fetch_detail if session else None)
+                        detail_fetcher=session.fetch_detail if session else None,
+                        comps_fetcher=session.ensure_comps if (session and nationwide and not has_pd) else None)
                 except Exception as exc:  # noqa: BLE001 — one bad listing must not abort the run
                     log.exception("Failed on %s", listing.listing_id)
                     summary.errors.append(f"{listing.listing_id}: {exc}")
@@ -285,7 +329,9 @@ def run_scan(
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(prog="brrr-scout", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--outcode", action="append", help="Outcode to scan (repeatable). Default: all")
+    ap.add_argument("--outcode", action="append", help="Outcode to scan (repeatable); switches portals to "
+                    "district searches. Default: England-wide county searches")
+    ap.add_argument("--area", action="append", help="County to search (repeatable), e.g. --area Kent")
     ap.add_argument("--sources", help=f"Comma list from {', '.join(ALL_SOURCES)}")
     ap.add_argument("--daily", action="store_true",
                     help="Morning routine: sources from config schedule.sources, alerts on")
@@ -308,7 +354,7 @@ def main(argv: list[str] | None = None) -> None:
         offline=args.sample, dry_run=args.dry_run, use_claude=not args.no_claude,
         min_roce=args.min_roce, storage=Storage(args.db) if args.db else None,
         include_rss=not args.no_rss, config_path=args.config,
-        trigger="schedule" if args.daily else "cli",
+        trigger="schedule" if args.daily else "cli", areas=args.area,
     )
     print(
         f"\nScanned {', '.join(summary.outcodes)} via {', '.join(summary.sources)} — fetched "

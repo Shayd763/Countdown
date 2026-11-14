@@ -23,7 +23,9 @@ DEFAULT_PREFS: dict[str, Any] = {
     "only_new": False,         # digest counts only deals first seen in the latest run
     "min_roce": None,          # % — None = any
     "max_cash_in": None,       # £ total cash deployed — None = any
-    "outcodes": [],            # [] = all target outcodes
+    "outcodes": [],            # postcode prefixes: areas (M), districts (ME4) or sectors; [] = anywhere
+    "regions": [],             # English regions; [] = all
+    "property_types": [],      # [] = any type
     "categories": ["residential"],
     "digest_size": 5,
     "plan": None,              # finance plan id for this person's views and alerts; None = default

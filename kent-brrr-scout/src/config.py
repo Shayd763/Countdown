@@ -101,11 +101,26 @@ def save_env(values: dict[str, str]) -> None:
             os.environ.pop(k, None)
 
 
+def config_version(path: str | None = None) -> tuple[float, float]:
+    """Changes whenever the base config or the Settings overrides change."""
+    base = Path(path or os.environ.get("BRRR_CONFIG") or PROJECT_ROOT / "config" / "postcodes.yaml")
+    if not base.is_absolute():
+        base = PROJECT_ROOT / base
+    return (base.stat().st_mtime if base.exists() else 0.0,
+            USER_OVERRIDES.stat().st_mtime if USER_OVERRIDES.exists() else 0.0)
+
+
 def all_outcodes(cfg: dict[str, Any]) -> list[str]:
     return [oc for group in cfg["outcodes"].values() for oc in group]
 
 
 def config_for_outcode(cfg: dict[str, Any], outcode: str) -> dict[str, Any]:
-    """Return the config with that outcode's overrides merged in."""
-    override = (cfg.get("outcode_overrides") or {}).get(outcode.upper(), {})
-    return _deep_merge(cfg, override) if override else cfg
+    """Return the config with that outcode's region overrides, then its own overrides, merged in."""
+    from .geo import region_of
+
+    out = cfg
+    region_override = (cfg.get("region_overrides") or {}).get(region_of(outcode or ""), {})
+    if region_override:
+        out = _deep_merge(out, region_override)
+    override = (cfg.get("outcode_overrides") or {}).get((outcode or "").upper(), {})
+    return _deep_merge(out, override) if override else out

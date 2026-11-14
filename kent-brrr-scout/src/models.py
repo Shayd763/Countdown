@@ -50,7 +50,20 @@ class RawListing(BaseModel):
     is_auction: bool = False
     lat: float | None = None
     lng: float | None = None
+    search_area: str = ""  # the county the portal search covered
     fetched_at: datetime = Field(default_factory=_now)
+
+    @property
+    def postcode_area(self) -> str:
+        from .geo import area_of
+
+        return area_of(self.outcode)
+
+    @property
+    def region(self) -> str:
+        from .geo import region_of
+
+        return region_of(self.outcode)
 
 
 class CompData(BaseModel):

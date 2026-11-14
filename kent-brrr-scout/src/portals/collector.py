@@ -26,19 +26,34 @@ def _noop(*_a: Any, **_k: Any) -> None:
     pass
 
 
-def to_raw_listing(item: dict, portal: Portal, outcode: str) -> RawListing:
-    pc = _FULL_PC.search(item.get("address") or "")
-    postcode = f"{pc.group(1).upper()} {pc.group(2).upper()}" if pc else outcode
+def to_raw_listing(item: dict, portal: Portal, outcode: str, *, channel: str = "residential",
+                   search_area: str = "") -> RawListing:
+    from ..geo import parse_postcode
+
+    full, oc = parse_postcode(item.get("address") or "")
+    if outcode and not oc:
+        oc = outcode
+    postcode = full or oc
+    outcode = oc
     text = f"{item.get('address', '')} {item.get('summary', '')}"
     tenure, lease = infer_tenure(text)
     ptype = item.get("property_type") or "unknown"
+    category = category_for_type(ptype, text)
+    if channel == "commercial" and category.value == "residential":
+        # a commercial search: anything not obviously a home is commercial
+        from ..models import PropertyCategory
+
+        category = PropertyCategory.COMMERCIAL
+        if ptype in ("unknown", "terraced", "detached"):
+            ptype = "commercial"
     return RawListing(
         listing_id=f"{portal.prefix}-{item['id']}", source=portal.name, url=item.get("url"),
         address=item.get("address") or "", postcode=postcode, outcode=outcode,
-        asking_price=item["price"], property_type=ptype, category=category_for_type(ptype, text),
+        asking_price=item["price"], property_type=ptype, category=category,
         tenure=tenure, lease_years_remaining=lease, bedrooms=item.get("bedrooms"),
         description=item.get("summary") or "", image_urls=item.get("images") or [],
         is_auction=bool(item.get("is_auction")), lat=item.get("lat"), lng=item.get("lng"),
+        search_area=search_area,
     )
 
 
@@ -62,6 +77,8 @@ class PortalSession:
                 "message": "", "debug": None} for n in self.portals
         }
         self.details_fetched = 0
+        self.comps_fetched = 0
+        self.located: dict[str, int] = {}
 
     def __enter__(self) -> PortalSession:
         self.browser.__enter__()
@@ -70,7 +87,8 @@ class PortalSession:
     def __exit__(self, *exc: Any) -> None:
         self.browser.__exit__(*exc)
         self.storage.kv_set("portal_status", {
-            "at": datetime.now(UTC).isoformat(timespec="seconds"), "portals": self.status})
+            "at": datetime.now(UTC).isoformat(timespec="seconds"), "portals": self.status,
+            "located": self.located, "comps_districts": self.comps_fetched})
 
     # -- search pages -------------------------------------------------------
 
@@ -81,14 +99,19 @@ class PortalSession:
         st["debug"] = self.browser.dump_debug(f"{name}-blocked", res)
         log.warning("%s blocked (%s) — skipping it for this run", name, reason)
 
-    def _pages(self, portal: Portal, outcode: str, channel: str, max_pages: int) -> list[dict]:
+    def _pages(self, portal: Portal, outcode: str, channel: str, max_pages: int,
+               url_for=None, label: str | None = None) -> list[dict]:
+        """Fetch search pages newest-first. `channel` is the extraction channel (sale/rent);
+        `url_for(page)` overrides the outcode URL (county searches)."""
         st = self.status[portal.name]
         max_price = int(self.cfg["ingestion"].get("max_price", 350000))
         items: list[dict] = []
         seen_streak = 0
         for page in range(max_pages):
-            url = portal.search_url(outcode, channel, page, max_price)
-            self.progress("collect", f"{portal.name}: {outcode} {channel} page {page + 1}")
+            url = url_for(page) if url_for else portal.search_url(outcode, channel, page, max_price)
+            if not url:
+                break
+            self.progress("collect", f"{portal.name}: {label or outcode} {channel} page {page + 1}")
             res = self.browser.fetch(url, detail_pattern=portal.detail_re.pattern)
             st["pages"] += 1
             if res.blocked:
@@ -100,10 +123,13 @@ class PortalSession:
             found = extract_listings(res.html, res.cards, base_url=portal.base_url,
                                      detail_re=portal.detail_re, channel=channel)
             if not found:
-                if page == 0 and not st["debug"]:
+                if page == 0 and not st["debug"] and not url_for:
                     st["debug"] = self.browser.dump_debug(f"{portal.name}-{outcode}-{channel}-empty", res)
                     st["message"] = (f"No listings read from {outcode} {channel} page — the site layout "
                                      f"may have changed (debug saved).")
+                if page == 0 and url_for:
+                    st.setdefault("empty_searches", 0)
+                    st["empty_searches"] += 1
                 break
             fresh = [f for f in found if f["id"] not in {i["id"] for i in items}]
             if not fresh:
@@ -166,6 +192,110 @@ class PortalSession:
             if st["state"] == "running":
                 st["state"] = "ok" if st["listings"] else "empty"
         return list(listings.values())
+
+    def collect_areas(self, areas: list[str]) -> list[RawListing]:
+        """England-wide: newest residential and commercial listings for each county search."""
+        cov = self.cfg.get("coverage") or {}
+        channels = cov.get("channels") or ["residential", "commercial"]
+        days = int(cov.get("added_within_days", 1))
+        max_pages = int(cov.get("max_pages_per_search", 8))
+        keywords = [k for k in (cov.get("keywords") or []) if k] or [""]
+        ing = self.cfg["ingestion"]
+        prices = {"residential": int(ing.get("max_price", 350000)),
+                  "commercial": int(ing.get("max_price_commercial", ing.get("max_price", 350000)))}
+        listings: dict[str, RawListing] = {}
+        by_address: set[str] = set()
+        for name, portal in self.portals.items():
+            st = self.status[name]
+            st["state"] = "running"
+            st.setdefault("areas", 0)
+            for area in areas:
+                if st["state"] == "blocked":
+                    break
+                if not portal.prepare_area(self.browser, area, self.cfg, self.storage):
+                    st["message"] = f"Could not find {area} on {name}"
+                    continue
+                st["areas"] += 1
+                for ch in channels:
+                    for kw in (keywords if ch == "residential" else [""]):
+                        if st["state"] == "blocked":
+                            break
+                        items = self._pages(
+                            portal, "", "sale", max_pages, label=f"{area} {ch}{' ' + kw if kw else ''}",
+                            url_for=lambda pg, a=area, c=ch, k=kw, pt=portal: pt.area_search_url(
+                                self.cfg, a, c, pg, prices[c], days, k))
+                        st["listings"] += len(items)
+                        for item in items:
+                            if item.get("sstc"):
+                                continue
+                            lst = to_raw_listing(item, portal, "", channel=ch, search_area=area)
+                            key = _address_key(lst)
+                            if lst.listing_id in listings or (lst.address and key in by_address):
+                                continue
+                            by_address.add(key)
+                            listings[lst.listing_id] = lst
+            if st["state"] == "running":
+                st["state"] = "ok" if st["listings"] else "empty"
+        out = self.locate(list(listings.values()))
+        return out
+
+    def locate(self, listings: list[RawListing]) -> list[RawListing]:
+        """Give every listing a postcode district (from its address, else its map position) and
+        drop those outside coverage."""
+        from ..geo import in_coverage, reverse_geocode
+
+        need = [(lst.lat, lst.lng) for lst in listings if not lst.outcode and lst.lat and lst.lng]
+        found = reverse_geocode(need, self.storage, (self.cfg.get("land_registry_ppd") or {}).get(
+            "postcodes_io", "https://api.postcodes.io")) if need else {}
+        kept, unplaced, outside = [], 0, 0
+        for lst in listings:
+            if not lst.outcode and lst.lat and lst.lng:
+                oc = found.get((lst.lat, lst.lng))
+                if oc:
+                    lst = lst.model_copy(update={"outcode": oc, "postcode": lst.postcode or oc})
+            if not lst.outcode:
+                unplaced += 1
+                continue
+            if not in_coverage(lst.outcode, self.cfg):
+                outside += 1
+                continue
+            kept.append(lst)
+        self.located = {"kept": len(kept), "no_postcode": unplaced, "outside_coverage": outside}
+        return kept
+
+    def ensure_comps(self, listing: RawListing) -> bool:
+        """One page of rentals and one of homes for sale in this listing's district, if local
+        comps are thin and weren't fetched recently. Returns True if anything was fetched."""
+        oc = listing.outcode
+        if not oc or self.comps_fetched >= int(self.pc.get("comps_max_districts_per_run", 120)):
+            return False
+        lc = self.cfg.get("local_comps") or {}
+        since = (datetime.now(UTC) - timedelta(days=int(lc.get("lookback_days", 120)))).isoformat(timespec="seconds")
+        need_n = int(lc.get("min_samples", 3))
+        todo = []
+        for channel, cache_key in (("rent", "comps_rent_cache_days"), ("sale", "comps_sale_cache_days")):
+            if len(self.storage.market_prices(oc, channel, None, listing.bedrooms, since)) >= need_n:
+                continue
+            last = self.storage.kv_get(f"comps_fetch:{channel}:{oc}")
+            max_age = timedelta(days=int(self.pc.get(cache_key, 30)))
+            if last and datetime.fromisoformat(last) > datetime.now(UTC) - max_age:
+                continue
+            todo.append(channel)
+        if not todo:
+            return False
+        self.comps_fetched += 1
+        for portal in self.portals.values():
+            if self.status[portal.name]["state"] == "blocked":
+                continue
+            if not portal.prepare(self.browser, oc, self.cfg, self.storage):
+                continue
+            for channel in todo:
+                items = self._pages(portal, oc, channel, 1)
+                rows = [self._market_row(portal, oc, channel, to_raw_listing(i, portal, oc)) for i in items]
+                self.storage.record_market(rows)
+                self.storage.kv_set(f"comps_fetch:{channel}:{oc}", datetime.now(UTC).isoformat(timespec="seconds"))
+            return True
+        return False
 
     @staticmethod
     def _market_row(portal: Portal, outcode: str, channel: str, lst: RawListing) -> dict:

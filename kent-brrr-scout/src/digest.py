@@ -45,7 +45,8 @@ def card(d: Deal, meta: dict[str, Any] | None = None, **extra: Any) -> dict[str,
     meta = meta or {}
     return {
         "listing_id": lst.listing_id, "address": lst.address or lst.postcode, "postcode": lst.postcode,
-        "outcode": lst.outcode, "property_type": lst.property_type, "bedrooms": lst.bedrooms,
+        "outcode": lst.outcode, "region": lst.region, "property_type": lst.property_type,
+        "bedrooms": lst.bedrooms,
         "category": lst.category.value, "source": lst.source, "url": lst.url,
         "image": (lst.image_urls or [None])[0], "is_auction": lst.is_auction,
         "refurb_tier": r.refurb_tier, "red_flags": len(d.refurb.red_flags),
@@ -57,8 +58,13 @@ def card(d: Deal, meta: dict[str, Any] | None = None, **extra: Any) -> dict[str,
 
 
 def _matches(d: Deal, prefs: dict[str, Any]) -> bool:
+    from .geo import matches_place
+
     lst, r = d.listing, d.result
-    if prefs.get("outcodes") and lst.outcode not in prefs["outcodes"]:
+    if not matches_place(lst.outcode, lst.postcode, regions=prefs.get("regions") or None,
+                         prefixes=prefs.get("outcodes") or None):
+        return False
+    if prefs.get("property_types") and lst.property_type not in prefs["property_types"]:
         return False
     if prefs.get("categories") and lst.category.value not in prefs["categories"]:
         return False

@@ -143,6 +143,7 @@ def test_full_pipeline_with_portals_and_local_comps(monkeypatch, tmp_path):
     try:
         cfg = config_mod.load_config()
         cfg["portals"] = portal_config(base)
+        cfg["land_registry_ppd"]["enabled"] = False
         monkeypatch.setattr("src.main.load_config", lambda *_a, **_k: cfg)
         st = Storage(":memory:")
         s = run_scan(["ME4"], sources=["portals"], storage=st, dry_run=True)

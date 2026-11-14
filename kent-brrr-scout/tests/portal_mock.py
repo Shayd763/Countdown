@@ -50,6 +50,28 @@ RM_DETAIL = {
     }},
 }
 
+# County (REGION) search results: listings across England plus one over the Welsh border
+RM_REGION_SALE = [
+    {"id": 92001, "bedrooms": 3, "displayAddress": "22 Test Grove, Manchester M14 5AB",
+     "propertySubType": "Terraced", "summary": "Three bed terrace needing full modernisation.",
+     "price": {"amount": 98000}, "propertyUrl": "/properties/92001"},
+    {"id": 92002, "bedrooms": 2, "displayAddress": "Flat 4, Mock Mill, Salford", "propertySubType": "Flat",
+     "summary": "Two bed flat, leasehold 110 years remaining, requires updating.",
+     "price": {"amount": 70000}, "propertyUrl": "/properties/92002",
+     "location": {"latitude": 53.4875, "longitude": -2.2901}},
+    {"id": 92003, "bedrooms": 3, "displayAddress": "9 Border Row, Cardiff CF10 1AA", "propertySubType": "Terraced",
+     "summary": "Terrace for renovation.", "price": {"amount": 90000}, "propertyUrl": "/properties/92003"},
+]
+RM_REGION_COMMERCIAL = [
+    {"id": 93001, "displayAddress": "Unit 2, Sample Parade, Leeds LS6 2AA", "propertySubType": "Retail",
+     "summary": "Ground floor retail unit, 900 sq ft.", "price": {"amount": 120000}, "propertyUrl": "/properties/93001"},
+]
+RM_DISTRICT_RENT = [
+    {"id": 94000 + i, "bedrooms": b, "displayAddress": f"{i} Let Street, Manchester M14", "propertySubType": "Terraced",
+     "price": {"amount": r, "frequency": "monthly"}, "propertyUrl": f"/properties/{94000 + i}"}
+    for i, (b, r) in enumerate([(3, 1250), (3, 1300), (3, 1350), (2, 1000), (2, 1050), (2, 1100)])
+]
+
 ZP_SALE_CARDS = [
     ("/for-sale/details/70001/", "£95,000\nGuide price\n2 bed terraced house\n5 Card Close, Chatham ME4 5YY\n"
                                   "Requires complete renovation. Cash buyers only."),
@@ -83,11 +105,28 @@ class Handler(BaseHTTPRequestHandler):
         q = {k: v[0] for k, v in parse_qs(u.query).items()}
         p = u.path
         if p.startswith("/rm/typeahead"):
-            body = {"matches": [{"id": "1652", "type": "OUTCODE", "displayName": q.get("query", "")}]}
+            name = q.get("query", "")
+            if name[:1].isdigit() or (len(name) <= 4 and any(ch.isdigit() for ch in name)):
+                body = {"matches": [{"id": "1652", "type": "OUTCODE", "displayName": name}]}
+            else:
+                body = {"matches": [{"id": "79192", "type": "REGION", "displayName": name}]}
             return self._send(200, json.dumps(body).encode(), "application/json")
+        if p.startswith("/rm/commercial-property-for-sale/find.html"):
+            props = RM_REGION_COMMERCIAL if int(q.get("index", 0)) == 0 else []
+            nd = {"props": {"pageProps": {"searchResults": {"properties": props}}}}
+            links = "".join(f'<div><a href="{x["propertyUrl"]}">£{x["price"]["amount"]:,}</a></div>' for x in props)
+            head = f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(nd)}</script>'
+            return self._send(200, _page("Commercial search", links or "<p>No results</p>", head))
         if p.startswith("/rm/property-for-sale/find.html") or p.startswith("/rm/property-to-rent/find.html"):
             rent = "to-rent" in p
-            props = (RM_RENT if rent else RM_SALE) if int(q.get("index", 0)) == 0 else []
+            region = q.get("locationIdentifier", "").startswith("REGION")
+            if region:
+                props = RM_REGION_SALE
+            elif rent and Handler.district_rent:
+                props = RM_DISTRICT_RENT
+            else:
+                props = RM_RENT if rent else RM_SALE
+            props = props if int(q.get("index", 0)) == 0 else []
             nd = {"props": {"pageProps": {"searchResults": {"properties": props, "resultCount": len(props)}}}}
             links = "".join(f'<div class="card"><a href="{x["propertyUrl"]}">£{x["price"]["amount"]:,}</a>'
                             f'<span>{x["displayAddress"]}</span></div>' for x in props)
@@ -114,6 +153,18 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(403, _page("Just a moment...", "<p>Checking your browser</p>"))
         return self._send(404, _page("Not found", "nope"))
 
+    district_rent = False  # tests switch on district-level rentals for on-demand comps
+
+    def do_POST(self):  # noqa: N802 — postcodes.io reverse geocoding stand-in
+        if self.path.startswith("/pio/postcodes"):
+            body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            out = []
+            for g in body.get("geolocations", []):
+                hit = [{"outcode": "M5", "postcode": "M5 4WT"}] if abs(g["latitude"] - 53.4875) < 0.01 else []
+                out.append({"query": g, "result": hit})
+            return self._send(200, json.dumps({"status": 200, "result": out}).encode(), "application/json")
+        return self._send(404, b"{}", "application/json")
+
 
 def start(port: int = 0) -> tuple[ThreadingHTTPServer, str]:
     srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
@@ -130,6 +181,13 @@ def portal_config(base: str) -> dict:
         "base_urls": {"rightmove": f"{base}/rm", "rightmove_typeahead": f"{base}/rm/typeahead",
                       "zoopla": f"{base}/zp", "onthemarket": f"{base}/otm"},
         "rightmove_location_ids": {},
+        "area_urls": {
+            "rightmove": {
+                "residential": "{base}/property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType=6&index={index}&maxDaysSinceAdded={days}",
+                "commercial": "{base}/commercial-property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType=6&index={index}",
+            },
+        },
+        "comps_max_districts_per_run": 10, "comps_rent_cache_days": 30, "comps_sale_cache_days": 14,
     }
 
 

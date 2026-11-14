@@ -93,6 +93,12 @@ class LocalMarketClient:
         raise PropertyDataError(f"{ep} not available from local comps")
 
     def _land_registry(self, outcode: str, ptype: str) -> list[float]:
+        from .ppd import sold_prices
+
+        months = int((self.cfg.get("local_comps") or {}).get("sold_lookback_months", 24))
+        local = sold_prices(self.storage, outcode, ptype or None, months)
+        if len(local) >= self.min_n:
+            return local
         key = f"lr_sold:{outcode}:{ptype}"
         cached = self.storage.kv_get(key)
         if cached and datetime.fromisoformat(cached["at"]) > datetime.now(UTC) - timedelta(

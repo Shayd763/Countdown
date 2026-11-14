@@ -161,7 +161,7 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
 </head>
 <body>
 <header>
-  <div class="brand"><img src="/icons/icon-192.png" alt="" width="30" height="30" style="border-radius:7px"><div><b>Gatehouse</b><div class="small">BRRR deals in Medway &amp; Thanet</div></div></div>
+  <div class="brand"><img src="/icons/icon-192.png" alt="" width="30" height="30" style="border-radius:7px"><div><b>Gatehouse</b><div class="small">BRRR deals across England</div></div></div>
   <nav>
     <button data-view="deals" class="on">Deals</button>
     <button data-view="runs">Runs</button>
@@ -181,8 +181,12 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
     <div id="banners"></div>
     <div class="layout">
       <aside class="panel filters">
-        <h3 class="sec">Postcodes</h3>
-        <div id="outcodeGroups"></div>
+        <h3 class="sec">Location</h3>
+        <div class="group-label"><span>Region</span><a id="regClear">clear</a></div>
+        <div class="chips" id="regions"></div>
+        <div class="group-label" style="margin-top:10px"><span>Postcode area</span></div>
+        <div class="chips" id="areas"></div>
+        <div class="field" style="margin-top:10px"><span>Postcode starts with</span><input type="text" id="pcPrefix" placeholder="M, LS6, ME4 6" style="text-transform:uppercase" /></div>
         <h3 class="sec">Category</h3>
         <div class="seg" id="categories"></div>
         <h3 class="sec">Property type</h3>
@@ -305,13 +309,27 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
           <p class="small">The laptop needs to be on (asleep is fine on a Mac: it runs when it wakes; Windows catches up at next start). Alerts go to Telegram when a deal passes all four gates.</p>
         </div>
         <div class="panel">
+          <h3 class="sec">Coverage</h3>
+          <div class="grid2">
+            <div class="field"><span>Search</span><select id="cov_scope"><option value="england">All of England, by county</option><option value="focus">Only my focus postcodes</option></select></div>
+            <div class="field"><span>Listed within the last</span><select id="cov_days"><option value="1">1 day</option><option value="3">3 days</option><option value="7">7 days</option></select></div>
+          </div>
+          <label class="row"><input type="checkbox" class="cov_ch" value="residential" /> Residential</label>
+          <label class="row"><input type="checkbox" class="cov_ch" value="commercial" /> Commercial</label>
+          <div class="field"><span>Commercial max asking £</span><input type="number" id="cov_maxcom" step="25000" /></div>
+          <details style="margin-top:6px"><summary class="small">Counties searched (<span id="cov_n"></span>)</summary><div id="cov_areas" class="grid3" style="margin-top:8px"></div></details>
+          <h3 class="sec">Land Registry sold prices</h3>
+          <div id="ppdStatus" class="small">Loading…</div>
+          <button id="ppdBtn" style="margin-top:8px">Download or update now</button>
+        </div>
+        <div class="panel">
           <h3 class="sec">Portal collector</h3>
           <label class="row"><input type="checkbox" class="s_portal" value="rightmove" /> Rightmove</label>
           <label class="row"><input type="checkbox" class="s_portal" value="zoopla" /> Zoopla</label>
           <label class="row"><input type="checkbox" class="s_portal" value="onthemarket" /> OnTheMarket</label>
           <label class="row"><input type="checkbox" id="s_showbrowser" /> Show the browser window while collecting</label>
           <div class="grid2">
-            <div class="field"><span>Pages per postcode (newest first)</span><input type="number" id="s_pages" min="1" max="10" /></div>
+            <div class="field"><span>Pages per search (newest first)</span><input type="number" id="cov_pages" min="1" max="20" /></div>
             <div class="field"><span>Max asking price £</span><input type="number" id="s_maxprice" step="5000" /></div>
           </div>
           <p class="small">Runs once a day at a slow, human pace and stops at listings it has already seen. If a site shows a block or captcha page it stops using that site for the run and tells you on the Runs tab.</p>
@@ -389,6 +407,7 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
   <div class="panel box">
     <h2>Scan now</h2>
     <p class="small" id="scanScope"></p>
+    <div class="field"><span>Only these counties (optional, comma separated)</span><input type="text" id="m_areas" placeholder="e.g. Kent, Greater Manchester" /></div>
     <label class="row"><input type="checkbox" class="m_src" value="portals" checked /> Rightmove / Zoopla / OnTheMarket <span class="small">(takes a while)</span></label>
     <label class="row"><input type="checkbox" class="m_src" value="rss" checked /> Auction RSS feeds</label>
     <label class="row"><input type="checkbox" class="m_src" value="propertydata" checked /> PropertyData <span class="small" id="pdHint"></span></label>
@@ -423,12 +442,23 @@ async function api(path, opts = {}) {
 }
 function toast(msg, ms = 3500) { const t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), ms); }
 
-const DEFAULT_FILTERS = { outcodes: [], categories: ["residential"], ptypes: [], statuses: [], hideRejected: true,
+const DEFAULT_FILTERS = { regions: [], areas: [], postcode: "", categories: ["residential"], ptypes: [], statuses: [], hideRejected: true,
   newOnly: false, passedOnly: false, inclIneligible: false, minRoce: "", minYield: "", maxPrice: "", sort: "roce_pct", q: "" };
 const state = { f: structuredClone(DEFAULT_FILTERS), meta: null, view: "deals", lastJobId: null, jobRunning: false };
 
 function saveFilters() { try { localStorage.setItem("brrr-f2", JSON.stringify(state.f)); } catch {} }
-function loadFilters() { try { const f = JSON.parse(localStorage.getItem("brrr-f2") || "null"); if (f) state.f = { ...DEFAULT_FILTERS, ...f }; } catch {} }
+function loadFilters() {
+  try {
+    const f = JSON.parse(localStorage.getItem("brrr-f2") || "null");
+    if (f) {
+      if (Array.isArray(f.outcodes) && f.outcodes.length && !f.postcode) f.postcode = f.outcodes.join(", ");
+      delete f.outcodes;
+      state.f = { ...DEFAULT_FILTERS, ...f };
+    }
+  } catch {}
+}
+let GEO = null;
+async function loadGeo(force) { if (!GEO || force) { try { GEO = await api("/api/geo"); } catch { GEO = { regions: [], tree: [] }; } } return GEO; }
 
 /* ---------------- navigation ---------------- */
 document.querySelectorAll("nav button").forEach((b) => b.onclick = () => show(b.dataset.view));
@@ -447,16 +477,16 @@ function toggleIn(arr, v) { const i = arr.indexOf(v); i >= 0 ? arr.splice(i, 1) 
 
 function renderFilters() {
   const m = state.meta, f = state.f;
-  const g = $("outcodeGroups"); g.innerHTML = "";
-  for (const [name, codes] of Object.entries(m.outcodes)) {
-    const lab = document.createElement("div"); lab.className = "group-label";
-    const allOn = codes.every((c) => f.outcodes.includes(c));
-    lab.innerHTML = `<span>${esc(name[0].toUpperCase() + name.slice(1))}</span><a>${allOn ? "clear" : "all"}</a>`;
-    lab.querySelector("a").onclick = () => { codes.forEach((c) => { const i = f.outcodes.indexOf(c); if (allOn) { if (i >= 0) f.outcodes.splice(i, 1); } else if (i < 0) f.outcodes.push(c); }); refresh(); };
-    const wrap = document.createElement("div"); wrap.className = "chips";
-    codes.forEach((c) => wrap.appendChild(chip(c, f.outcodes.includes(c), () => { toggleIn(f.outcodes, c); refresh(); })));
-    g.append(lab, wrap);
-  }
+  const geo = GEO || { regions: [], tree: [] };
+  const counts = Object.fromEntries(geo.tree.map((r) => [r.region, r.n]));
+  const rg = $("regions"); rg.innerHTML = "";
+  geo.regions.forEach((r) => rg.appendChild(chip(counts[r] ? `${r} · ${counts[r]}` : r, f.regions.includes(r), () => { toggleIn(f.regions, r); refresh(); })));
+  $("regClear").onclick = () => { f.regions = []; f.areas = []; refresh(); };
+  const ar = $("areas"); ar.innerHTML = "";
+  const areas = geo.tree.filter((r) => !f.regions.length || f.regions.includes(r.region)).flatMap((r) => r.areas).sort((a, b) => b.n - a.n).slice(0, 40);
+  if (!areas.length) ar.innerHTML = `<span class="small">No saved deals in these regions yet.</span>`;
+  areas.forEach((a) => ar.appendChild(chip(`${a.area} · ${a.n}`, f.areas.includes(a.area), () => { toggleIn(f.areas, a.area); refresh(); })));
+  $("pcPrefix").value = f.postcode;
   const cats = $("categories"); cats.innerHTML = "";
   cats.appendChild(chip("All", f.categories.length === 0, () => { f.categories = []; refresh(); }));
   m.categories.forEach((c) => cats.appendChild(chip(c[0].toUpperCase() + c.slice(1), f.categories.includes(c), () => { toggleIn(f.categories, c); refresh(); })));
@@ -471,13 +501,16 @@ function renderFilters() {
 const bind = [["hideRejected", "hideRejected", "checked"], ["newOnly", "newOnly", "checked"], ["passedOnly", "passedOnly", "checked"],
   ["inclIneligible", "inclIneligible", "checked"], ["minRoce", "minRoce", "value"], ["minYield", "minYield", "value"],
   ["maxPrice", "maxPrice", "value"], ["sort", "sort", "value"]];
+$("pcPrefix").addEventListener("change", () => { state.f.postcode = $("pcPrefix").value.toUpperCase().trim(); refresh(); });
 bind.forEach(([id, key, prop]) => $(id).addEventListener("change", () => { state.f[key] = $(id)[prop]; refresh(); }));
 let qTimer; $("q").addEventListener("input", () => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.f.q = $("q").value.trim(); loadDeals(); saveFilters(); }, 250); });
 $("resetFilters").onclick = () => { state.f = structuredClone(DEFAULT_FILTERS); refresh(); };
 
 function query() {
   const f = state.f, q = new URLSearchParams();
-  f.outcodes.forEach((o) => q.append("outcode", o)); f.categories.forEach((c) => q.append("category", c));
+  f.regions.forEach((r) => q.append("region", r)); f.areas.forEach((a) => q.append("area", a));
+  if (f.postcode) q.set("postcode", f.postcode);
+  f.categories.forEach((c) => q.append("category", c));
   f.ptypes.forEach((t) => q.append("ptype", t)); f.statuses.forEach((s) => q.append("status", s));
   if (f.hideRejected) q.set("hide_rejected", "true"); if (f.newOnly) q.set("new_only", "true");
   if (f.passedOnly) q.set("passed_only", "true"); if (f.inclIneligible) q.set("include_ineligible", "true");
@@ -512,7 +545,7 @@ function renderBanners() {
       <div class="steps">
         <div class="step"><b>1. Try it with sample data</b><span class="small">17 invented Kent listings so you can click around — nothing is sent anywhere.</span><br><button style="margin-top:8px" id="bSample">Load sample data</button></div>
         <div class="step"><b>2. Add keys &amp; the daily run</b><span class="small">Telegram for alerts and Claude for refurb scope are optional. Install the 07:30 run.</span><br><button style="margin-top:8px" id="bSettings">Open settings</button></div>
-        <div class="step"><b>3. Run a live scan</b><span class="small">Opens a browser on this laptop and reads the newest Medway &amp; Thanet listings.</span><br><button class="primary" style="margin-top:8px" id="bScan">Scan now</button></div>
+        <div class="step"><b>3. Run a live scan</b><span class="small">Opens a browser on this laptop and reads the newest listings across England.</span><br><button class="primary" style="margin-top:8px" id="bScan">Scan now</button></div>
       </div></div></div>`;
     $("bSample").onclick = () => startScan({ sources: ["sample"], use_claude: false });
     $("bSettings").onclick = () => show("settings");
@@ -528,13 +561,14 @@ function renderBanners() {
 }
 
 async function loadSummary() {
-  const rows = await api("/api/summary"); const c = $("cards"); c.innerHTML = "";
+  const sq = new URLSearchParams(); state.f.regions.forEach((r) => sq.append("region", r));
+  const rows = (await api("/api/summary?" + sq)).slice(0, 24); const c = $("cards"); c.innerHTML = "";
   for (const r of rows) {
-    const el = document.createElement("div"); el.className = "card" + (state.f.outcodes.includes(r.outcode) ? " on" : "");
+    const el = document.createElement("div"); el.className = "card" + (state.f.areas.includes(r.outcode) ? " on" : "");
     el.innerHTML = `<div class="oc">${esc(r.outcode)}</div><div class="n">${r.passing || 0}</div>
       <div class="m">pass of ${r.listings} · yield ${r.avg_yield_pct ?? "–"}%</div>
       <div class="m">best ROCE ${r.infinite_roce_deals ? "∞" : (r.best_roce_pct != null ? r.best_roce_pct.toFixed(0) + "%" : "–")}</div>`;
-    el.onclick = () => { state.f.outcodes = state.f.outcodes.length === 1 && state.f.outcodes[0] === r.outcode ? [] : [r.outcode]; refresh(); };
+    el.onclick = () => { state.f.areas = state.f.areas.length === 1 && state.f.areas[0] === r.outcode ? [] : [r.outcode]; refresh(); };
     c.appendChild(el);
   }
 }
@@ -578,7 +612,7 @@ async function loadDeals() {
 
 async function refresh() {
   saveFilters();
-  await loadMeta();
+  await Promise.all([loadMeta(), loadGeo()]);
   renderFilters(); renderBanners();
   await Promise.all([loadSummary(), loadDeals()]);
 }
@@ -722,8 +756,7 @@ function openScanModal() {
   $("pdHint").textContent = keys.PROPERTYDATA_API_KEY ? "" : "(no key — will be skipped)";
   $("claudeHint").textContent = keys.ANTHROPIC_API_KEY ? "" : "(no key — keyword heuristic used)";
   $("m_alerts").disabled = !(keys.TELEGRAM_BOT_TOKEN && keys.TELEGRAM_CHAT_ID) && !keys.ALERT_WEBHOOK_URL;
-  const oc = state.f.outcodes;
-  $("scanScope").textContent = oc.length ? `Postcodes: ${oc.join(", ")} (your current selection)` : "All 11 target postcodes. Select postcodes on the left to scan fewer.";
+  $("scanScope").textContent = "Searches the newest residential and commercial listings across England's 47 counties (about an hour). Name a few counties below to try a quicker scan.";
   $("scanModal").classList.add("open");
 }
 $("scanBtn").onclick = openScanModal;
@@ -736,7 +769,8 @@ $("scanGo").onclick = () => {
   const sources = srcs.includes("sample") ? ["sample"] : srcs;
   if (!sources.length) return toast("Pick at least one source");
   $("scanModal").classList.remove("open");
-  startScan({ sources, outcodes: state.f.outcodes.length ? state.f.outcodes : null, send_alerts: $("m_alerts").checked, use_claude: $("m_claude").checked });
+  const areas = $("m_areas").value.split(",").map((x) => x.trim()).filter(Boolean);
+  startScan({ sources, areas: areas.length ? areas : null, send_alerts: $("m_alerts").checked, use_claude: $("m_claude").checked });
 };
 async function startScan(body) {
   try { await api("/api/scan", { method: "POST", body }); toast("Scan started — progress shows at the top"); pollJob(true); }
@@ -809,7 +843,30 @@ let settings = null;
 const getPath = (o, p) => p.split(".").reduce((a, k) => a?.[k], o);
 function setPath(o, p, v) { const ks = p.split("."); let cur = o; ks.slice(0, -1).forEach((k) => cur = cur[k] ||= {}); cur[ks.at(-1)] = v; }
 
+async function loadCoverage() {
+  let c; try { c = await api("/api/coverage"); } catch (e) { return; }
+  $("cov_scope").value = c.scope; $("cov_days").value = String(c.added_within_days);
+  document.querySelectorAll(".cov_ch").forEach((x) => x.checked = c.channels.includes(x.value));
+  $("cov_maxcom").value = c.max_price_commercial; $("cov_pages").value = c.max_pages_per_search;
+  $("cov_areas").innerHTML = c.all_areas.map((a) => `<label class="row small"><input type="checkbox" class="cov_a" value="${esc(a)}" ${c.search_areas.includes(a) ? "checked" : ""}> ${esc(a)}</label>`).join("");
+  $("cov_n").textContent = `${c.search_areas.length} of ${c.all_areas.length}`;
+  const p = c.ppd;
+  $("ppdStatus").innerHTML = p.rows ? `${p.rows.toLocaleString("en-GB")} sales across ${p.districts.toLocaleString("en-GB")} postcode districts, ${esc(p.from)} to ${esc(p.to)}. Updated ${when(p.refreshed_at)}.`
+    : "Not downloaded yet. The first portal scan downloads about 300 MB of sold prices (a few minutes), then a small monthly update.";
+  const save = async () => {
+    const body = { config: { coverage: { scope: $("cov_scope").value, added_within_days: Number($("cov_days").value),
+      channels: [...document.querySelectorAll(".cov_ch:checked")].map((x) => x.value),
+      max_pages_per_search: Number($("cov_pages").value) || 8,
+      search_areas: [...document.querySelectorAll(".cov_a:checked")].map((x) => x.value) },
+      ingestion: { max_price_commercial: Number($("cov_maxcom").value) || 750000 } } };
+    try { await api("/api/settings", { method: "PUT", body }); toast("Coverage saved"); $("cov_n").textContent = `${body.config.coverage.search_areas.length} of ${c.all_areas.length}`; } catch (e) { toast(e.message, 5000); }
+  };
+  document.querySelectorAll("#cov_scope, #cov_days, .cov_ch, #cov_maxcom, #cov_pages, .cov_a").forEach((el) => el.onchange = save);
+  $("ppdBtn").onclick = async () => { try { await api("/api/ppd/refresh", { method: "POST" }); toast("Downloading Land Registry data. Progress is on the Runs tab."); pollJob(true); } catch (e) { toast(e.message, 5000); } };
+}
+
 async function loadSettings() {
+  loadCoverage();
   settings = await api("/api/settings");
   const c = settings.config, sch = settings.schedule;
   $("schedStatus").innerHTML = sch.installed ? `<span class="badge b-pass">Installed</span> ${esc(sch.platform)} · daily at <b>${esc(sch.time)}</b>${sch.next_run ? " · next " + esc(sch.next_run) : ""}`
@@ -818,7 +875,7 @@ async function loadSettings() {
   document.querySelectorAll(".s_src").forEach((x) => x.checked = (c.schedule.sources || []).includes(x.value));
   document.querySelectorAll(".s_portal").forEach((x) => x.checked = (c.portals.enabled || []).includes(x.value));
   $("s_showbrowser").checked = c.portals.headless === false;
-  $("s_pages").value = c.portals.max_sale_pages_per_outcode; $("s_maxprice").value = c.ingestion.max_price;
+  $("s_maxprice").value = c.ingestion.max_price;
   $("keys").innerHTML = Object.entries(KEY_LABELS).map(([k, label]) => {
     const s = settings.secrets[k];
     return `<div class="keyrow"><label for="k_${k}">${label}<div class="small">${s.set ? "Saved " + esc(s.hint) : "Not set"}</div></label>
@@ -850,10 +907,10 @@ async function savePortalAndSchedule() {
   const enabled = [...document.querySelectorAll(".s_portal:checked")].map((x) => x.value);
   const sources = [...document.querySelectorAll(".s_src:checked")].map((x) => x.value);
   await api("/api/settings", { method: "PUT", body: { config: {
-    portals: { enabled, headless: !$("s_showbrowser").checked, max_sale_pages_per_outcode: Number($("s_pages").value) || 3 },
+    portals: { enabled, headless: !$("s_showbrowser").checked },
     ingestion: { max_price: Number($("s_maxprice").value) || 350000 }, schedule: { time: $("s_time").value, sources } } } });
 }
-document.querySelectorAll(".s_portal, .s_src, #s_showbrowser, #s_pages, #s_maxprice").forEach((el) =>
+document.querySelectorAll(".s_portal, .s_src, #s_showbrowser, #s_maxprice").forEach((el) =>
   el.addEventListener("change", async () => { await savePortalAndSchedule(); toast("Saved"); }));
 $("schedInstall").onclick = async () => {
   await savePortalAndSchedule();

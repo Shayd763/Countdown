@@ -337,10 +337,7 @@ def underwrite(
     net_annual = annual_rent - annual_opex - annual_payment - tax
     net_monthly = net_annual / 12
 
-    if product is None:
-        stress_rate = 0.0
-    else:
-        stress_rate = product.stress_rate if product.kind == "btl" else product.pay_rate
+    stress_rate = 0.0 if product is None else (product.stress_rate if product.kind == "btl" else product.pay_rate)
     stressed_interest = long_loan * stress_rate
     icr = annual_rent / stressed_interest if stressed_interest else float("inf")
     icr_needed = product.icr if product and product.kind == "btl" else 1.0

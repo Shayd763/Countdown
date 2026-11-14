@@ -1,9 +1,76 @@
 # Kent BRRR Scout — target geography, cost assumptions and gate thresholds.
 # Every number the underwriting engine uses lives here so you can tune without code changes.
 
+# Focus outcodes: used for PropertyData's per-postcode lists, the bundled sample data, and
+# coverage.scope = focus. The daily portal search covers all of England (see coverage).
 outcodes:
   medway: [ME1, ME2, ME4, ME5, ME7, ME8]
   thanet: [CT8, CT9, CT10, CT11, CT12]
+
+# ---------------------------------------------------------------------------
+# Coverage: what the daily portal search looks at.
+# scope: england -> the counties below, residential and commercial, newest listings only
+#        focus   -> only the focus outcodes above (the original Kent-only behaviour)
+# Wales and Scotland are left out until their purchase taxes (LTT, LBTT/ADS) are modelled.
+# ---------------------------------------------------------------------------
+coverage:
+  scope: england
+  channels: [residential, commercial]
+  added_within_days: 1          # only listings the portal says were added in the last day
+  max_pages_per_search: 8       # per county, per channel, per portal (25 listings a page)
+  keywords: []                  # e.g. [renovation, modernisation]: narrows residential searches if set
+  search_areas:
+    - Bedfordshire
+    - Berkshire
+    - Bristol
+    - Buckinghamshire
+    - Cambridgeshire
+    - Cheshire
+    - Cornwall
+    - Cumbria
+    - Derbyshire
+    - Devon
+    - Dorset
+    - County Durham
+    - East Riding of Yorkshire
+    - East Sussex
+    - Essex
+    - Gloucestershire
+    - London
+    - Greater Manchester
+    - Hampshire
+    - Herefordshire
+    - Hertfordshire
+    - Isle of Wight
+    - Kent
+    - Lancashire
+    - Leicestershire
+    - Lincolnshire
+    - Merseyside
+    - Norfolk
+    - North Yorkshire
+    - Northamptonshire
+    - Northumberland
+    - Nottinghamshire
+    - Oxfordshire
+    - Rutland
+    - Shropshire
+    - Somerset
+    - South Yorkshire
+    - Staffordshire
+    - Suffolk
+    - Surrey
+    - Tyne and Wear
+    - Warwickshire
+    - West Midlands
+    - West Sussex
+    - West Yorkshire
+    - Wiltshire
+    - Worcestershire
+
+# Region-wide threshold/cost overrides (same shape as outcode_overrides). For example London
+# rarely reaches a 6.8% gross yield; lower it here if you want London deals to pass.
+region_overrides: {}
 
 # Optional per-outcode overrides of any key under `thresholds` or `costs`.
 outcode_overrides:
@@ -87,12 +154,23 @@ eligibility:
     - cash buyers only due to mortgage
     - help to buy only
 
-# Commercial valuation path (rent from £/sq ft, ARV = rent / net initial yield)
+# Commercial valuation path (rent from £/sq ft, ARV = rent / net initial yield).
+# Rough: lookup order is outcode, then region, then default. Treat commercial results as a
+# first screen and get a proper valuation before offering.
 commercial:
   rent_per_sqft_pa:
-    default: 12.0
+    default: 11.0
     ME4: 14.0
     CT9: 11.0
+    London: 32.0
+    South East: 15.0
+    East of England: 13.0
+    South West: 12.0
+    West Midlands: 11.0
+    East Midlands: 10.0
+    North West: 10.5
+    Yorkshire and the Humber: 9.5
+    North East: 8.5
   valuation_yield: 0.085
 
 ingestion:
@@ -105,6 +183,7 @@ ingestion:
     - reduced-properties
     - cash-buyers-only
   max_price: 350000
+  max_price_commercial: 750000
   # Auction / RSS feeds (Clive Emson etc.). Any RSS 2.0 / Atom URL.
   rss_feeds:
     - https://www.cliveemson.co.uk/feed/
@@ -129,15 +208,32 @@ portals:
   max_rent_pages_per_outcode: 2
   rent_refresh_days: 7          # rental comps don't need refreshing daily
   page_delay_seconds: [4, 9]    # random pause between page loads
-  max_detail_pages_per_run: 40  # detail pages only for listings that survive the cheap pre-gate
+  max_detail_pages_per_run: 150 # detail pages only for listings that survive the cheap pre-gate
   stop_after_seen_streak: 12    # consecutive already-seen listings → stop paging that outcode
   base_urls:
     rightmove: https://www.rightmove.co.uk
     rightmove_typeahead: https://los.rightmove.co.uk/typeahead
     zoopla: https://www.zoopla.co.uk
     onthemarket: https://www.onthemarket.com
-  # Pin Rightmove location ids here if auto-lookup fails, e.g. ME4: "OUTCODE^1652"
+  # County (area) search URLs. Placeholders: {base} {loc} {slug} {name} {max_price} {index}
+  # {page1} {days} {zoopla_added} {otm_added} {kw}. Fix here if a portal changes its URLs.
+  area_urls:
+    rightmove:
+      residential: "{base}/property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType=6&index={index}&maxDaysSinceAdded={days}&dontShow=retirement%2CsharedOwnership&includeSSTC=false{kw}"
+      commercial: "{base}/commercial-property-for-sale/find.html?locationIdentifier={loc}&maxPrice={max_price}&sortType=6&index={index}&maxDaysSinceAdded={days}"
+    zoopla:
+      residential: "{base}/for-sale/property/{slug}/?q={name}&results_sort=newest_listings&search_source=refine&price_max={max_price}&added={zoopla_added}&is_retirement_home=false&is_shared_ownership=false&pn={page1}{kw}"
+      commercial: "{base}/for-sale/commercial/{slug}/?q={name}&results_sort=newest_listings&price_max={max_price}&added={zoopla_added}&pn={page1}"
+    onthemarket:
+      residential: "{base}/for-sale/property/{slug}/?max-price={max_price}&sort-field=update_date&recently-added={otm_added}&retirement=false&shared-ownership=false&page={page1}{kw}"
+      commercial: "{base}/for-sale/commercial/{slug}/?max-price={max_price}&sort-field=update_date&recently-added={otm_added}&page={page1}"
+  # Pin Rightmove location ids here if auto-lookup fails, e.g. ME4: "OUTCODE^1652", Kent: "REGION^61294"
   rightmove_location_ids: {}
+  # On-demand comps: for each postcode district where a listing looks promising, read one page
+  # of rentals and one of homes for sale (cached), so rent and asking-price comps exist anywhere.
+  comps_max_districts_per_run: 120
+  comps_rent_cache_days: 30
+  comps_sale_cache_days: 14
 
 # Local comps (used when no PROPERTYDATA_API_KEY): asking-price and rent medians built
 # from everything the portal collector has seen, plus HM Land Registry sold prices.
@@ -145,9 +241,21 @@ local_comps:
   lookback_days: 120
   min_samples: 3
   land_registry_cache_days: 7
+  sold_lookback_months: 24
+
+# HM Land Registry Price Paid Data (England and Wales, Open Government Licence), kept locally
+# for sold-price comps everywhere. First run downloads the yearly files (~300 MB, a few minutes);
+# after that only the monthly update file.
+land_registry_ppd:
+  enabled: true
+  base_url: http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com
+  years: 2                      # current year plus the previous one
+  monthly_file: pp-monthly-update-new-version.csv
+  refresh_days: 30
+  postcodes_io: https://api.postcodes.io
 
 schedule:
-  time: "07:30"                 # local time on the laptop
+  time: "05:30"                 # local time on the laptop; England-wide takes about an hour
   sources: [portals, rss, propertydata]
 
 # ---------------------------------------------------------------------------

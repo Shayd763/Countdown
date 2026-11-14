@@ -73,11 +73,40 @@ def build_plan(cfg: dict[str, Any], plan_id: str | None = None) -> FinancePlan:
     )
 
 
+_CACHE: dict[tuple, UnderwritingResult] = {}
+_CACHE_VERSION: list[Any] = [None]
+_CACHE_MAX = 250_000
+
+
 def reunderwrite(deal: Deal, cfg: dict[str, Any], plan_id: str | None = None,
                  asking_price: float | None = None, refurb_tier: str | None = None,
                  refurb_cost: float | None = None, monthly_rent: float | None = None,
                  arv: float | None = None) -> UnderwritingResult:
-    """The saved deal's numbers under a plan (and optional what-if overrides)."""
+    """The saved deal's numbers under a plan (and optional what-if overrides). Plain plan
+    switches are cached until the config or the deal changes."""
+    from .config import config_version
+
+    plain = not any(v is not None for v in (asking_price, refurb_tier, refurb_cost, monthly_rent, arv))
+    if plain:
+        version = config_version()
+        if _CACHE_VERSION[0] != version or len(_CACHE) > _CACHE_MAX:
+            _CACHE.clear()
+            _CACHE_VERSION[0] = version
+        key = (deal.listing.listing_id, deal.listing.asking_price, deal.result.underwritten_at.isoformat(),
+               deal.refurb.tier, deal.result.eligible, plan_id)
+        hit = _CACHE.get(key)
+        if hit is not None:
+            return hit.model_copy()
+    res = _reunderwrite(deal, cfg, plan_id, asking_price, refurb_tier, refurb_cost, monthly_rent, arv)
+    if plain:
+        _CACHE[key] = res
+        return res.model_copy()
+    return res
+
+
+def _reunderwrite(deal: Deal, cfg: dict[str, Any], plan_id: str | None, asking_price: float | None,
+                  refurb_tier: str | None, refurb_cost: float | None, monthly_rent: float | None,
+                  arv: float | None) -> UnderwritingResult:
     lst, c = deal.listing, deal.comps
     ocfg = config_for_outcode(cfg, lst.outcode)
     res = underwrite(

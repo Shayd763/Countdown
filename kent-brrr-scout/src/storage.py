@@ -14,6 +14,19 @@ import sqlite_utils
 from .config import PROJECT_ROOT
 from .models import Deal, RawListing
 
+_PARSED: dict[tuple[str, str], Deal] = {}
+
+
+def _parsed(listing_id: str, underwritten_at: str, deal_json: str) -> Deal:
+    """Parsing saved deals dominates large listings; reuse them until the deal is saved again."""
+    key = (listing_id, underwritten_at or "")
+    d = _PARSED.get(key)
+    if d is None:
+        if len(_PARSED) > 300_000:
+            _PARSED.clear()
+        d = _PARSED[key] = Deal.model_validate_json(deal_json)
+    return d.model_copy()
+
 
 def _now() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
@@ -60,6 +73,20 @@ class Storage:
                 "alerted_at": str, "underwritten_at": str, "deal_json": str,
             }, pk="listing_id")
             db["deals"].create_index(["outcode", "passed"])
+        # nationwide columns (added to databases created before they existed)
+        cols = db["deals"].columns_dict
+        added = False
+        for col in ("postcode_area", "region", "postcode"):
+            if col not in cols:
+                db["deals"].add_column(col, str)
+                added = True
+        if added:
+            from .geo import area_of, region_of
+
+            for row in list(db.query("select listing_id, outcode from deals")):
+                db["deals"].update(row["listing_id"], {"postcode_area": area_of(row["outcode"] or ""),
+                                                       "region": region_of(row["outcode"] or "")})
+            db["deals"].create_index(["region", "postcode_area"], if_not_exists=True)
         if "audit_log" not in db.table_names():
             db["audit_log"].create(
                 {"id": int, "ts": str, "event": str, "listing_id": str, "detail": str}, pk="id"
@@ -149,6 +176,7 @@ class Storage:
             prior = self.db["deals"].get(lst.listing_id)
         self.db["deals"].upsert({
             "listing_id": lst.listing_id, "outcode": lst.outcode, "category": lst.category.value,
+            "postcode_area": lst.postcode_area, "region": lst.region, "postcode": lst.postcode,
             "property_type": lst.property_type, "bedrooms": lst.bedrooms,
             "asking_price": r.asking_price, "conservative_arv": r.conservative_arv,
             "refurb_tier": r.refurb_tier, "gross_yield": r.gross_yield,
@@ -186,10 +214,29 @@ class Storage:
         max_price: float | None = None, min_yield: float | None = None,
         statuses: list[str] | None = None, hide_rejected: bool = False,
         new_since: str | None = None, search: str | None = None,
+        regions: list[str] | None = None, areas: list[str] | None = None,
+        postcode_prefixes: list[str] | None = None,
         sort: str = "roce_pct", limit: int = 500,
     ) -> list[dict[str, Any]]:
         """Deals plus pipeline status, notes and first-seen date."""
         where, params = ["1=1"], []
+        if regions:
+            where.append(f"d.region in ({','.join('?' * len(regions))})")
+            params += regions
+        if areas:
+            where.append(f"d.postcode_area in ({','.join('?' * len(areas))})")
+            params += [a.upper() for a in areas]
+        prefixes = [x.upper().replace(" ", "") for x in (postcode_prefixes or []) if x and x.strip()]
+        if prefixes:
+            ors = []
+            for pre in prefixes:
+                if pre.isalpha():  # a postcode area: exact letters, so M doesn't match ME
+                    ors.append("d.postcode_area = ?")
+                    params.append(pre)
+                else:
+                    ors.append("(d.outcode = ? or replace(coalesce(d.postcode, ''), ' ', '') like ?)")
+                    params += [pre, pre + "%"]
+            where.append("(" + " or ".join(ors) + ")")
         if outcodes:
             where.append(f"d.outcode in ({','.join('?' * len(outcodes))})")
             params += [o.upper() for o in outcodes]
@@ -231,7 +278,8 @@ class Storage:
             "newest": "l.first_seen desc",
         }
         sql = f"""
-            select d.deal_json, coalesce(s.status, 'new') as status, s.notes, l.first_seen
+            select d.listing_id as lid, d.underwritten_at as uw, d.deal_json,
+                   coalesce(s.status, 'new') as status, s.notes, l.first_seen
             from deals d
             left join deal_status s on s.listing_id = d.listing_id
             left join listings l on l.listing_id = d.listing_id
@@ -239,7 +287,7 @@ class Storage:
             order by passed desc, {sort_cols.get(sort, 'roce_pct desc')}
             limit {int(limit)}"""
         return [
-            {"deal": Deal.model_validate_json(r["deal_json"]), "status": r["status"],
+            {"deal": _parsed(r["lid"], r["uw"], r["deal_json"]), "status": r["status"],
              "notes": r["notes"], "first_seen": r["first_seen"]}
             for r in self.db.query(sql, params)
         ]
@@ -280,6 +328,29 @@ class Storage:
             return Deal.model_validate_json(self.db["deals"].get(listing_id)["deal_json"])
         except sqlite_utils.db.NotFoundError:
             return None
+
+    def geo_tree(self) -> list[dict[str, Any]]:
+        """Regions -> postcode areas -> districts present in the saved deals, with counts."""
+        rows = list(self.db.query("""
+            select coalesce(region, '') as region, coalesce(postcode_area, '') as area, outcode,
+                   count(*) as n, sum(passed) as passing
+            from deals where eligible = 1 group by region, postcode_area, outcode"""))
+        tree: dict[str, dict[str, Any]] = {}
+        for r in rows:
+            reg = tree.setdefault(r["region"] or "Unknown", {"region": r["region"] or "Unknown", "n": 0,
+                                                             "passing": 0, "areas": {}})
+            ar = reg["areas"].setdefault(r["area"], {"area": r["area"], "n": 0, "passing": 0, "districts": []})
+            ar["districts"].append({"outcode": r["outcode"], "n": r["n"], "passing": r["passing"] or 0})
+            for x in (reg, ar):
+                x["n"] += r["n"]
+                x["passing"] += r["passing"] or 0
+        out = []
+        for reg in sorted(tree.values(), key=lambda x: -x["n"]):
+            areas = sorted(reg["areas"].values(), key=lambda a: -a["n"])
+            for a in areas:
+                a["districts"].sort(key=lambda d: -d["n"])
+            out.append({**reg, "areas": areas})
+        return out
 
     def outcode_summary(self) -> list[dict[str, Any]]:
         return list(self.db.query("""

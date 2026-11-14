@@ -47,6 +47,7 @@ def deal_row(d: Deal, meta: dict[str, Any] | None = None) -> dict[str, Any]:
     meta = meta or {}
     return {
         "listing_id": lst.listing_id, "outcode": lst.outcode, "postcode": lst.postcode,
+        "region": lst.region, "postcode_area": lst.postcode_area,
         "address": lst.address, "url": lst.url, "source": lst.source, "is_auction": lst.is_auction,
         "category": lst.category.value, "property_type": lst.property_type, "bedrooms": lst.bedrooms,
         "tenure": lst.tenure.value, "asking_price": r.asking_price, "conservative_arv": r.conservative_arv,
@@ -128,6 +129,7 @@ class Jobs:
 
 class ScanRequest(BaseModel):
     outcodes: list[str] | None = None
+    areas: list[str] | None = None
     sources: list[str] | None = None
     offline: bool = False  # legacy alias for sources=["sample"]
     use_claude: bool = True
@@ -178,7 +180,8 @@ EDITABLE = {
                 "refi_fee_pct_of_loan"],
     "costs": ["fixed_acquisition_costs", "arv_haircut_pct", "rent_haircut_pct", "refurb_contingency_pct",
               "refurb_per_sqft"],
-    "ingestion": ["max_price"],
+    "ingestion": ["max_price", "max_price_commercial"],
+    "coverage": ["scope", "added_within_days", "channels", "max_pages_per_search", "search_areas", "keywords"],
     "portals": ["enabled", "headless", "max_sale_pages_per_outcode"],
     "schedule": ["time", "sources"],
     "eligibility": ["include_commercial", "min_lease_years_flats"],
@@ -259,7 +262,7 @@ def create_app() -> FastAPI:
     def planned_rows(request: Request, plan: str | None, outcode=None, category=None, ptype=None,
                      passed_only=False, include_ineligible=False, min_roce=None, max_price=None,
                      min_yield=None, status=None, hide_rejected=False, new_only=False, q=None,
-                     sort="roce_pct", limit=500) -> list[dict[str, Any]]:
+                     sort="roce_pct", limit=500, region=None, area=None, postcode=None) -> list[dict[str, Any]]:
         """Saved deals re-underwritten under a finance plan and the current settings, then
         filtered and sorted on the recalculated numbers."""
         from .finance import reunderwrite
@@ -268,6 +271,9 @@ def create_app() -> FastAPI:
         pid = plan_for(request, plan)
         base = filters(outcode, category, ptype, False, include_ineligible, None, max_price, None,
                        status, hide_rejected, new_only, q, "roce_pct", 100_000)
+        base["regions"] = region or None
+        base["areas"] = area or None
+        base["postcode_prefixes"] = [x.strip() for x in (postcode or "").split(",") if x.strip()] or None
         rows = storage().query_deal_rows(**base)
         for r in rows:
             r["deal"] = r["deal"].model_copy(update={"result": reunderwrite(r["deal"], cfg, pid)})
@@ -286,12 +292,16 @@ def create_app() -> FastAPI:
         return out[:limit]
 
     @app.get("/api/summary")
-    def summary(request: Request, plan: str | None = None) -> list[dict[str, Any]]:
-        rows = planned_rows(request, plan, limit=100_000)
+    def summary(request: Request, plan: str | None = None, group: str = "area",
+                region: list[str] | None = Query(None)) -> list[dict[str, Any]]:
+        from .geo import area_of
+
+        rows = planned_rows(request, plan, limit=100_000, region=region)
         by: dict[str, dict[str, Any]] = {}
         for r in rows:
             res = r["deal"].result
-            s_ = by.setdefault(res.outcode, {"outcode": res.outcode, "listings": 0, "passing": 0,
+            key = area_of(res.outcode) if group == "area" else res.outcode
+            s_ = by.setdefault(key, {"outcode": key, "group": group, "listings": 0, "passing": 0,
                                              "yields": [], "best_roce_pct": None, "infinite_roce_deals": 0})
             s_["listings"] += 1
             s_["yields"].append(res.gross_yield)
@@ -308,6 +318,17 @@ def create_app() -> FastAPI:
             out.append(s_)
         return sorted(out, key=lambda x: (-x["passing"], x["outcode"]))
 
+    @app.get("/api/geo")
+    def geo() -> dict[str, Any]:
+        from .geo import REGIONS
+
+        cfg = load_config()
+        cov = cfg.get("coverage") or {}
+        return {"regions": REGIONS, "tree": storage().geo_tree(), "scope": cov.get("scope", "england"),
+                "search_areas": cov.get("search_areas") or [],
+                "property_types": ["terraced", "end-terrace", "semi-detached", "detached", "bungalow", "flat",
+                                   "maisonette", "commercial", "mixed-use"]}
+
     @app.get("/api/deals")
     def deals(
         request: Request,
@@ -317,9 +338,11 @@ def create_app() -> FastAPI:
         max_price: float | None = None, min_yield: float | None = None,
         status: list[str] | None = Query(None), hide_rejected: bool = False, new_only: bool = False,
         q: str | None = None, sort: str = "roce_pct", limit: int = 500, plan: str | None = None,
+        region: list[str] | None = Query(None), area: list[str] | None = Query(None), postcode: str | None = None,
     ) -> list[dict[str, Any]]:
         rows = planned_rows(request, plan, outcode, category, ptype, passed_only, include_ineligible,
-                            min_roce, max_price, min_yield, status, hide_rejected, new_only, q, sort, limit)
+                            min_roce, max_price, min_yield, status, hide_rejected, new_only, q, sort, limit,
+                            region, area, postcode)
         return [deal_row(r["deal"], r) for r in rows]
 
     @app.get("/api/deals.csv")
@@ -331,10 +354,12 @@ def create_app() -> FastAPI:
         max_price: float | None = None, min_yield: float | None = None,
         status: list[str] | None = Query(None), hide_rejected: bool = False, new_only: bool = False,
         q: str | None = None, sort: str = "roce_pct", plan: str | None = None,
+        region: list[str] | None = Query(None), area: list[str] | None = Query(None), postcode: str | None = None,
     ) -> Response:
         rows = planned_rows(request, plan, outcode, category, ptype, passed_only, include_ineligible,
-                            min_roce, max_price, min_yield, status, hide_rejected, new_only, q, sort, 100_000)
-        cols = ["listing_id", "status", "passed", "plan", "outcode", "postcode", "address", "property_type",
+                            min_roce, max_price, min_yield, status, hide_rejected, new_only, q, sort, 100_000,
+                            region, area, postcode)
+        cols = ["listing_id", "status", "passed", "plan", "region", "outcode", "postcode", "address", "property_type",
                 "bedrooms", "tenure", "asking_price", "max_offer_price", "conservative_arv", "refurb_tier",
                 "refurb_cost", "cash_to_buy", "refi_loan", "money_left_in", "gross_yield",
                 "net_monthly_cashflow", "roce_pct", "capital_recycled_pct", "price_drop_pct", "first_seen",
@@ -361,6 +386,7 @@ def create_app() -> FastAPI:
         fp = build_plan(cfg, pid)
         return {**deal.model_dump(mode="json"), "price_history": st.price_history(listing_id),
                 "pipeline": st.get_status(listing_id), "first_seen": st.first_seen(listing_id),
+                "region": deal.listing.region, "postcode_area": deal.listing.postcode_area,
                 "plan": {"id": fp.id, "label": fp.label, "note": fp.note, "months": fp.months,
                          "purchase": fp.purchase}}
 
@@ -461,7 +487,7 @@ def create_app() -> FastAPI:
         from .main import run_scan
 
         sources = ["sample"] if req.offline else req.sources
-        return jobs.start("scan", run_scan, outcodes=req.outcodes, sources=sources,
+        return jobs.start("scan", run_scan, outcodes=req.outcodes, sources=sources, areas=req.areas,
                           dry_run=not req.send_alerts, use_claude=req.use_claude,
                           trigger="ui")  # storage is opened inside the worker thread
 
@@ -484,6 +510,33 @@ def create_app() -> FastAPI:
             return {"checks": run_checks()}
 
         return jobs.start("doctor", fn)
+
+    @app.get("/api/coverage")
+    def coverage() -> dict[str, Any]:
+        from .geo import ENGLAND_COUNTIES
+        from .ppd import summary as ppd_summary
+
+        cfg = load_config()
+        cov = cfg.get("coverage") or {}
+        return {"scope": cov.get("scope", "england"), "added_within_days": cov.get("added_within_days", 1),
+                "channels": cov.get("channels") or ["residential", "commercial"],
+                "max_pages_per_search": cov.get("max_pages_per_search", 8),
+                "search_areas": cov.get("search_areas") or [], "all_areas": ENGLAND_COUNTIES,
+                "keywords": cov.get("keywords") or [],
+                "max_price_commercial": cfg["ingestion"].get("max_price_commercial", 750000),
+                "ppd": ppd_summary(storage())}
+
+    @app.post("/api/ppd/refresh")
+    def ppd_refresh(request: Request) -> dict[str, Any]:
+        from .ppd import refresh
+
+        require_admin(request)
+
+        def fn(progress):
+            progress("comps", "Downloading Land Registry sold prices…")
+            return refresh(Storage(os.environ.get("BRRR_DB_PATH")), load_config(), progress, force=True)
+
+        return jobs.start("land registry", fn)
 
     @app.get("/api/job")
     def job() -> dict[str, Any] | None:

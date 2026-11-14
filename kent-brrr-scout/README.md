@@ -1,16 +1,23 @@
 # Gatehouse
 
-Gatehouse finds BRRR deals in Medway and Thanet and only shows you the ones that get through all four
-financial gates. (The project folder is still called `kent-brrr-scout`.)
+Gatehouse finds BRRR deals across England, residential and commercial, and shows you the ones that get
+through all four financial gates. (The project folder is still called `kent-brrr-scout`.)
 
-This app runs on your own laptop. Every morning it reads the newest Rightmove, Zoopla and OnTheMarket
-listings for Medway (`ME1 ME2 ME4 ME5 ME7 ME8`) and Thanet (`CT8 CT9 CT10 CT11 CT12`). It checks each one
-against your four BRRR gates and shows the results in a web app on your laptop. When a deal passes, it can
-also send you a Telegram message.
+Every morning, a browser on your own laptop reads the listings added in the last day on Rightmove, Zoopla
+and OnTheMarket, county by county (England's 47). It works out each one's postcode district, values it
+against HM Land Registry sold prices and local rents, and checks it against your gates under the finance
+plan you choose. You then filter by region, postcode area, postcode, property type and category on your
+phone or laptop, and a morning alert tells you what passed.
 
-The portal pages are read in an ordinary browser on your home internet connection. These sites block
-cloud servers, but this is just the same pages you would look at yourself, read once a day at a slow,
-human pace.
+**Scope.** England only for now. Wales has its own purchase tax instead of stamp duty (Land Transaction
+Tax) and Scotland has another (LBTT plus the Additional Dwelling Supplement), so the gates would be wrong
+there until those are modelled. The free Land Registry data doesn't cover Scotland either.
+
+**Volume.** The England-wide run is about 500 to 800 page loads, roughly an hour, which is why the daily
+run defaults to 05:30. That is far more than browsing Kent alone, so a portal is more likely to restrict
+your connection for a while. It stops for the day at any block or captcha instead of trying to get around
+it. You can switch portals or counties off in Settings → Coverage, or set the search back to your focus
+postcodes only.
 
 ---
 
@@ -100,6 +107,31 @@ further and the offer slider need the laptop to be awake and online.
 
 To add another person (for example a partner), use **Settings → People** on the laptop. They sign in
 on their own phone with their own profile, filters and notifications.
+
+---
+
+## Where the data comes from (England-wide)
+
+| What | Source | How often |
+|---|---|---|
+| New listings | Rightmove, Zoopla, OnTheMarket county searches, residential and commercial, listed in the last day | daily |
+| Postcode district | the listing's address, else its map position via postcodes.io (free) | per listing |
+| Sold prices | HM Land Registry Price Paid Data, kept on your laptop (about 300 MB; first download takes a few minutes) | monthly update |
+| Rents and asking prices | one page of rentals and one of homes for sale per district, only where a listing could pass at Land Registry prices | cached 30 and 14 days |
+| Commercial value | rent per sq ft by region (Settings) ÷ valuation yield: a rough first screen | — |
+| Paid alternative | a PropertyData key replaces the local comps with PropertyData's | — |
+
+Filters on both apps:
+- **Region:** the nine English regions.
+- **Postcode area:** for example M, LS, ME, built from the deals you have.
+- **Postcode starts with:** any mix of areas, districts or sectors, such as `M, LS6, ME4 6`. An area like
+  M matches M1 to M99 but not ME.
+- **Property type** and **category** (residential, commercial, mixed-use).
+
+Your morning alert uses the same choices, set in Alerts on the phone. Settings → Coverage on the laptop
+chooses the counties, residential and commercial, how recent, the commercial price ceiling, and shows
+the Land Registry data status. Region-wide rule changes go in `region_overrides` in the config: London,
+for example, rarely reaches a 6.8% yield.
 
 ---
 
@@ -200,7 +232,7 @@ browser (on your laptop)
 
 ```bash
 pip install -e ".[dev]"
-pytest                                         # 79 tests incl. real-browser portal run, push encryption vs RFC 8291
+pytest                                         # 97 tests incl. real-browser portal run, push encryption vs RFC 8291
 python -m src.main --sample --dry-run          # sample data, prints deal memos
 python -m src.main --sources portals --outcode ME4 --dry-run
 python -m src.main --daily                     # what the schedule runs

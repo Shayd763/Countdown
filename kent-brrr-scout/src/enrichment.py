@@ -237,7 +237,10 @@ def enrich(listing: RawListing, client: DataClient, cfg: dict[str, Any], *,
 
     if listing.category != PropertyCategory.RESIDENTIAL:
         com = cfg["commercial"]
-        rate = com["rent_per_sqft_pa"].get(oc, com["rent_per_sqft_pa"]["default"])
+        from .geo import region_of
+
+        rents = com["rent_per_sqft_pa"]
+        rate = rents.get(oc) or rents.get(region_of(oc)) or rents["default"]
         annual_rent = rate * sqft
         arv_est = {"income_capitalisation": annual_rent / com["valuation_yield"]}
         monthly = annual_rent / 12

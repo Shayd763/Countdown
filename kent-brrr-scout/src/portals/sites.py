@@ -7,7 +7,7 @@ import logging
 import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, quote_plus, urlencode
 
 if TYPE_CHECKING:
     from .browser import PortalBrowser
@@ -28,6 +28,30 @@ class Portal:
 
     def search_url(self, outcode: str, channel: str, page: int, max_price: int) -> str:
         raise NotImplementedError
+
+    # -- county (area) searches, from config templates --------------------------
+    def prepare_area(self, browser: PortalBrowser, area: str, cfg: dict[str, Any], storage) -> bool:
+        return True
+
+    def area_loc(self, area: str) -> str:
+        return ""
+
+    def area_search_url(self, cfg: dict[str, Any], area: str, channel: str, page: int, max_price: int,
+                        days: int, keyword: str = "") -> str | None:
+        tpl = ((cfg["portals"].get("area_urls") or {}).get(self.name) or {}).get(channel)
+        if not tpl:
+            return None
+        return tpl.format(
+            base=self.base_url, loc=quote(self.area_loc(area), safe=""), slug=slugify(area),
+            name=quote_plus(area), max_price=max_price, index=page * self.page_size, page1=page + 1,
+            days=days, zoopla_added="24_hours" if days <= 1 else ("3_days" if days <= 3 else "7_days"),
+            otm_added="24-hours" if days <= 1 else ("3-days" if days <= 3 else "7-days"),
+            kw=f"&keywords={quote_plus(keyword)}" if keyword else "",
+        )
+
+
+def slugify(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 class Rightmove(Portal):
@@ -60,6 +84,34 @@ class Rightmove(Portal):
                     "portals.rightmove_location_ids", outcode)
         return False
 
+    def prepare_area(self, browser, area, cfg, storage) -> bool:
+        pinned = (cfg["portals"].get("rightmove_location_ids") or {}).get(area)
+        cached = storage.kv_get(f"rightmove_locid:{area}")
+        if pinned or cached:
+            self._ids[area] = pinned or cached
+            return True
+        url = f"{self.typeahead_url}?{urlencode({'query': area, 'limit': 10, 'exclude': 'STREET'})}"
+        res = browser.fetch(url, polite=True, cards=False)
+        try:
+            data = json.loads(res.text)
+            want = area.lower()
+            for m in data.get("matches") or data.get("typeAheadLocations") or []:
+                mtype = (m.get("type") or m.get("locationType") or "").upper()
+                name = (m.get("displayName") or m.get("name") or "").lower()
+                ident = m.get("locationIdentifier") or (f"{mtype}^{m['id']}" if m.get("id") and mtype else None)
+                if mtype in ("REGION", "COUNTY") and ident and (name == want or name.startswith(want + ",")
+                                                                 or name.startswith(want + " ")):
+                    self._ids[area] = ident
+                    storage.kv_set(f"rightmove_locid:{area}", ident)
+                    return True
+        except (ValueError, KeyError, AttributeError):
+            pass
+        log.warning("Rightmove: could not resolve area %s; pin it in portals.rightmove_location_ids", area)
+        return False
+
+    def area_loc(self, area: str) -> str:
+        return self._ids.get(area, "")
+
     def search_url(self, outcode, channel, page, max_price):
         q = {"locationIdentifier": self._ids[outcode], "sortType": 6, "index": page * self.page_size,
              "radius": "0.0"}
@@ -75,7 +127,7 @@ class Rightmove(Portal):
 class Zoopla(Portal):
     def __init__(self, base_url: str):
         super().__init__("zoopla", "zp", base_url.rstrip("/"),
-                         re.compile(r"/(?:for-sale|to-rent|new-homes)/details/(\d+)"), 25)
+                         re.compile(r"/(?:for-sale|to-rent|new-homes)/(?:commercial/)?details/(\d+)"), 25)
 
     def search_url(self, outcode, channel, page, max_price):
         q: dict[str, Any] = {"q": outcode, "results_sort": "newest_listings", "search_source": "refine",

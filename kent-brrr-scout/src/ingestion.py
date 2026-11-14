@@ -19,7 +19,7 @@ from .models import PropertyCategory, RawListing, Tenure
 
 log = logging.getLogger(__name__)
 
-POSTCODE_RE = re.compile(r"\b((?:ME|CT)\d{1,2})\s?(\d[A-Z]{2})\b", re.I)
+POSTCODE_RE = re.compile(r"\b([A-Z]{1,2}\d[A-Z\d]?)\s?(\d[A-Z]{2})\b", re.I)
 PRICE_RE = re.compile(r"£\s?([\d,]{4,})")
 LEASE_RE = re.compile(r"(\d{2,3})\s*(?:years?|yrs?)\s*(?:remaining|left|unexpired|lease)", re.I)
 LEASE_RE_2 = re.compile(r"lease(?:hold)?[^.]{0,40}?(\d{2,3})\s*(?:years?|yrs?)", re.I)
@@ -207,7 +207,7 @@ def parse_rss(xml_text: str, feed_name: str, target_outcodes: set[str]) -> list[
         if not pc or not price_m:
             continue
         outcode = pc.group(1).upper()
-        if outcode not in target_outcodes:
+        if target_outcodes and outcode not in target_outcodes:
             continue
         ptype = normalise_type(blob)
         tenure, lease = infer_tenure(blob)

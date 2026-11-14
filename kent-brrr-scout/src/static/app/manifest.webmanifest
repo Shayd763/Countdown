@@ -1,7 +1,7 @@
 {
   "name": "Gatehouse",
   "short_name": "Gatehouse",
-  "description": "BRRR deals in Medway and Thanet, checked every morning: cost to buy, refinance and cashflow for each.",
+  "description": "BRRR deals across England, residential and commercial, checked every morning: cost to buy, refinance and cashflow for each.",
   "id": "/app/",
   "start_url": "/app/#/today",
   "scope": "/",
