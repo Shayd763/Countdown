@@ -1,197 +1,361 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0b6e6e" />
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="BRRR Scout" />
+<meta name="description" content="BRRR deals in Medway and Thanet, checked every morning: cost to buy, refinance and cashflow for each." />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 <link rel="icon" href="/icons/icon-192.png" />
 <title>BRRR Scout</title>
 <style>
+/* ---------- tokens: iOS system colours, one radius scale, one glass recipe ---------- */
 :root {
-  --bg: #f3f5f7; --card: #ffffff; --ink: #11161d; --muted: #616b7a; --line: #e3e7ec;
-  --accent: #0b6e6e; --accent-ink: #fff; --accent-soft: #e2f1f0;
-  --pass: #157347; --pass-bg: #e3f3ea; --fail: #b42318; --fail-bg: #fdeceb; --warn: #8a5a00; --warn-bg: #fff2cf;
-  --chip: #edf0f4; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 6px 18px rgba(16,24,40,.06);
-  --safe-b: env(safe-area-inset-bottom, 0px); --safe-t: env(safe-area-inset-top, 0px);
+  --bg: #f2f2f7; --cell: #ffffff; --cell-hi: #e5e5ea;
+  --label: #000000; --label-2: rgba(60, 60, 67, .62); --label-3: rgba(60, 60, 67, .32);
+  --sep: rgba(60, 60, 67, .2); --fill: rgba(118, 118, 128, .12); --fill-2: rgba(118, 118, 128, .2);
+  --tint: #007aff; --green: #34c759; --green-text: #248a3d; --red: #ff3b30; --red-text: #d70015;
+  --orange: #ff9500; --orange-text: #b45309;
+  --glass: rgba(255, 255, 255, .58); --glass-strong: rgba(255, 255, 255, .78);
+  --glass-edge: rgba(255, 255, 255, .7); --glass-hi: rgba(255, 255, 255, .95); --glass-lo: rgba(0, 0, 0, .04);
+  --glass-shadow: 0 8px 28px rgba(0, 0, 0, .12), 0 1px 3px rgba(0, 0, 0, .08);
+  --r-xl: 26px; --r-lg: 20px; --r-md: 14px; --r-sm: 10px;
+  --ease: cubic-bezier(.2, .8, .2, 1); --ease-sheet: cubic-bezier(.32, .72, 0, 1);
+  --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
+  --round: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0d1014; --card: #171b21; --ink: #e9ecf1; --muted: #9aa4b2; --line: #272d36;
-    --accent: #33b8ad; --accent-ink: #052421; --accent-soft: #10302d;
-    --pass: #4cc38a; --pass-bg: #132d1f; --fail: #ff7b6b; --fail-bg: #3a1916; --warn: #f2c14e; --warn-bg: #362b10;
-    --chip: #222831; --shadow: none;
+    --bg: #000000; --cell: #1c1c1e; --cell-hi: #2c2c2e;
+    --label: #ffffff; --label-2: rgba(235, 235, 245, .62); --label-3: rgba(235, 235, 245, .3);
+    --sep: rgba(84, 84, 88, .62); --fill: rgba(118, 118, 128, .24); --fill-2: rgba(118, 118, 128, .36);
+    --tint: #0a84ff; --green: #30d158; --green-text: #30d158; --red: #ff453a; --red-text: #ff6961;
+    --orange: #ff9f0a; --orange-text: #ffb340;
+    --glass: rgba(44, 44, 48, .5); --glass-strong: rgba(44, 44, 48, .72);
+    --glass-edge: rgba(255, 255, 255, .12); --glass-hi: rgba(255, 255, 255, .22); --glass-lo: rgba(0, 0, 0, .3);
+    --glass-shadow: 0 10px 30px rgba(0, 0, 0, .5), 0 1px 2px rgba(0, 0, 0, .4);
   }
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; background: var(--bg); color: var(--ink); }
-body { font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, Roboto, "Segoe UI", sans-serif;
-  padding-bottom: calc(72px + var(--safe-b)); min-height: 100vh; }
-a { color: var(--accent); text-decoration: none; }
-button { font: inherit; color: inherit; cursor: pointer; border: none; background: none; }
-input, select, textarea { font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--line);
-  border-radius: 12px; padding: 11px 12px; width: 100%; }
-textarea { min-height: 80px; resize: vertical; }
+html { background: var(--bg); }
+body { margin: 0; color: var(--label); background: var(--bg); min-height: 100vh;
+  font: 17px/1.3 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, Roboto, "Segoe UI", sans-serif;
+  letter-spacing: -.01em; -webkit-font-smoothing: antialiased; padding-bottom: calc(108px + var(--safe-b)); }
+body.no-tabs { padding-bottom: calc(32px + var(--safe-b)); }
+a { color: var(--tint); text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input, select, textarea { font: inherit; color: var(--label); letter-spacing: inherit; }
+svg.i { width: 22px; height: 22px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .num { font-variant-numeric: tabular-nums; }
-.muted { color: var(--muted); } .small { font-size: 13px; } .tiny { font-size: 12px; }
+.rnd { font-family: var(--round); }
+.l2 { color: var(--label-2); } .l3 { color: var(--label-3); }
+.fn { font-size: 13px; line-height: 1.35; letter-spacing: 0; }
+.sub { font-size: 15px; line-height: 1.33; }
+.green { color: var(--green-text); } .red { color: var(--red-text); } .orange { color: var(--orange-text); }
 
-/* top bar */
-.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  padding: calc(10px + var(--safe-t)) 16px 10px; display: flex; align-items: center; gap: 10px; }
-.top h1 { font-size: 22px; margin: 0; letter-spacing: -.02em; flex: 1; }
-.iconbtn { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--card);
-  border: 1px solid var(--line); }
-.page { padding: 4px 16px 24px; max-width: 640px; margin: 0 auto; }
+/* ---------- glass ---------- */
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(1.9); backdrop-filter: blur(22px) saturate(1.9);
+  border: .5px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 0 var(--glass-lo), var(--glass-shadow);
+}
+.gbtn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--label);
+  transition: transform .12s var(--ease); }
+.gbtn:active { transform: scale(.9); }
+.gbtn.on-photo { color: #fff; background: rgba(30, 30, 30, .28); border-color: rgba(255, 255, 255, .3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 20px rgba(0, 0, 0, .25); }
+.chip-glass { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 15px;
+  font-size: 13px; font-weight: 600; letter-spacing: 0; color: #fff; background: rgba(20, 20, 22, .32);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8); backdrop-filter: blur(16px) saturate(1.8);
+  border: .5px solid rgba(255, 255, 255, .28); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.dot.g { background: var(--green); } .dot.r { background: var(--red); } .dot.o { background: var(--orange); } .dot.n { background: var(--label-3); }
 
-/* tab bar */
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; display: flex; background: var(--card);
-  border-top: 1px solid var(--line); padding-bottom: var(--safe-b); }
-.tabs[hidden] { display: none; }
-.tabs a { flex: 1; text-align: center; padding: 9px 0 8px; color: var(--muted); font-size: 11px; font-weight: 600; }
-.tabs a svg { display: block; margin: 0 auto 2px; width: 24px; height: 24px; }
-.tabs a.on { color: var(--accent); }
+/* ---------- navigation bar with large title ---------- */
+.nav { position: sticky; top: 0; z-index: 10; height: calc(54px + var(--safe-t)); padding: var(--safe-t) 16px 0;
+  display: grid; grid-template-columns: 88px 1fr 88px; align-items: center; transition: background .2s, box-shadow .2s; }
+.nav.scrolled { background: color-mix(in srgb, var(--bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8); backdrop-filter: blur(20px) saturate(1.8); box-shadow: 0 .5px 0 var(--sep); }
+.nav .ct { text-align: center; font-weight: 600; font-size: 17px; opacity: 0; transition: opacity .18s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav.scrolled .ct { opacity: 1; }
+.nav .right { display: flex; gap: 8px; justify-content: flex-end; }
+.lt { padding: 0 20px 4px; }
+.lt h1 { font-size: 34px; line-height: 1.1; font-weight: 700; letter-spacing: -.025em; margin: 0; }
+.lt p { margin: 4px 0 0; color: var(--label-2); font-size: 15px; }
+.page { padding: 0 16px; max-width: 680px; margin: 0 auto; }
 
-/* banners & chips */
-.banner { border-radius: 14px; padding: 10px 12px; margin: 8px 0 12px; font-size: 13px; display: block; }
-.banner.offline { background: var(--warn-bg); color: var(--warn); }
-.banner.info { background: var(--accent-soft); }
-.chip { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 999px; background: var(--chip);
-  font-size: 13px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
-.chip.on { background: var(--accent); color: var(--accent-ink); }
-.chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.scrollx { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
-.scrollx::-webkit-scrollbar { display: none; }
-.pill { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
-.p-pass { background: var(--pass-bg); color: var(--pass); } .p-fail { background: var(--fail-bg); color: var(--fail); }
-.p-warn { background: var(--warn-bg); color: var(--warn); } .p-neutral { background: var(--chip); color: var(--muted); }
-.p-accent { background: var(--accent-soft); color: var(--accent); }
+/* ---------- floating glass tab bar ---------- */
+.tabbar { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%); bottom: calc(10px + var(--safe-b));
+  width: min(92vw, 400px); height: 64px; border-radius: 32px; display: flex; padding: 5px; }
+.tabbar[hidden] { display: none; }
+.tabbar a { flex: 1; border-radius: 27px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; color: var(--label); font-size: 10.5px; font-weight: 600; letter-spacing: 0; transition: background .2s var(--ease), color .2s; }
+.tabbar a svg { width: 25px; height: 25px; }
+.tabbar a.on { color: var(--tint); background: var(--fill); }
+.tabbar a:active { transform: scale(.94); }
 
-/* today */
-.hello { font-size: 14px; color: var(--muted); margin: 2px 0 10px; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
-.stat { background: var(--card); border-radius: 16px; padding: 12px; box-shadow: var(--shadow); }
-.stat b { display: block; font-size: 24px; letter-spacing: -.02em; line-height: 1.1; }
-.stat span { font-size: 12px; color: var(--muted); }
-.stat.good b { color: var(--pass); }
-h2.sec { font-size: 17px; margin: 22px 0 10px; display: flex; justify-content: space-between; align-items: baseline; letter-spacing: -.01em; }
-h2.sec small { font-size: 13px; font-weight: 500; color: var(--muted); }
+/* ---------- grouped lists ---------- */
+.gh { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin: 28px 4px 10px; display: flex; justify-content: space-between; align-items: baseline; }
+.gh a, .gh button { font-size: 15px; font-weight: 400; color: var(--tint); letter-spacing: -.01em; }
+.gh-sm { font-size: 13px; color: var(--label-2); text-transform: uppercase; letter-spacing: .02em; margin: 26px 16px 7px; font-weight: 400; }
+.group { background: var(--cell); border-radius: var(--r-xl); overflow: hidden; }
+.gf { font-size: 13px; color: var(--label-2); margin: 7px 16px 0; line-height: 1.38; letter-spacing: 0; }
+.cell { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 11px 16px; position: relative; color: var(--label); width: 100%; text-align: left; }
+.cell + .cell::before { content: ""; position: absolute; top: 0; right: 0; left: var(--inset, 16px); border-top: .5px solid var(--sep); }
+a.cell:active, button.cell:active, label.cell:active { background: var(--cell-hi); }
+.cell .grow { flex: 1; min-width: 0; }
+.cell .val { color: var(--label-2); text-align: right; white-space: nowrap; }
+.cell .val.strong { color: var(--label); font-weight: 600; }
+.cell.total { font-weight: 600; }
+.cell.total .val { color: var(--label); font-weight: 700; }
+.cell .chev { width: 14px; height: 14px; color: var(--label-3); stroke-width: 2.6; }
+.icn { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; color: #fff; flex: none; }
+.icn svg { width: 18px; height: 18px; stroke-width: 2.2; }
+.cell input, .cell select { border: 0; background: none; text-align: right; color: var(--label-2); padding: 0; min-width: 0; outline: none; }
+.cell select { -webkit-appearance: none; appearance: none; color: var(--tint); }
+.cell input::placeholder { color: var(--label-3); }
+.cell input[type=number], .cell input[type=time] { width: 112px; flex: none; }
+.cell input#name { width: 55%; flex: none; }
+.cell textarea { width: 100%; border: 0; background: none; min-height: 88px; resize: none; outline: none; padding: 0; line-height: 1.4; }
 
-/* deal card */
-.dcard { background: var(--card); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 14px; display: block; color: inherit; }
-.dcard .ph { position: relative; aspect-ratio: 16/8; background: var(--chip) center/cover no-repeat; }
-.dcard .ph .pill { position: absolute; top: 10px; left: 10px; }
-.dcard .ph .roce { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,.6); color: #fff; padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: 13px; }
-.dcard .body { padding: 12px 14px 14px; }
-.dcard .addr { font-weight: 700; font-size: 16px; letter-spacing: -.01em; }
-.dcard .sub { font-size: 13px; color: var(--muted); margin: 2px 0 10px; }
-.grid4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.tile { background: var(--bg); border-radius: 12px; padding: 9px 10px; }
-.tile span { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
-.tile b { font-size: 17px; letter-spacing: -.01em; }
-.tile.good b { color: var(--pass); } .tile.bad b { color: var(--fail); }
-.offer { margin-top: 10px; padding: 9px 10px; background: var(--warn-bg); color: var(--warn); border-radius: 12px; font-size: 13px; font-weight: 600; }
+/* ---------- switch, segmented control, slider ---------- */
+.sw { position: relative; width: 51px; height: 31px; flex: none; }
+.sw input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+.sw i { position: absolute; inset: 0; border-radius: 16px; background: var(--fill-2); transition: background .22s var(--ease); }
+.sw i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .15), 0 3px 1px rgba(0, 0, 0, .06); transition: transform .22s var(--ease); }
+.sw input:checked + i { background: var(--green); }
+.sw input:checked + i::after { transform: translateX(20px); }
+.sw input:disabled + i { opacity: .45; }
+.seg { display: flex; background: var(--fill); border-radius: 10px; padding: 2px; position: relative; }
+.seg button { flex: 1; height: 32px; border-radius: 8px; font-size: 13px; font-weight: 500; letter-spacing: 0; position: relative; z-index: 1; white-space: nowrap; padding: 0 6px; }
+.seg button.on { background: var(--cell); font-weight: 600; box-shadow: 0 3px 8px rgba(0, 0, 0, .12), 0 3px 1px rgba(0, 0, 0, .04); }
+@media (prefers-color-scheme: dark) { .seg button.on { background: #636366; } }
+input[type=range].slider { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: none; margin: 6px 0; }
+input[type=range].slider::-webkit-slider-runnable-track { height: 4px; border-radius: 2px;
+  background: linear-gradient(to right, var(--tint) var(--p, 50%), var(--fill-2) var(--p, 50%)); }
+input[type=range].slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; margin-top: -12px; border-radius: 50%;
+  background: #fff; box-shadow: 0 .5px 4px rgba(0, 0, 0, .12), 0 6px 13px rgba(0, 0, 0, .12); }
+input[type=range].slider::-moz-range-track { height: 4px; border-radius: 2px; background: var(--fill-2); }
+input[type=range].slider::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--tint); }
+input[type=range].slider::-moz-range-thumb { width: 28px; height: 28px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 6px 13px rgba(0, 0, 0, .15); }
 
-/* compact list */
-.row { display: flex; gap: 12px; background: var(--card); border-radius: 16px; padding: 10px; margin-bottom: 10px; box-shadow: var(--shadow); color: inherit; align-items: center; }
-.row .th { width: 74px; height: 74px; border-radius: 12px; background: var(--chip) center/cover; flex: none; position: relative; }
-.row .th i { position: absolute; left: 6px; bottom: 6px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--card); }
-.row .mid { flex: 1; min-width: 0; }
-.row .a { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.row .l { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.row .k { font-size: 13px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.row .r { text-align: right; flex: none; }
-.row .r b { display: block; font-size: 16px; }
-.dot-pass { background: var(--pass); } .dot-fail { background: var(--fail); } .dot-neutral { background: var(--muted); }
-.searchbar { display: flex; gap: 8px; margin: 4px 0 10px; }
-
-/* detail */
-.hero { position: relative; aspect-ratio: 4/3; max-height: 46vh; width: 100%; background: var(--chip) center/cover; }
-.hero.noimg { aspect-ratio: auto; height: calc(120px + var(--safe-t)); background: linear-gradient(135deg, var(--accent), #0a4f57); }
-.dcard .ph.noimg { aspect-ratio: auto; height: 54px; background: linear-gradient(135deg, var(--accent-soft), var(--chip)); }
-.hero .back, .hero .share { position: absolute; top: calc(10px + var(--safe-t)); width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(0,0,0,.5); color: #fff; display: grid; place-items: center; }
-.hero .back { left: 12px; } .hero .share { right: 12px; }
-.verdict { border-radius: 16px; padding: 12px 14px; margin: -26px 0 12px; position: relative; font-weight: 700; box-shadow: var(--shadow); }
-.verdict.ok { background: var(--pass-bg); color: var(--pass); } .verdict.no { background: var(--fail-bg); color: var(--fail); }
-.verdict.mid { background: var(--warn-bg); color: var(--warn); }
-.verdict small { display: block; font-weight: 500; opacity: .9; margin-top: 2px; }
-.box { background: var(--card); border-radius: 18px; padding: 14px; box-shadow: var(--shadow); margin-bottom: 12px; }
-.box h3 { margin: 0 0 8px; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
-.line { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
-.line:last-child { border: none; }
-.line span:first-child { color: var(--muted); }
-.line span:last-child { white-space: nowrap; padding-left: 10px; text-align: right; }
-.line.total { font-weight: 800; font-size: 16px; } .line.total span:first-child { color: var(--ink); }
-.gate { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; font-size: 14px; }
-.gate i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 13px; font-weight: 800; }
-.gate.ok i { background: var(--pass-bg); color: var(--pass); } .gate.no i { background: var(--fail-bg); color: var(--fail); }
-input[type=range] { padding: 0; border: none; background: none; accent-color: var(--accent); }
-.btnrow { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn { padding: 11px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+/* ---------- buttons ---------- */
+.btn { height: 50px; border-radius: 25px; padding: 0 22px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 17px; font-weight: 600; transition: transform .12s var(--ease), opacity .12s; }
+.btn:active { transform: scale(.97); }
+.btn.fill { background: var(--tint); color: #fff; }
+.btn.tinted { background: color-mix(in srgb, var(--tint) 15%, transparent); color: var(--tint); }
 .btn.block { width: 100%; }
-.btn:disabled { opacity: .5; }
+.btn:disabled { opacity: .4; }
+.capsule { height: 34px; padding: 0 14px; border-radius: 17px; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;
+  background: var(--fill); color: var(--label); transition: transform .12s var(--ease); white-space: nowrap; }
+.capsule:active { transform: scale(.95); }
+.capsule.on { background: var(--label); color: var(--bg); }
+.rowx { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+.rowx::-webkit-scrollbar { display: none; }
 
-/* forms / me */
-.field { margin: 10px 0; } .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
-.switch { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); gap: 12px; }
-.switch:last-child { border: none; }
-.toggle { position: relative; width: 50px; height: 30px; flex: none; }
-.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-.toggle span { position: absolute; inset: 0; background: var(--line); border-radius: 999px; transition: .2s; }
-.toggle span::after { content: ""; position: absolute; width: 24px; height: 24px; left: 3px; top: 3px; border-radius: 50%; background: #fff; transition: .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
-.toggle input:checked + span { background: var(--accent); } .toggle input:checked + span::after { transform: translateX(20px); }
+/* ---------- deal cards ---------- */
+.card { display: block; background: var(--cell); border-radius: var(--r-xl); overflow: hidden; color: var(--label); margin-bottom: 14px;
+  transition: transform .14s var(--ease); }
+.card:active { transform: scale(.98); }
+.photo { position: relative; aspect-ratio: 16 / 10; background: var(--fill) center / cover no-repeat; }
+.photo.none { background: linear-gradient(150deg, color-mix(in srgb, var(--tint) 16%, var(--cell)), var(--fill-2)); display: grid; place-items: center; }
+.photo.none svg { width: 54px; height: 54px; stroke-width: 1.3; color: var(--label-3); }
+.photo .tl { position: absolute; top: 12px; left: 12px; } .photo .tr { position: absolute; top: 12px; right: 12px; }
+.card .meta { padding: 14px 16px 4px; }
+.card .t { font-size: 19px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+.card .s { font-size: 15px; color: var(--label-2); margin-top: 3px; }
+.figs { display: grid; grid-template-columns: repeat(3, 1fr); margin: 12px 16px 0; padding: 12px 0 0; border-top: .5px solid var(--sep); }
+.figs > div + div { border-left: .5px solid var(--sep); padding-left: 12px; }
+.figs span { display: block; font-size: 12px; color: var(--label-2); letter-spacing: 0; }
+.figs b { display: block; font-family: var(--round); font-size: 19px; font-weight: 600; letter-spacing: -.01em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.card .foot { padding: 10px 16px 15px; font-size: 13px; color: var(--label-2); letter-spacing: 0; }
+.card .foot b { color: var(--label); font-weight: 600; }
+.card .offer { color: var(--orange-text); }
 
-/* login */
-.login { max-width: 400px; margin: 0 auto; padding: calc(40px + var(--safe-t)) 22px 40px; }
-.login .logo { width: 72px; height: 72px; border-radius: 18px; display: block; margin: 0 auto 14px; }
-.login h1 { text-align: center; margin: 0 0 4px; font-size: 26px; letter-spacing: -.02em; }
-.err { color: var(--fail); font-size: 14px; min-height: 20px; margin: 6px 0; }
+/* ---------- list rows ---------- */
+.lrow { display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; color: var(--label); position: relative; }
+.lrow + .lrow::before { content: ""; position: absolute; top: 0; right: 0; left: 86px; border-top: .5px solid var(--sep); }
+.lrow:active { background: var(--cell-hi); }
+.thumb { width: 64px; height: 64px; border-radius: 12px; background: var(--fill) center / cover; flex: none; display: grid; place-items: center; }
+.thumb svg { width: 26px; height: 26px; color: var(--label-3); stroke-width: 1.5; }
+.lrow .grow { flex: 1; min-width: 0; }
+.lrow .a { font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 7px; }
+.lrow .b, .lrow .c { font-size: 13px; color: var(--label-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0; margin-top: 2px; }
+.lrow .c b { color: var(--label); font-weight: 600; }
+.lrow .p { text-align: right; flex: none; }
+.lrow .p b { display: block; font-family: var(--round); font-weight: 600; font-size: 16px; }
+.lrow .p span { font-size: 12px; color: var(--label-2); }
 
-/* sheet */
-.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 20; display: none; }
-.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; background: var(--bg); border-radius: 20px 20px 0 0;
-  max-height: 86vh; overflow: auto; padding: 8px 16px calc(20px + var(--safe-b)); transform: translateY(105%); transition: transform .22s ease; }
-.sheet { visibility: hidden; } .sheet.open { transform: none; visibility: visible; } .sheet-bg.open { display: block; }
-.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 4px auto 12px; }
-.toast { position: fixed; left: 50%; bottom: calc(86px + var(--safe-b)); transform: translateX(-50%); background: var(--ink); color: var(--bg);
-  padding: 10px 16px; border-radius: 12px; z-index: 30; font-size: 14px; display: none; max-width: 90vw; text-align: center; }
-.toast.on { display: block; }
-.empty { text-align: center; padding: 40px 16px; color: var(--muted); }
-.skeleton { background: linear-gradient(90deg, var(--chip), var(--card), var(--chip)); background-size: 200% 100%; animation: sk 1.2s infinite; border-radius: 18px; height: 260px; margin-bottom: 14px; }
-@keyframes sk { to { background-position: -200% 0; } }
+/* ---------- search ---------- */
+.search { display: flex; align-items: center; gap: 6px; height: 38px; border-radius: 12px; background: var(--fill); padding: 0 10px; margin: 6px 0 12px; color: var(--label-2); }
+.search svg { width: 18px; height: 18px; }
+.search input { flex: 1; border: 0; background: none; outline: none; font-size: 17px; min-width: 0; color: var(--label); }
+.search input::placeholder { color: var(--label-2); }
+
+/* ---------- detail ---------- */
+.hero { position: relative; height: min(52vh, 420px); background: var(--fill) center / cover no-repeat; }
+.hero.none { height: calc(150px + var(--safe-t)); background: linear-gradient(160deg, color-mix(in srgb, var(--tint) 22%, var(--bg)), var(--bg)); }
+.hero .bar { position: absolute; top: calc(8px + var(--safe-t)); left: 16px; right: 16px; display: flex; justify-content: space-between; }
+.hero .bar .gbtn:not(.on-photo) { color: var(--label); }
+.sheet-top { position: relative; margin-top: -28px; background: var(--bg); border-radius: 28px 28px 0 0; padding: 22px 16px 0; }
+.dt { font-size: 28px; font-weight: 700; letter-spacing: -.025em; line-height: 1.15; margin: 0 4px; }
+.ds { color: var(--label-2); font-size: 15px; margin: 5px 4px 18px; }
+.verdict { display: flex; gap: 12px; align-items: center; padding: 14px 16px; }
+.verdict .vi { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.verdict .vi svg { width: 22px; height: 22px; stroke-width: 2.4; }
+.vi.g { background: color-mix(in srgb, var(--green) 18%, transparent); color: var(--green-text); }
+.vi.r { background: color-mix(in srgb, var(--red) 16%, transparent); color: var(--red-text); }
+.vi.o { background: color-mix(in srgb, var(--orange) 18%, transparent); color: var(--orange-text); }
+.verdict b { display: block; font-size: 17px; }
+.verdict span { font-size: 13px; color: var(--label-2); letter-spacing: 0; line-height: 1.35; display: block; margin-top: 2px; }
+.bignum { padding: 16px 16px 14px; }
+.bignum span { font-size: 13px; color: var(--label-2); letter-spacing: 0; }
+.bignum b { display: block; font-family: var(--round); font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1.05; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.group .figs { margin: 0 16px; padding: 12px 0 14px; }
+.gates .cell { align-items: flex-start; }
+.gates .cell svg { width: 20px; height: 20px; stroke-width: 2.6; margin-top: 1px; }
+.offerbox { padding: 16px; }
+.offerbox .o { display: flex; justify-content: space-between; align-items: baseline; }
+.offerbox .o b { font-family: var(--round); font-size: 32px; font-weight: 700; letter-spacing: -.03em; }
+.result { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 10px; align-items: center; padding: 14px 16px; border-top: .5px solid var(--sep); }
+.result span { display: block; font-size: 12px; color: var(--label-2); letter-spacing: 0; }
+.result b { font-family: var(--round); font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pass-badge { height: 28px; border-radius: 14px; padding: 0 11px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0; }
+.pass-badge.g { background: color-mix(in srgb, var(--green) 18%, transparent); color: var(--green-text); }
+.pass-badge.r { background: color-mix(in srgb, var(--red) 15%, transparent); color: var(--red-text); }
+details.more summary { list-style: none; cursor: pointer; }
+details.more summary::-webkit-details-marker { display: none; }
+details.more[open] .chev { transform: rotate(90deg); }
+.actions { display: flex; gap: 10px; margin-top: 20px; }
+.actions .btn { flex: 1; }
+
+/* ---------- today summary ---------- */
+.summary { padding: 18px 18px 16px; }
+.summary .lead { font-size: 22px; font-weight: 700; letter-spacing: -.02em; line-height: 1.22; }
+.summary .lead em { font-style: normal; color: var(--green-text); }
+.summary .lead em.o { color: var(--orange-text); }
+.summary p { margin: 8px 0 0; color: var(--label-2); font-size: 15px; line-height: 1.38; }
+.notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r-lg); margin: 4px 0 14px; font-size: 14px; line-height: 1.38; letter-spacing: 0; }
+.notice svg { width: 20px; height: 20px; margin-top: 1px; }
+.notice.warn { background: color-mix(in srgb, var(--orange) 14%, var(--cell)); color: var(--orange-text); }
+.notice.info { background: var(--cell); color: var(--label); }
+
+/* ---------- avatar, login ---------- */
+.avatar { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 22px; color: #fff;
+  background: linear-gradient(180deg, #a5abb6, #858a94); flex: none; letter-spacing: 0; }
+.login { max-width: 420px; margin: 0 auto; padding: calc(64px + var(--safe-t)) 16px 40px; }
+.login .appicon { width: 92px; height: 92px; border-radius: 22px; display: block; margin: 0 auto 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, .18); }
+.login h1 { text-align: center; font-size: 28px; font-weight: 700; letter-spacing: -.025em; margin: 0; }
+.login .intro { text-align: center; color: var(--label-2); margin: 6px 12px 26px; font-size: 15px; line-height: 1.38; }
+.login .cell input { text-align: left; color: var(--label); }
+.err { color: var(--red-text); font-size: 14px; min-height: 22px; margin: 10px 16px 6px; letter-spacing: 0; }
+
+/* ---------- sheet & toast ---------- */
+.scrim { position: fixed; inset: 0; z-index: 40; background: rgba(0, 0, 0, .28); opacity: 0; pointer-events: none; transition: opacity .3s var(--ease-sheet); }
+.scrim.open { opacity: 1; pointer-events: auto; }
+.sheet { position: fixed; z-index: 41; left: 8px; right: 8px; bottom: calc(8px + var(--safe-b)); max-height: 84vh; overflow: auto; border-radius: 34px;
+  padding: 8px 16px 18px; transform: translateY(calc(100% + 40px)); transition: transform .42s var(--ease-sheet); visibility: hidden;
+  background: var(--glass-strong); }
+.sheet.open { transform: none; visibility: visible; }
+.sheet .grab { width: 36px; height: 5px; border-radius: 3px; background: var(--label-3); margin: 0 auto 10px; }
+.sheet h2 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin: 2px 4px 12px; display: flex; justify-content: space-between; align-items: center; }
+.sheet .group { background: var(--cell); }
+.toast { position: fixed; z-index: 60; left: 50%; top: calc(10px + var(--safe-t)); transform: translate(-50%, -140%); transition: transform .4s var(--ease-sheet);
+  border-radius: 24px; padding: 11px 18px; font-size: 15px; font-weight: 600; max-width: 90vw; text-align: center; display: flex; gap: 8px; align-items: center; }
+.toast.on { transform: translate(-50%, 0); }
+.toast svg { width: 18px; height: 18px; }
+.empty { text-align: center; padding: 48px 24px; color: var(--label-2); font-size: 15px; line-height: 1.4; }
+.empty svg { width: 44px; height: 44px; stroke-width: 1.4; color: var(--label-3); display: block; margin: 0 auto 12px; }
+.skel { border-radius: var(--r-xl); background: var(--cell); height: 300px; margin-bottom: 14px; position: relative; overflow: hidden; }
+.skel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, var(--fill) 50%, transparent 70%); animation: sk 1.3s linear infinite; }
+@keyframes sk { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; border-radius: 8px; }
+@media (prefers-reduced-motion: reduce) { *, *::after { transition: none !important; animation: none !important; } }
+@media (min-width: 700px) { .figs b { font-size: 21px; } }
 </style>
 </head>
 <body>
+<header class="nav" id="nav"><div class="left" id="navL"></div><div class="ct" id="navT"></div><div class="right" id="navR"></div></header>
 <div id="view"></div>
-<nav class="tabs" id="tabs" hidden>
-  <a href="#/today" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Today</a>
-  <a href="#/deals" data-tab="deals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deals</a>
-  <a href="#/me" data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Alerts &amp; me</a>
+<nav class="tabbar glass" id="tabs" hidden aria-label="Sections">
+  <a href="#/today" data-tab="today"><svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>Today</a>
+  <a href="#/deals" data-tab="deals"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>Deals</a>
+  <a href="#/me" data-tab="me"><svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Alerts</a>
 </nav>
-<div class="sheet-bg" id="sheetBg"></div>
-<div class="sheet" id="sheet"></div>
-<div class="toast" id="toast"></div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet glass" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="toast glass" id="toast" role="status" aria-live="polite"></div>
 
 <script>
+/* ======================= icons (Lucide-style line set) ======================= */
+const P = {
+  refresh: '<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>',
+  sliders: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+  back: '<path d="m15 18-6-6 6-6"/>',
+  chev: '<path d="m9 18 6-6-6-6"/>',
+  share: '<path d="M12 3v13"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  seal: '<path d="M12 2.5 14.4 4.3l3-.2.8 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.8 2.9-3-.2L12 21.5l-2.4-1.8-3 .2-.8-2.9-2.5-1.7 1-2.8-1-2.8 2.5-1.7.8-2.9 3 .2z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  tag: '<path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="1"/>',
+  octagon: '<path d="M7.9 2h8.2L22 7.9v8.2L16.1 22H7.9L2 16.1V7.9z"/><path d="M15 9l-6 6M9 9l6 6"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  house: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M10 21v-6h4v6"/>',
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
+  map: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  ext: '<path d="M7 17 17 7"/><path d="M8 7h9v9"/>',
+  pin: '<path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12"/><circle cx="12" cy="10" r="2.5"/>',
+  layers: '<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 12 10 5 10-5"/><path d="m2 17 10 5 10-5"/>',
+  pound: '<path d="M18 7c0-5.3-8-5.3-8 0v10"/><path d="M6 13h8"/><path d="M6 21h12"/>',
+  percent: '<path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+  spark: '<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+  laptop: '<rect x="4" y="4" width="16" height="11" rx="2"/><path d="M2 20h20"/>',
+  lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+  wifi: '<path d="M2 2l20 20"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M5 12.9a10 10 0 0 1 5.2-2.8"/><path d="M19 12.9a10 10 0 0 0-2.3-1.7"/><path d="M12 20h0"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h0"/>',
+  plus: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/>',
+};
+const ic = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+
 /* ======================= helpers ======================= */
 const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const gbp = (x) => x == null || isNaN(x) ? "–" : (x < 0 ? "−£" : "£") + Math.abs(Math.round(x)).toLocaleString("en-GB");
 const gbpk = (x) => x == null || isNaN(x) ? "–" : Math.abs(x) >= 100000 ? (x < 0 ? "−£" : "£") + (Math.abs(x) / 1000).toFixed(0) + "k" : gbp(x);
+const gk = (x) => x == null || isNaN(x) ? "–" : Math.abs(x) >= 10000 ? (x < 0 ? "−£" : "£") + Math.round(Math.abs(x) / 1000) + "k" : gbp(x);
 const pct = (x, d = 1) => x == null ? "–" : (x * 100).toFixed(d) + "%";
 const roce = (x) => x == null ? "∞" : x.toFixed(0) + "%";
-const when = (iso) => iso ? new Date(iso).toLocaleString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "–";
-const GATE = { all_in_cap: "75% all-in cap", gross_yield: "Gross yield", net_cashflow: "Net cashflow", capital_recycled: "Capital recycled" };
+const day = () => new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+const hm = (iso) => iso ? new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "";
+const when = (iso) => {
+  if (!iso) return "";
+  const d = new Date(iso), now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  const yest = new Date(now - 864e5).toDateString() === d.toDateString();
+  return sameDay ? `today at ${hm(iso)}` : yest ? `yesterday at ${hm(iso)}` : d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }) + ` at ${hm(iso)}`;
+};
+const TYPE = { terraced: "terrace", "end-terrace": "end terrace", "semi-detached": "semi", flat: "flat", maisonette: "maisonette", detached: "detached", bungalow: "bungalow", commercial: "commercial unit", "mixed-use": "shop with flat", unknown: "property" };
+const what = (d) => `${d.bedrooms ? d.bedrooms + " bed " : ""}${TYPE[d.property_type] || d.property_type}`;
+const GATE = { all_in_cap: "All-in under 75% of value", gross_yield: "Gross yield", net_cashflow: "Cashflow after tax", capital_recycled: "Cash back at refinance" };
 const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone;
 const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
-function toast(msg, ms = 3000) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), ms); }
+function toast(msg, icon = "check", ms = 2600) {
+  const t = $("#toast"); t.innerHTML = ic(icon) + `<span>${esc(msg)}</span>`; t.classList.add("on");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), ms);
+}
 
 const state = { user: null, offline: false, cachedAt: null, filters: null };
 const DEFAULT_FILTERS = { outcodes: [], category: "residential", passOnly: true, sort: "roce_pct", q: "", maxCash: "", minRoce: "" };
@@ -209,14 +373,22 @@ async function api(path, opts = {}) {
   if (!res.ok) throw new Error((data && data.detail) || res.statusText);
   return data;
 }
-function offlineBanner() {
-  return state.offline ? `<div class="banner offline">⚡ Laptop not reachable — showing saved data${state.cachedAt ? " from " + when(state.cachedAt) : ""}.</div>` : "";
+function offlineNotice() {
+  return state.offline ? `<div class="notice warn">${ic("wifi")}<div>Your laptop isn't reachable, so this is the copy saved ${state.cachedAt ? when(state.cachedAt) : "earlier"}.</div></div>` : "";
 }
-function setTabs(active) {
-  $("#tabs").hidden = !active;
-  document.querySelectorAll(".tabs a").forEach((a) => a.classList.toggle("on", a.dataset.tab === active));
+
+/* chrome: nav bar, tab bar, large-title collapse */
+function chrome({ tab = null, title = "", left = "", right = "", hideNav = false } = {}) {
+  $("#tabs").hidden = !tab;
+  document.body.classList.toggle("no-tabs", !tab);
+  $$("#tabs a").forEach((a) => a.classList.toggle("on", a.dataset.tab === tab));
+  const nav = $("#nav"); nav.hidden = hideNav; nav.classList.remove("scrolled");
+  $("#navT").textContent = title; $("#navL").innerHTML = left; $("#navR").innerHTML = right;
 }
+addEventListener("scroll", () => { const n = $("#nav"); if (!n.hidden) n.classList.toggle("scrolled", scrollY > 36); }, { passive: true });
 function render(html) { $("#view").innerHTML = html; window.scrollTo(0, 0); }
+const largeTitle = (t, sub = "") => `<div class="lt"><h1>${esc(t)}</h1>${sub ? `<p>${sub}</p>` : ""}</div>`;
+const gb = (icon, label, attrs = "") => `<button class="gbtn glass" aria-label="${label}" ${attrs}>${ic(icon)}</button>`;
 
 /* ======================= router ======================= */
 const routes = [
@@ -228,42 +400,45 @@ async function route() {
   if (!state.user && !h.startsWith("#/login")) {
     try { const s = await api("/api/auth/status"); state.user = s.user; } catch {}
     if (!state.user) {
-      // offline but previously signed in: let cached screens render
-      try { const me = await api("/api/auth/me"); state.user = me; } catch { location.hash = "#/login"; return; }
+      try { state.user = await api("/api/auth/me"); } catch { location.hash = "#/login"; return; }
     }
   }
+  closeSheet();
   for (const [re, fn] of routes) { const m = h.match(re); if (m) return fn(...m.slice(1).map(decodeURIComponent)); }
   location.hash = "#/today";
 }
 addEventListener("hashchange", route);
-// Installed apps have no pull-to-refresh: refresh lists when the app comes back to the foreground.
-let lastShown = Date.now();
+let lastHidden = Date.now();
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState !== "visible") { lastShown = Date.now(); return; }
-  if (Date.now() - lastShown > 30000 && /^#\/(today|deals)/.test(location.hash || "#/today")) route();
+  if (document.visibilityState !== "visible") { lastHidden = Date.now(); return; }
+  if (Date.now() - lastHidden > 30000 && /^#\/(today|deals)/.test(location.hash || "#/today")) route();
 });
 
-/* ======================= login ======================= */
+/* ======================= sign in ======================= */
 async function viewLogin() {
-  setTabs(null);
+  chrome({ hideNav: true });
   let setup = false;
   try { setup = (await api("/api/auth/status")).setup_needed; } catch {}
   render(`<div class="login">
-    <img class="logo" src="/icons/icon-192.png" alt="">
-    <h1>${setup ? "Create your profile" : "Sign in"}</h1>
-    <p class="muted" style="text-align:center;margin:0 0 18px">${setup ? "This becomes the owner account for your BRRR Scout." : "Kent BRRR Scout — Medway &amp; Thanet"}</p>
-    <form id="f">
-      ${setup ? `<div class="field"><label>Your name</label><input name="name" autocomplete="name" required></div>` : ""}
-      <div class="field"><label>Email</label><input name="email" type="email" autocomplete="username" required></div>
-      <div class="field"><label>Password</label><input name="password" type="password" autocomplete="${setup ? "new-password" : "current-password"}" minlength="8" required></div>
+    <img class="appicon" src="/icons/icon-192.png" alt="">
+    <h1>${setup ? "Create your profile" : "BRRR Scout"}</h1>
+    <p class="intro">${setup ? "You'll be the owner. You can add someone else later from the laptop." : "Sign in to see this morning's Medway and Thanet deals."}</p>
+    <form id="f" novalidate>
+      <div class="group">
+        ${setup ? `<label class="cell"><input name="name" autocomplete="name" placeholder="Your name" aria-label="Your name" required></label>` : ""}
+        <label class="cell"><input name="email" type="email" inputmode="email" autocomplete="username" placeholder="Email" aria-label="Email" required></label>
+        <label class="cell"><input name="password" type="password" autocomplete="${setup ? "new-password" : "current-password"}" placeholder="Password${setup ? " (8 or more characters)" : ""}" aria-label="Password" minlength="8" required></label>
+      </div>
       <div class="err" id="err"></div>
-      <button class="btn primary block" type="submit">${setup ? "Create profile" : "Sign in"}</button>
+      <button class="btn fill block" type="submit">${setup ? "Create profile" : "Sign in"}</button>
     </form>
-    ${!isStandalone() ? `<p class="small muted" style="text-align:center;margin-top:22px">${isIOS() ? "Tip: tap <b>Share → Add to Home Screen</b> to install the app (needed for notifications on iPhone)." : "Tip: use your browser menu → <b>Install app</b> / <b>Add to Home screen</b>."}</p>` : ""}
+    ${!isStandalone() ? `<p class="gf" style="text-align:center;margin-top:28px">${isIOS() ? `To install, tap ${ic("share", "i fn-i")} Share, then Add to Home Screen. iPhone sends notifications only to installed apps.` : "To install, open the browser menu and choose Install app."}</p>` : ""}
   </div>`);
+  $$(".fn-i").forEach((s) => { s.style.cssText = "width:15px;height:15px;vertical-align:-2px"; });
   $("#f").onsubmit = async (e) => {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(e.target));
+    if (!fd.email || !fd.password) { $("#err").textContent = "Enter your email and password."; return; }
     try {
       const r = await api(setup ? "/api/auth/setup" : "/api/auth/login", { method: "POST", body: fd });
       state.user = r.user;
@@ -274,92 +449,84 @@ async function viewLogin() {
 }
 
 /* ======================= cards ======================= */
-function verdictPill(d) {
-  if (!d.eligible) return `<span class="pill p-neutral">Ineligible</span>`;
-  return d.passed ? `<span class="pill p-pass">✓ Passes all 4</span>` : `<span class="pill p-fail">✗ Fails</span>`;
+function photo(d, cls = "photo") {
+  return d.image ? `<div class="${cls}" style="background-image:url('${esc(d.image)}')">` : `<div class="${cls} none">${ic("house")}`;
 }
-function bigCard(d, near) {
-  const img = d.image ? `style="background-image:url('${esc(d.image)}')"` : "";
-  return `<a class="dcard" href="#/deal/${encodeURIComponent(d.listing_id)}">
-    <div class="ph ${d.image ? "" : "noimg"}" ${img}>${near ? `<span class="pill p-warn">Negotiable</span>` : verdictPill(d)}<span class="roce">ROCE ${roce(near ? d.at_offer_roce : d.roce_pct)}</span></div>
-    <div class="body">
-      <div class="addr">${esc(d.address)}</div>
-      <div class="sub">${esc(d.property_type)}${d.bedrooms ? " · " + d.bedrooms + " bed" : ""} · ${esc(d.outcode)} · asking <b class="num" style="color:var(--ink)">${gbp(d.asking_price)}</b>${d.is_auction ? " · auction" : ""}${d.price_drop_pct ? ` · <span style="color:var(--warn)">−${d.price_drop_pct.toFixed(0)}%</span>` : ""}</div>
-      <div class="grid4 num">
-        <div class="tile"><span>Cash to buy</span><b>${gbp(d.cash_to_buy)}</b></div>
-        <div class="tile"><span>Refinance</span><b>${gbp(d.refi_loan)}</b></div>
-        <div class="tile ${(near ? d.at_offer_money_left_in : d.money_left_in) <= 0 ? "good" : ""}"><span>Money left in</span><b>${gbp(near ? d.at_offer_money_left_in : d.money_left_in)}</b></div>
-        <div class="tile ${(near ? d.at_offer_cashflow : d.net_monthly_cashflow) > 0 ? "good" : "bad"}"><span>Cashflow / mo</span><b>${gbp(near ? d.at_offer_cashflow : d.net_monthly_cashflow)}</b></div>
-      </div>
-      ${near ? `<div class="offer">Works if you offer ${gbp(d.max_offer_price)} — ${d.offer_gap_pct.toFixed(0)}% under asking</div>` : ""}
-    </div></a>`;
-}
-function rowCard(d) {
-  const cls = !d.eligible ? "dot-neutral" : d.passed ? "dot-pass" : "dot-fail";
-  return `<a class="row" href="#/deal/${encodeURIComponent(d.listing_id)}">
-    <div class="th" ${d.image ? `style="background-image:url('${esc(d.image)}')"` : ""}><i class="${cls}"></i></div>
-    <div class="mid">
-      <div class="a">${esc(d.address || d.postcode)}</div>
-      <div class="l">${esc(d.property_type)}${d.bedrooms ? " · " + d.bedrooms + "b" : ""} · ${esc(d.outcode)} · ${esc(d.refurb_tier)} refurb${d.status !== "new" ? " · " + esc(d.status) : ""}</div>
-      <div class="k num">In ${gbpk(d.cash_to_buy)} · Refi ${gbpk(d.refi_loan)} · <b style="color:${d.net_monthly_cashflow > 0 ? "var(--pass)" : "var(--fail)"}">${gbp(d.net_monthly_cashflow)}/mo</b></div>
+function dealCard(d, near = false) {
+  const left = near ? d.at_offer_money_left_in : d.money_left_in;
+  const cash = near ? d.at_offer_cashflow : d.net_monthly_cashflow;
+  const status = near ? `<span class="chip-glass"><i class="dot o"></i>Offer ${gbp(d.max_offer_price)}</span>`
+    : d.passed ? `<span class="chip-glass"><i class="dot g"></i>Passes</span>` : `<span class="chip-glass"><i class="dot r"></i>Fails</span>`;
+  return `<a class="card" href="#/deal/${encodeURIComponent(d.listing_id)}">
+    ${photo(d)}<span class="tl">${status}</span><span class="tr chip-glass">ROCE ${roce(near ? d.at_offer_roce : d.roce_pct)}</span></div>
+    <div class="meta"><div class="t">${esc(d.address)}</div>
+      <div class="s">${esc(what(d))} in ${esc(d.outcode)}, ${near ? "asking" : ""} ${gbp(d.asking_price)}${d.is_auction ? " at auction" : ""}</div></div>
+    <div class="figs">
+      <div><span>Cash to buy</span><b>${gbpk(d.cash_to_buy)}</b></div>
+      <div><span>Refinance</span><b>${gbpk(d.refi_loan)}</b></div>
+      <div><span>Per month</span><b class="${cash > 0 ? "green" : "red"}">${gbp(cash)}</b></div>
     </div>
-    <div class="r num"><b>${gbpk(d.asking_price)}</b><span class="tiny muted">ROCE ${roce(d.roce_pct)}</span></div>
+    <div class="foot">${near ? `<span class="offer">Asking is ${d.offer_gap_pct.toFixed(0)}% too high.</span> At the offer, ${left <= 0 ? "all" : ""}` : (left <= 0 ? "All" : "")}${left <= 0 ? ` your cash comes back at refinance, plus <b>${gbp(-left)}</b>.` : ` <b>${gbp(left)}</b> stays in the deal after refinance.`}</div>
+  </a>`;
+}
+function listRow(d) {
+  const dot = !d.eligible ? "n" : d.passed ? "g" : "r";
+  return `<a class="lrow" href="#/deal/${encodeURIComponent(d.listing_id)}">
+    <div class="thumb" ${d.image ? `style="background-image:url('${esc(d.image)}')"` : ""}>${d.image ? "" : ic("house")}</div>
+    <div class="grow">
+      <div class="a"><i class="dot ${dot}"></i><span style="overflow:hidden;text-overflow:ellipsis">${esc(d.address || d.postcode)}</span></div>
+      <div class="b">${esc(what(d))} · ${esc(d.outcode)} · ${esc(d.refurb_tier)} refurb${d.status !== "new" ? " · " + esc(d.status) : ""}</div>
+      <div class="c num">${gk(d.cash_to_buy)} in · refi ${gk(d.refi_loan)} · <b class="${d.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(d.net_monthly_cashflow)}</b>/mo</div>
+    </div>
+    <div class="p"><b>${gk(d.asking_price)}</b><span>${roce(d.roce_pct)} ROCE</span></div>
   </a>`;
 }
 
 /* ======================= today ======================= */
 async function viewToday() {
-  setTabs("today");
-  render(`<div class="top"><h1>Today</h1><a class="iconbtn" href="#/me" aria-label="Settings">⚙︎</a></div><div class="page"><div class="skeleton"></div><div class="skeleton"></div></div>`);
+  const right = gb("refresh", "Refresh", 'onclick="route()"');
+  chrome({ tab: "today", title: "Today", right });
+  render(largeTitle("Today", day()) + `<div class="page" style="margin-top:14px"><div class="skel" style="height:150px"></div><div class="skel"></div></div>`);
   let dg;
   try { dg = await api("/api/digest"); }
   catch (e) {
     let pushed = null;
     try { pushed = await (await caches.match("/api/push-digest"))?.json(); } catch {}
-    return render(`<div class="top"><h1>Today</h1></div><div class="page"><div class="banner offline">⚡ Can't reach your laptop.</div>
-      ${pushed ? `<h2 class="sec">From this morning's notification</h2>${pushed.best.map((d) => `<a class="row" href="#/deal/${encodeURIComponent(d.listing_id)}"><div class="mid"><div class="a">${esc(d.address)}</div><div class="k num">${gbp(d.asking_price)} · In ${gbpk(d.total_cash_deployed)} · Refi ${gbpk(d.refi_loan)} · ${gbp(d.net_monthly_cashflow)}/mo</div></div><div class="r"><b>${roce(d.roce_pct)}</b><span class="tiny muted">ROCE</span></div></a>`).join("")}` : `<div class="empty">${esc(e.message)}</div>`}</div>`);
+    return render(largeTitle("Today", day()) + `<div class="page" style="margin-top:14px">
+      <div class="notice warn">${ic("wifi")}<div>Your laptop isn't reachable right now.</div></div>
+      ${pushed && pushed.best.length ? `<h2 class="gh">From this morning's alert</h2><div class="group">${pushed.best.map((d) => `<a class="cell" href="#/deal/${encodeURIComponent(d.listing_id)}"><div class="grow"><div style="font-weight:600">${esc(d.address)}</div><div class="fn l2 num">${gbp(d.asking_price)} · ${gbpk(d.total_cash_deployed)} in · refi ${gbpk(d.refi_loan)} · ${gbp(d.net_monthly_cashflow)}/mo</div></div>${ic("chev", "i chev")}</a>`).join("")}</div>`
+        : `<div class="empty">${ic("laptop")}${esc(e.message)}</div>`}</div>`);
   }
-  const hr = new Date().getHours();
-  const greet = hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
-  const run = dg.run;
-  render(`<div class="top"><h1>Today</h1><button class="iconbtn" onclick="route()" aria-label="Refresh">↻</button><a class="iconbtn" href="#/me" aria-label="Settings">⚙︎</a></div>
-  <div class="page">
-    ${offlineBanner()}
-    <div class="hello">${greet}${state.user ? ", " + esc(state.user.name.split(" ")[0]) : ""}. ${run ? `Last scan ${when(run.started_at)}${run.fetched != null ? ` · ${run.fetched} listings checked` : ""}${run.status === "partial" ? " · some sources had problems" : ""}.` : "No scans yet — your laptop runs one each morning."}</div>
-    <div class="stats num">
-      <div class="stat good"><b>${dg.counts.passing}</b><span>pass all gates</span></div>
-      <div class="stat"><b>${dg.counts.near_misses}</b><span>negotiable</span></div>
-      <div class="stat"><b>${run && run.new_passing != null ? run.new_passing : "–"}</b><span>new passes</span></div>
-    </div>
-    ${dg.best.length ? `<h2 class="sec">Best deals <small>by ROCE</small></h2>${dg.best.map((d) => bigCard(d)).join("")}`
-      : `<div class="box"><b>No deal passes all four gates right now.</b><div class="small muted" style="margin-top:4px">${dg.counts.matching} listings match your filters. Check the negotiable ones below, or loosen your filters in Alerts &amp; me.</div></div>`}
-    ${dg.near_misses.length ? `<h2 class="sec">Negotiable <small>pass at a lower offer</small></h2>${dg.near_misses.map((d) => bigCard(d, true)).join("")}` : ""}
-    ${dg.counts.passing > 1 ? `<div class="box small"><div class="line"><span>Cash to do all ${dg.counts.passing} passing deals</span><b class="num">${gbp(dg.totals.cash_needed_all_passing)}</b></div><div class="line"><span>Combined cashflow once complete</span><b class="num">${gbp(dg.totals.monthly_cashflow_all_passing)}/mo</b></div></div>` : ""}
-    <a class="btn block" href="#/deals" style="margin-top:6px">Browse all deals</a>
+  const run = dg.run, n = dg.counts.passing, nm = dg.counts.near_misses;
+  const scanned = run ? `Checked ${run.fetched != null ? run.fetched + " listings " : ""}${when(run.started_at)}${run.status === "partial" ? ". Some sources didn't respond" : ""}.` : "Your laptop hasn't run a scan yet. The first one happens at the time set in Alerts.";
+  let lead;
+  if (n) lead = `<em>${n} deal${n > 1 ? "s" : ""} pass${n > 1 ? "" : "es"}</em> all four gates${nm ? `, and <em class="o">${nm} more</em> work${nm > 1 ? "" : "s"} at a lower offer` : ""}.`;
+  else if (nm) lead = `Nothing passes at asking price, but <em class="o">${nm} deal${nm > 1 ? "s" : ""}</em> work${nm > 1 ? "" : "s"} at a lower offer.`;
+  else lead = run ? "Nothing passes today." : "No deals yet.";
+  const totals = n > 1 ? `<div class="figs" style="margin:0 18px;padding-bottom:16px"><div><span>Cash for all ${n}</span><b>${gbpk(dg.totals.cash_needed_all_passing)}</b></div><div><span>Monthly, all ${n}</span><b class="green">${gbp(dg.totals.monthly_cashflow_all_passing)}</b></div><div><span>New today</span><b>${run && run.new_passing != null ? run.new_passing : "–"}</b></div></div>` : "";
+  render(largeTitle("Today", day()) + `<div class="page" style="margin-top:14px">
+    ${offlineNotice()}
+    <div class="group"><div class="summary"><div class="lead">${lead}</div><p>${scanned}${!n && dg.counts.matching ? ` ${dg.counts.matching} listings match your filters.` : ""}</p></div>${totals}</div>
+    ${dg.best.length ? `<h2 class="gh">Best return<a href="#/deals">See all</a></h2>${dg.best.map((d) => dealCard(d)).join("")}` : ""}
+    ${dg.near_misses.length ? `<h2 class="gh">Worth an offer</h2>${dg.near_misses.map((d) => dealCard(d, true)).join("")}` : ""}
+    ${!dg.best.length && !dg.near_misses.length ? `<div class="empty">${ic("search")}Nothing to act on this morning.<br>Loosen your filters in Alerts, or browse every listing.<div style="margin-top:16px"><a class="btn tinted" href="#/deals">Browse deals</a></div></div>` : ""}
   </div>`);
 }
 
 /* ======================= deals ======================= */
 async function viewDeals() {
-  setTabs("deals");
+  chrome({ tab: "deals", title: "Deals", right: gb("sliders", "Filters", 'id="fbtn"') });
   const f = state.filters;
-  render(`<div class="top"><h1>Deals</h1><button class="iconbtn" id="fbtn" aria-label="Filters"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button></div>
-  <div class="page">
-    <div class="searchbar"><input type="search" id="q" placeholder="Search street, town or postcode" value="${esc(f.q)}"></div>
-    <div class="scrollx" id="quick"></div>
-    <div id="list" style="margin-top:12px"><div class="skeleton" style="height:90px"></div><div class="skeleton" style="height:90px"></div></div>
+  const cats = [["residential", "Residential"], ["commercial", "Commercial"], ["mixed-use", "Shop and flat"], ["", "Any type"]];
+  render(largeTitle("Deals") + `<div class="page">
+    <label class="search">${ic("search")}<input type="search" id="q" placeholder="Street, town or postcode" value="${esc(f.q)}" aria-label="Search"></label>
+    <div class="seg" id="seg" style="margin-bottom:10px"><button data-p="1" class="${f.passOnly ? "on" : ""}">Passing</button><button data-p="0" class="${f.passOnly ? "" : "on"}">Everything</button></div>
+    <div class="rowx" id="cats">${cats.map(([v, l]) => `<button class="capsule ${f.category === v ? "on" : ""}" data-c="${v}">${l}</button>`).join("")}${f.outcodes.length ? `<button class="capsule on" data-oc="1">${esc(f.outcodes.join(", "))} ${ic("x", "i")}</button>` : ""}</div>
+    <div id="list" style="margin-top:14px"><div class="skel" style="height:260px"></div></div>
   </div>`);
-  const quick = $("#quick");
-  const q = [["passOnly", "Passing only"], ["cat:residential", "Residential"], ["cat:commercial", "Commercial"], ["cat:mixed-use", "Mixed-use"], ["cat:", "All types"]];
-  quick.innerHTML = q.map(([k, l]) => {
-    const on = k === "passOnly" ? f.passOnly : k.startsWith("cat:") && f.category === k.slice(4);
-    return `<button class="chip ${on ? "on" : ""}" data-k="${k}">${l}</button>`; }).join("") +
-    (f.outcodes.length ? `<button class="chip on" data-k="oc">${esc(f.outcodes.join(", "))} ✕</button>` : "");
-  quick.onclick = (e) => {
-    const k = e.target.dataset.k; if (!k) return;
-    if (k === "passOnly") f.passOnly = !f.passOnly; else if (k === "oc") f.outcodes = []; else f.category = k.slice(4);
-    saveFilters(); viewDeals();
-  };
+  $$("#cats svg").forEach((s) => { s.style.cssText = "width:14px;height:14px"; });
+  $("#seg").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; f.passOnly = b.dataset.p === "1"; saveFilters(); $$("#seg button").forEach((x) => x.classList.toggle("on", x === b)); loadList(); };
+  $("#cats").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.oc) f.outcodes = []; else f.category = b.dataset.c; saveFilters(); viewDeals(); };
   let t; $("#q").oninput = (e) => { clearTimeout(t); t = setTimeout(() => { f.q = e.target.value.trim(); saveFilters(); loadList(); }, 250); };
   $("#fbtn").onclick = openFilters;
   loadList();
@@ -375,188 +542,204 @@ async function loadList() {
   const el = $("#list"); if (!el) return;
   try {
     let rows = await api("/api/deals?" + p);
-    if (f.maxCash) rows = rows.filter((d) => d.total_cash_deployed <= Number(f.maxCash));
-    el.innerHTML = offlineBanner() + `<div class="tiny muted" style="margin-bottom:8px">${rows.length} deal${rows.length === 1 ? "" : "s"}</div>` +
-      (rows.length ? rows.map(rowCard).join("") : `<div class="empty">No deals match. ${f.passOnly ? "Try turning off “Passing only”." : ""}</div>`);
-  } catch (e) { el.innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+    if (f.maxCash) rows = rows.filter((d) => d.cash_to_buy <= Number(f.maxCash));
+    el.innerHTML = offlineNotice() + (rows.length
+      ? `<p class="gf" style="margin:0 4px 8px">${rows.length} ${rows.length === 1 ? "deal" : "deals"}, sorted by ${SORTS.find((s) => s[0] === f.sort)?.[1].toLowerCase() || "return"}</p><div class="group">${rows.map(listRow).join("")}</div>`
+      : `<div class="empty">${ic("search")}No deals match.${f.passOnly ? "<br>Switch to Everything to see the near misses." : ""}</div>`);
+  } catch (e) { el.innerHTML = `<div class="empty">${ic("laptop")}${esc(e.message)}</div>`; }
 }
+const SORTS = [["roce_pct", "Return on cash"], ["net_monthly_cashflow", "Monthly cashflow"], ["gross_yield", "Gross yield"], ["discount", "Discount to value"], ["newest", "Newest first"], ["price_drop_pct", "Price cuts"], ["asking_price", "Lowest price"]];
 async function openFilters() {
   const f = state.filters;
   let meta = null; try { meta = await api("/api/meta"); } catch {}
   const groups = meta ? meta.outcodes : { medway: ["ME1","ME2","ME4","ME5","ME7","ME8"], thanet: ["CT8","CT9","CT10","CT11","CT12"] };
-  openSheet(`<h2 style="margin:0 0 6px">Filters</h2>
-    ${Object.entries(groups).map(([g, codes]) => `<div class="field"><label>${g[0].toUpperCase() + g.slice(1)}</label><div class="chips">${codes.map((c) => `<button class="chip ${f.outcodes.includes(c) ? "on" : ""}" data-oc="${c}">${c}</button>`).join("")}</div></div>`).join("")}
-    <div class="field"><label>Sort by</label><select id="fs">
-      ${[["roce_pct","Return on capital (ROCE)"],["net_monthly_cashflow","Monthly cashflow"],["gross_yield","Gross yield"],["discount","Discount to value"],["newest","Newest"],["price_drop_pct","Biggest price drop"],["asking_price","Cheapest"]].map(([v,l]) => `<option value="${v}" ${f.sort === v ? "selected" : ""}>${l}</option>`).join("")}
-    </select></div>
-    <div class="field"><label>Max cash you can put in (£)</label><input id="fc" type="number" inputmode="numeric" step="5000" placeholder="any" value="${esc(f.maxCash)}"></div>
-    <div class="field"><label>Min ROCE (%)</label><input id="fr" type="number" inputmode="numeric" placeholder="any" value="${esc(f.minRoce)}"></div>
-    <div class="btnrow" style="margin-top:14px"><button class="btn" id="fx">Reset</button><button class="btn primary" style="flex:1" id="fa">Show deals</button></div>`);
-  $("#sheet").querySelectorAll("[data-oc]").forEach((b) => b.onclick = () => { b.classList.toggle("on"); });
+  openSheet(`<h2>Filters<button class="gbtn glass" id="fclose" aria-label="Close">${ic("x")}</button></h2>
+    ${Object.entries(groups).map(([g, codes]) => `<p class="gh-sm" style="margin-top:14px">${g === "medway" ? "Medway" : g === "thanet" ? "Thanet" : esc(g)}</p><div class="rowx" style="flex-wrap:wrap;margin:0;padding:0">${codes.map((c) => `<button class="capsule ${f.outcodes.includes(c) ? "on" : ""}" data-oc="${c}">${c}</button>`).join("")}</div>`).join("")}
+    <p class="gh-sm">Sort and limits</p>
+    <div class="group">
+      <label class="cell"><span class="grow">Sort by</span><select id="fs">${SORTS.map(([v, l]) => `<option value="${v}" ${f.sort === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+      <label class="cell"><span class="grow">Most cash I can put in</span><input id="fc" type="number" inputmode="numeric" step="5000" placeholder="Any" value="${esc(f.maxCash)}"></label>
+      <label class="cell"><span class="grow">Lowest return on cash (%)</span><input id="fr" type="number" inputmode="numeric" placeholder="Any" value="${esc(f.minRoce)}"></label>
+    </div>
+    <div class="actions"><button class="btn tinted" id="fx">Reset</button><button class="btn fill" id="fa">Show deals</button></div>`);
+  $$("#sheet [data-oc]").forEach((b) => b.onclick = () => b.classList.toggle("on"));
+  $("#fclose").onclick = closeSheet;
   $("#fx").onclick = () => { state.filters = { ...DEFAULT_FILTERS }; saveFilters(); closeSheet(); viewDeals(); };
   $("#fa").onclick = () => {
-    f.outcodes = [...$("#sheet").querySelectorAll("[data-oc].on")].map((b) => b.dataset.oc);
+    f.outcodes = $$("#sheet [data-oc].on").map((b) => b.dataset.oc);
     f.sort = $("#fs").value; f.maxCash = $("#fc").value; f.minRoce = $("#fr").value;
     saveFilters(); closeSheet(); viewDeals();
   };
 }
-function openSheet(html) { $("#sheet").innerHTML = `<div class="grab"></div>` + html; $("#sheet").classList.add("open"); $("#sheetBg").classList.add("open"); }
-function closeSheet() { $("#sheet").classList.remove("open"); $("#sheetBg").classList.remove("open"); }
-$("#sheetBg").onclick = closeSheet;
+function openSheet(html) { $("#sheet").innerHTML = `<div class="grab"></div>` + html; $("#sheet").classList.add("open"); $("#scrim").classList.add("open"); }
+function closeSheet() { $("#sheet").classList.remove("open"); $("#scrim").classList.remove("open"); }
+$("#scrim").onclick = closeSheet;
 
-/* ======================= deal detail ======================= */
-let cur = null;
+/* ======================= deal ======================= */
 async function viewDeal(id) {
-  setTabs(null);
-  render(`<div class="page" style="padding-top:calc(20px + var(--safe-t))"><div class="skeleton" style="height:300px"></div></div>`);
+  chrome({ hideNav: true });
+  render(`<div class="hero none"></div><div class="sheet-top"><div class="skel" style="height:120px"></div><div class="skel"></div></div>`);
   let d;
   try { d = await api("/api/deals/" + encodeURIComponent(id)); }
-  catch (e) { return render(`<div class="top"><a class="iconbtn" href="javascript:history.back()">‹</a><h1>Deal</h1></div><div class="page"><div class="empty">${esc(e.message)}</div></div>`); }
-  cur = d;
+  catch (e) {
+    chrome({ title: "Deal", left: gb("back", "Back", 'onclick="history.back()"') });
+    return render(`<div class="page"><div class="empty">${ic("laptop")}${esc(e.message)}</div></div>`);
+  }
   const r = d.result, l = d.listing, f = d.refurb, c = d.comps;
   const failed = r.gates.filter((g) => !g.passed);
   const cashToBuy = r.all_in_cost + r.bridging_costs;
-  let verdict;
-  if (!r.eligible) verdict = `<div class="verdict mid">Doesn't fit your criteria<small>${esc(r.eligibility_reasons.join("; "))}</small></div>`;
-  else if (r.passed) verdict = `<div class="verdict ok">✓ Passes all four gates<small>ROCE ${roce(r.roce_pct)} · ${gbp(r.net_monthly_cashflow)}/mo after tax · ${pct(r.capital_recycled_pct, 0)} of your cash back at refinance</small></div>`;
-  else verdict = `<div class="verdict ${r.max_offer_price >= r.asking_price * 0.75 ? "mid" : "no"}">✗ Fails ${failed.length} gate${failed.length > 1 ? "s" : ""}<small>${failed.map((g) => esc(GATE[g.name])).join(", ")}${r.max_offer_price > 0 ? ` · max offer to clear the cap: ${gbp(r.max_offer_price)}` : ""}</small></div>`;
   const img = (l.image_urls || [])[0];
+  const onPhoto = img ? "on-photo" : "";
+  let verdict;
+  if (!r.eligible) verdict = `<div class="vi o">${ic("info")}</div><div><b>Outside your criteria</b><span>${esc(r.eligibility_reasons.join(". "))}</span></div>`;
+  else if (r.passed) verdict = `<div class="vi g">${ic("check")}</div><div><b>Passes all four gates</b><span>${r.money_left_in <= 0 ? "All your cash comes back at refinance" : `${gbp(r.money_left_in)} stays in after refinance`}, then ${gbp(r.net_monthly_cashflow)} a month after tax.</span></div>`;
+  else if (r.max_offer_price > 0 && r.max_offer_price >= r.asking_price * 0.75) verdict = `<div class="vi o">${ic("tag")}</div><div><b>Works at ${gbp(r.max_offer_price)}</b><span>At asking it fails on ${failed.map((g) => GATE[g.name].toLowerCase()).join(" and ")}. Try the offer below.</span></div>`;
+  else verdict = `<div class="vi r">${ic("x")}</div><div><b>Fails ${failed.length} of 4 gates</b><span>${failed.map((g) => esc(g.detail)).join(". ")}.</span></div>`;
+  const row = (label, val, cls = "") => `<div class="cell ${cls}"><span class="grow">${label}</span><span class="val num">${val}</span></div>`;
+  const statuses = [["new", "New"], ["shortlisted", "Shortlist"], ["viewing", "Viewing"], ["offer", "Offer"], ["rejected", "Pass on it"]];
+  const sliderMin = Math.round(Math.min(r.asking_price, r.max_offer_price || r.asking_price) * 0.6 / 500) * 500,
+    sliderMax = Math.round(Math.max(r.asking_price, r.max_offer_price || 0) * 1.05 / 500) * 500;
+
   render(`
-  <div class="hero ${img ? "" : "noimg"}" ${img ? `style="background-image:url('${esc(img)}')"` : ""}>
-    <button class="back" onclick="history.length > 1 ? history.back() : (location.hash='#/today')" aria-label="Back">‹</button>
-    <button class="share" id="share" aria-label="Share">⤴</button>
+  <div class="hero ${img ? "" : "none"}" ${img ? `style="background-image:url('${esc(img)}')"` : ""}>
+    <div class="bar"><button class="gbtn glass ${onPhoto}" aria-label="Back" id="back">${ic("back")}</button><button class="gbtn glass ${onPhoto}" aria-label="Share" id="share">${ic("share")}</button></div>
   </div>
-  <div class="page">
-    ${verdict}
-    ${offlineBanner()}
-    <div style="margin:4px 2px 12px"><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">${esc(l.address || l.postcode)}</div>
-      <div class="muted small">${esc(l.postcode)} · ${esc(l.property_type)}${l.bedrooms ? " · " + l.bedrooms + " bed" : ""} · ${esc(l.tenure)}${l.lease_years_remaining ? " (" + l.lease_years_remaining + "y)" : ""} · ${esc(l.source)}</div></div>
+  <div class="sheet-top"><div class="page" style="padding:0">
+    <h1 class="dt">${esc(l.address || l.postcode)}</h1>
+    <p class="ds">${esc(what({ bedrooms: l.bedrooms, property_type: l.property_type }))}, ${esc(l.tenure.replaceAll("-", " "))}${l.lease_years_remaining ? ` (${l.lease_years_remaining} years left)` : ""} · ${esc(l.postcode)} · ${esc(l.source.split(":")[0])}</p>
+    ${offlineNotice()}
+    <div class="group"><div class="verdict">${verdict}</div></div>
 
-    <div class="grid4 num" style="margin-bottom:12px">
-      <div class="tile"><span>Asking</span><b>${gbp(r.asking_price)}</b></div>
-      <div class="tile"><span>Cash to buy</span><b>${gbp(cashToBuy)}</b></div>
-      <div class="tile"><span>Refinance</span><b>${gbp(r.refi_loan)}</b></div>
-      <div class="tile ${r.net_monthly_cashflow > 0 ? "good" : "bad"}"><span>Cashflow / mo</span><b>${gbp(r.net_monthly_cashflow)}</b></div>
-    </div>
-
-    <div class="box"><h3>1 · Cost to purchase <span class="pill p-neutral">${esc(r.refurb_tier)} refurb</span></h3>
-      <div class="line"><span>Purchase price</span><span class="num">${gbp(r.asking_price)}</span></div>
-      <div class="line"><span>Stamp duty (inc. 5% surcharge)</span><span class="num">${gbp(r.sdlt)}</span></div>
-      <div class="line"><span>Refurb (${esc(r.refurb_tier)}, inc. contingency)</span><span class="num">${gbp(r.refurb_cost)}</span></div>
-      <div class="line"><span>Legal, survey, broker</span><span class="num">${gbp(r.fixed_acquisition_costs)}</span></div>
-      <div class="line"><span>Bridging finance cost</span><span class="num">${gbp(r.bridging_costs)}</span></div>
-      <div class="line total"><span>Cash to buy &amp; refurb</span><span class="num">${gbp(cashToBuy)}</span></div>
-    </div>
-
-    <div class="box"><h3>2 · Refinance</h3>
-      <div class="line"><span>After-repair value (conservative)</span><span class="num">${gbp(r.conservative_arv)}</span></div>
-      <div class="line"><span>Mortgage at 75% LTV</span><span class="num">${gbp(r.refi_loan)}</span></div>
-      <div class="line"><span>Lender &amp; refinance fees</span><span class="num">${gbp(-r.refi_costs)}</span></div>
-      <div class="line"><span>Cash back to you</span><span class="num">${gbp(r.net_refi_proceeds)}</span></div>
-      <div class="line"><span>Total cash deployed</span><span class="num">${gbp(r.total_cash_deployed)}</span></div>
-      <div class="line total"><span>Money left in the deal</span><span class="num" style="color:${r.money_left_in <= 0 ? "var(--pass)" : "inherit"}">${gbp(r.money_left_in)}</span></div>
-      <div class="line"><span>Capital recycled</span><span class="num">${pct(r.capital_recycled_pct, 0)}</span></div>
-    </div>
-
-    <div class="box"><h3>3 · Once complete <span class="muted small">per month</span></h3>
-      <div class="line"><span>Rent</span><span class="num">${gbp(r.annual_rent / 12)}</span></div>
-      <div class="line"><span>Running costs (management, voids, repairs)</span><span class="num">${gbp(-r.annual_opex / 12)}</span></div>
-      <div class="line"><span>Mortgage interest</span><span class="num">${gbp(-r.annual_interest / 12)}</span></div>
-      <div class="line"><span>Corporation tax</span><span class="num">${gbp(-r.corporation_tax / 12)}</span></div>
-      <div class="line total"><span>Net cashflow</span><span class="num" style="color:${r.net_monthly_cashflow > 0 ? "var(--pass)" : "var(--fail)"}">${gbp(r.net_monthly_cashflow)}</span></div>
-      <div class="line"><span>Per year</span><span class="num">${gbp(r.net_annual_cashflow)}</span></div>
-      <div class="line"><span>Gross yield · ICR</span><span class="num">${pct(r.gross_yield, 2)} · ${r.icr.toFixed(2)}x</span></div>
-      <div class="line"><span>Return on cash left in</span><span class="num">${roce(r.roce_pct)}</span></div>
-    </div>
-
-    <div class="box"><h3>What if I offer…</h3>
-      <div style="display:flex;justify-content:space-between;align-items:baseline"><b class="num" style="font-size:22px" id="wiP">${gbp(r.asking_price)}</b><span class="small muted" id="wiPct">asking</span></div>
-      <input type="range" id="wiR" min="${Math.round(r.asking_price * 0.6 / 500) * 500}" max="${Math.round(r.asking_price * 1.05 / 500) * 500}" step="500" value="${Math.round(r.asking_price / 500) * 500}">
-      <div class="btnrow" style="margin:6px 0 10px">${r.max_offer_price > 0 ? `<button class="chip" id="wiMax">Max offer ${gbp(r.max_offer_price)}</button>` : ""}<button class="chip" id="wiAsk">Asking</button></div>
-      <div class="field"><label>Refurb scope</label><select id="wiT">${["light","medium","heavy","structural"].map((t) => `<option ${t === r.refurb_tier ? "selected" : ""}>${t}</option>`).join("")}</select></div>
-      <div class="grid4 num" id="wiOut"></div>
-    </div>
-
-    <div class="box"><h3>The four gates</h3>
-      ${r.gates.map((g) => `<div class="gate ${g.passed ? "ok" : "no"}"><i>${g.passed ? "✓" : "✗"}</i><div><b>${GATE[g.name]}</b><div class="small muted">${esc(g.detail)}</div></div></div>`).join("")}
-    </div>
-
-    <div class="box"><h3>Refurb &amp; risks</h3>
-      ${f.key_works.map((w) => `<div class="small" style="padding:3px 0">• ${esc(w)}</div>`).join("")}
-      ${f.red_flags.map((w) => `<div class="small" style="padding:3px 0;color:var(--warn)">⚠ ${esc(w)}</div>`).join("")}
-      <div class="tiny muted" style="margin-top:6px">${esc(f.rationale)}</div>
-    </div>
-
-    <div class="box"><h3>My pipeline</h3>
-      <div class="chips" id="st">${["new","shortlisted","viewing","offer","rejected"].map((s) => `<button class="chip ${d.pipeline.status === s ? "on" : ""}" data-s="${s}" style="text-transform:capitalize">${s}</button>`).join("")}</div>
-      <div class="field"><textarea id="notes" placeholder="Notes — agent, viewing time, offer…">${esc(d.pipeline.notes || "")}</textarea></div>
-    </div>
-
-    <div class="btnrow">
-      ${l.url ? `<a class="btn primary" style="flex:1" href="${esc(l.url)}" target="_blank" rel="noopener">Open listing</a>` : ""}
-      <a class="btn" style="flex:1" href="https://maps.apple.com/?q=${encodeURIComponent((l.address || "") + " " + l.postcode)}" target="_blank" rel="noopener">Map</a>
-    </div>
-    <details style="margin-top:14px"><summary class="small muted">Comparables &amp; description</summary>
-      <div class="box" style="margin-top:8px">
-        ${Object.entries(c.arv_estimates).map(([k, v]) => `<div class="line"><span>${esc(k.replaceAll("_", " "))}</span><span class="num">${gbp(v)}</span></div>`).join("")}
-        <div class="line"><span>Floor area (${esc(c.floor_area_source)})</span><span class="num">${Math.round(c.floor_area_sqft)} sq ft</span></div>
-        <div class="line"><span>Market rent</span><span class="num">${gbp(c.monthly_rent_average)}/mo</span></div>
-        <p class="small muted" style="white-space:pre-wrap">${esc(l.description)}</p>
+    <div class="group" style="margin-top:14px">
+      <div class="bignum"><span>Cash to buy and refurbish</span><b>${gbp(cashToBuy)}</b></div>
+      <div class="figs" style="margin:0 16px;padding:12px 0 14px">
+        <div><span>Asking</span><b>${gbpk(r.asking_price)}</b></div>
+        <div><span>Refinance</span><b>${gbpk(r.refi_loan)}</b></div>
+        <div><span>Per month</span><b class="${r.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(r.net_monthly_cashflow)}</b></div>
       </div>
-    </details>
-  </div>`);
+    </div>
 
-  // what-if
-  const range = $("#wiR");
-  let t;
+    <h2 class="gh">Buying it</h2>
+    <div class="group">
+      ${row("Purchase price", gbp(r.asking_price))}
+      ${row("Stamp duty, with the 5% surcharge", gbp(r.sdlt))}
+      ${row(`Refurb, ${esc(r.refurb_tier)}, with contingency`, gbp(r.refurb_cost))}
+      ${row("Legal, survey and broker", gbp(r.fixed_acquisition_costs))}
+      ${row("Bridging loan interest and fees", gbp(r.bridging_costs))}
+      ${row("Cash to buy and refurbish", gbp(cashToBuy), "total")}
+    </div>
+
+    <h2 class="gh">Refinancing</h2>
+    <div class="group">
+      ${row("Value once refurbished", gbp(r.conservative_arv))}
+      ${row("Buy-to-let mortgage at 75%", gbp(r.refi_loan))}
+      ${row("Lender and refinance fees", gbp(-r.refi_costs))}
+      ${row("Cash back to you", gbp(r.net_refi_proceeds))}
+      ${r.money_left_in <= 0 ? row("Left in the deal", "None", "total") + row("Extra cash out to you", `<span class="green">${gbp(-r.money_left_in)}</span>`) : row("Left in the deal", gbp(r.money_left_in), "total")}
+    </div>
+    <p class="gf">You get back ${pct(r.capital_recycled_pct, 0)} of the ${gbp(r.total_cash_deployed)} you put in.</p>
+
+    <h2 class="gh">Once it's let</h2>
+    <div class="group">
+      ${row("Rent", gbp(r.annual_rent / 12))}
+      ${row("Management, voids and repairs", gbp(-r.annual_opex / 12))}
+      ${row("Mortgage interest", gbp(-r.annual_interest / 12))}
+      ${row("Corporation tax", gbp(-r.corporation_tax / 12))}
+      ${row("Cashflow each month", `<span class="${r.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(r.net_monthly_cashflow)}</span>`, "total")}
+    </div>
+    <p class="gf">${gbp(r.net_annual_cashflow)} a year. Gross yield ${pct(r.gross_yield, 2)}, rent covers the stressed interest ${r.icr.toFixed(2)} times, return on cash left in ${roce(r.roce_pct)}.</p>
+
+    <h2 class="gh">Try an offer</h2>
+    <div class="group">
+      <div class="offerbox">
+        <div class="o"><b class="num" id="wiP">${gbp(r.asking_price)}</b><span class="sub l2" id="wiPct">asking price</span></div>
+        <input type="range" class="slider" id="wiR" min="${sliderMin}" max="${sliderMax}" step="500" value="${Math.round(r.asking_price / 500) * 500}" aria-label="Offer price">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${r.max_offer_price > 0 ? `<button class="capsule" id="wiMax">Highest that passes, ${gbpk(r.max_offer_price)}</button>` : ""}<button class="capsule" id="wiAsk">Asking</button></div>
+        <div class="seg" id="wiT" style="margin-top:14px">${["light", "medium", "heavy", "structural"].map((t) => `<button data-t="${t}" class="${t === r.refurb_tier ? "on" : ""}" style="text-transform:capitalize">${t}</button>`).join("")}</div>
+      </div>
+      <div class="result" id="wiOut"></div>
+    </div>
+
+    <h2 class="gh">The four gates</h2>
+    <div class="group gates">${r.gates.map((g) => `<div class="cell"><span class="${g.passed ? "green" : "red"}">${ic(g.passed ? "check" : "x")}</span><div class="grow"><div style="font-weight:600">${GATE[g.name]}</div><div class="fn l2">${esc(g.detail)}</div></div></div>`).join("")}</div>
+
+    <h2 class="gh">Refurb and risks</h2>
+    <div class="group">
+      ${f.key_works.map((w) => `<div class="cell"><span class="grow sub">${esc(w.replace(/^Signal: /, "Listing says "))}</span></div>`).join("")}
+      ${f.red_flags.map((w) => `<div class="cell"><span class="orange">${ic("info")}</span><span class="grow sub">${esc(w)}</span></div>`).join("")}
+    </div>
+    <p class="gf">${esc(f.rationale.replace("Offline keyword heuristic (Claude not used).", "Read from the listing text by keyword. Add a Claude key on the laptop for a closer read of the photos and description."))}</p>
+
+    <h2 class="gh">Your notes</h2>
+    <div class="seg" id="st" style="margin-bottom:10px">${statuses.map(([v, lab]) => `<button data-s="${v}" class="${d.pipeline.status === v ? "on" : ""}">${lab}</button>`).join("")}</div>
+    <div class="group"><div class="cell"><textarea id="notes" placeholder="Agent, viewing time, what you offered" aria-label="Notes">${esc(d.pipeline.notes || "")}</textarea></div></div>
+
+    <div class="actions">
+      ${l.url ? `<a class="btn fill" href="${esc(l.url)}" target="_blank" rel="noopener">${ic("ext")}View listing</a>` : ""}
+      <a class="btn tinted" href="https://maps.apple.com/?q=${encodeURIComponent((l.address || "") + " " + l.postcode)}" target="_blank" rel="noopener">${ic("pin")}Map</a>
+    </div>
+
+    <details class="more" style="margin-top:22px">
+      <summary class="group"><div class="cell"><span class="grow">How the value and rent were worked out</span>${ic("chev", "i chev")}</div></summary>
+      <div class="group" style="margin-top:10px">
+        ${Object.entries(c.arv_estimates).map(([k, v]) => row({ sold_median: "Median sold price nearby", sold_ppsf_x_area: "Sold £ per sq ft × floor area", asking_avg_less_5pct: "Average asking price, less 5%", income_capitalisation: "Rent ÷ valuation yield" }[k] || esc(k), gbp(v))).join("")}
+        ${row(`Floor area (${esc({ listing: "from listing", propertydata: "PropertyData", epc: "EPC", default: "typical size" }[c.floor_area_source] || c.floor_area_source)})`, `${Math.round(c.floor_area_sqft)} sq ft`)}
+        ${row("Average local rent", gbp(c.monthly_rent_average))}
+      </div>
+      ${l.description ? `<p class="gf" style="white-space:pre-wrap;margin-top:12px">${esc(l.description)}</p>` : ""}
+    </details>
+  </div></div>`);
+
+  $("#back").onclick = () => history.length > 1 ? history.back() : (location.hash = "#/today");
+  const range = $("#wiR"), paint = () => range.style.setProperty("--p", ((range.value - sliderMin) / (sliderMax - sliderMin) * 100) + "%");
+  let tier = r.refurb_tier, t;
   const run = async () => {
     const price = Number(range.value);
     $("#wiP").textContent = gbp(price);
     const diff = (price / r.asking_price - 1) * 100;
-    $("#wiPct").textContent = Math.abs(diff) < 0.5 ? "asking" : `${diff > 0 ? "+" : ""}${diff.toFixed(0)}% vs asking`;
+    $("#wiPct").textContent = Math.abs(diff) < 0.5 ? "asking price" : `${Math.abs(diff).toFixed(0)}% ${diff < 0 ? "under" : "over"} asking`;
+    paint();
     try {
-      const w = await api(`/api/deals/${encodeURIComponent(id)}/whatif`, { method: "POST", body: { asking_price: price, refurb_tier: $("#wiT").value } });
-      $("#wiOut").innerHTML = `
-        <div class="tile"><span>Cash to buy</span><b>${gbp(w.all_in_cost + w.bridging_costs)}</b></div>
-        <div class="tile ${w.money_left_in <= 0 ? "good" : ""}"><span>Left in</span><b>${gbp(w.money_left_in)}</b></div>
-        <div class="tile ${w.net_monthly_cashflow > 0 ? "good" : "bad"}"><span>Cashflow / mo</span><b>${gbp(w.net_monthly_cashflow)}</b></div>
-        <div class="tile ${w.passed ? "good" : "bad"}"><span>Verdict</span><b>${w.passed ? "Passes" : "Fails " + w.gates.filter((g) => !g.passed).length}</b></div>`;
-    } catch (e) { $("#wiOut").innerHTML = `<div class="small muted" style="grid-column:1/-1">What-if needs your laptop online.</div>`; }
+      const w = await api(`/api/deals/${encodeURIComponent(id)}/whatif`, { method: "POST", body: { asking_price: price, refurb_tier: tier } });
+      $("#wiOut").innerHTML = `<div><span>Cash in</span><b>${gk(w.all_in_cost + w.bridging_costs)}</b></div>
+        <div>${w.money_left_in <= 0 ? `<span>Cash out</span><b class="green">+${gk(-w.money_left_in)}</b>` : `<span>Left in</span><b>${gk(w.money_left_in)}</b>`}</div>
+        <div><span>Per month</span><b class="${w.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(w.net_monthly_cashflow)}</b></div>
+        <span class="pass-badge ${w.passed ? "g" : "r"}">${w.passed ? "Passes" : `Fails ${w.gates.filter((g) => !g.passed).length}`}</span>`;
+    } catch { $("#wiOut").innerHTML = `<div class="fn l2" style="grid-column:1/-1">Trying offers needs your laptop online.</div>`; }
   };
-  range.oninput = () => { clearTimeout(t); $("#wiP").textContent = gbp(Number(range.value)); t = setTimeout(run, 200); };
-  $("#wiT").onchange = run;
+  range.oninput = () => { clearTimeout(t); $("#wiP").textContent = gbp(Number(range.value)); paint(); t = setTimeout(run, 180); };
+  $("#wiT").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; tier = b.dataset.t; $$("#wiT button").forEach((x) => x.classList.toggle("on", x === b)); run(); };
   if ($("#wiMax")) $("#wiMax").onclick = () => { range.value = r.max_offer_price; run(); };
   $("#wiAsk").onclick = () => { range.value = r.asking_price; run(); };
   run();
 
   $("#st").onclick = async (e) => {
-    const s = e.target.dataset.s; if (!s) return;
-    try { await api(`/api/deals/${encodeURIComponent(id)}/status`, { method: "PUT", body: { status: s } });
-      $("#st").querySelectorAll(".chip").forEach((b) => b.classList.toggle("on", b.dataset.s === s)); toast(`Marked ${s}`); }
-    catch (err) { toast(err.message); }
+    const b = e.target.closest("button"); if (!b) return;
+    try { await api(`/api/deals/${encodeURIComponent(id)}/status`, { method: "PUT", body: { status: b.dataset.s } });
+      $$("#st button").forEach((x) => x.classList.toggle("on", x === b)); toast(b.textContent === "Pass on it" ? "Hidden from your lists" : `Moved to ${b.textContent}`); }
+    catch (err) { toast(err.message, "info"); }
   };
-  $("#notes").onchange = async (e) => { try { await api(`/api/deals/${encodeURIComponent(id)}/status`, { method: "PUT", body: { notes: e.target.value } }); toast("Notes saved"); } catch (err) { toast(err.message); } };
+  $("#notes").onchange = async (e) => { try { await api(`/api/deals/${encodeURIComponent(id)}/status`, { method: "PUT", body: { notes: e.target.value } }); toast("Notes saved"); } catch (err) { toast(err.message, "info"); } };
   $("#share").onclick = async () => {
-    const text = `${l.address} — asking ${gbp(r.asking_price)}, cash in ${gbp(cashToBuy)}, refi ${gbp(r.refi_loan)}, ${gbp(r.net_monthly_cashflow)}/mo, ROCE ${roce(r.roce_pct)}`;
+    const text = `${l.address}: asking ${gbp(r.asking_price)}, ${gbp(cashToBuy)} to buy and refurbish, refinance ${gbp(r.refi_loan)}, ${gbp(r.net_monthly_cashflow)} a month after tax.`;
     if (navigator.share) { try { await navigator.share({ title: l.address, text, url: l.url || undefined }); } catch {} }
     else { try { await navigator.clipboard.writeText(text + (l.url ? " " + l.url : "")); toast("Copied"); } catch {} }
   };
 }
 
-/* ======================= me / alerts ======================= */
+/* ======================= alerts & profile ======================= */
 async function pushState() {
   if (!("serviceWorker" in navigator) || !("PushManager" in window) || !window.isSecureContext) return { supported: false };
   const reg = await navigator.serviceWorker.ready;
-  const sub = await reg.pushManager.getSubscription();
-  return { supported: true, sub, permission: Notification.permission };
+  return { supported: true, sub: await reg.pushManager.getSubscription(), permission: Notification.permission };
 }
 async function enablePush() {
-  if (isIOS() && !isStandalone()) throw new Error("On iPhone, first add the app to your Home Screen (Share → Add to Home Screen), then open it from there.");
+  if (isIOS() && !isStandalone()) throw new Error("Add the app to your Home Screen first, then open it from there.");
   const perm = await Notification.requestPermission();
-  if (perm !== "granted") throw new Error("Notifications are blocked — allow them in your phone's settings for this app.");
+  if (perm !== "granted") throw new Error("Notifications are off for this app in your phone's Settings.");
   const { key } = await api("/api/push/key");
   const reg = await navigator.serviceWorker.ready;
-  const raw = Uint8Array.from(atob(key.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((key.length + 3) % 4)), (c) => c.charCodeAt(0));
+  const raw = Uint8Array.from(atob(key.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((key.length + 3) % 4)), (ch) => ch.charCodeAt(0));
   const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: raw });
   await api("/api/push/subscribe", { method: "POST", body: sub.toJSON() });
 }
@@ -566,84 +749,101 @@ async function disablePush() {
 }
 
 async function viewMe() {
-  setTabs("me");
-  render(`<div class="top"><h1>Alerts &amp; me</h1></div><div class="page"><div class="skeleton" style="height:180px"></div></div>`);
+  chrome({ tab: "me", title: "Alerts" });
+  render(largeTitle("Alerts") + `<div class="page" style="margin-top:14px"><div class="skel" style="height:90px"></div><div class="skel" style="height:220px"></div></div>`);
   let me, meta = null, settings = null;
-  try { me = await api("/api/auth/me"); state.user = me; } catch (e) { return; }
+  try { me = await api("/api/auth/me"); state.user = me; } catch { return; }
   try { meta = await api("/api/meta"); } catch {}
   if (me.is_admin) { try { settings = await api("/api/settings"); } catch {} }
   const p = me.prefs;
   const ps = await pushState().catch(() => ({ supported: false }));
   const groups = meta ? meta.outcodes : {};
   const sched = settings?.schedule;
-  render(`<div class="top"><h1>Alerts &amp; me</h1></div>
-  <div class="page">
-    ${offlineBanner()}
-    ${!isStandalone() && isIOS() ? `<div class="banner info">📲 Install the app: tap <b>Share</b> → <b>Add to Home Screen</b>. iPhone only allows notifications for installed apps.</div>` : ""}
-    <div class="box"><h3>Daily notification</h3>
-      <div class="switch"><div><b>Notifications on this phone</b><div class="small muted">${!ps.supported ? (window.isSecureContext ? "Not supported in this browser." : "Needs the secure (https) address — see the laptop's Settings → Phone app.") : ps.sub ? "On" : ps.permission === "denied" ? "Blocked in phone settings" : "Off"}</div></div>
-        <label class="toggle"><input type="checkbox" id="pushT" ${ps.sub ? "checked" : ""} ${!ps.supported ? "disabled" : ""}><span></span></label></div>
-      <div class="field"><label>Send me the morning digest</label><select id="notify">
+  const initials = (me.name || me.email).split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+  const pushNote = !ps.supported ? (window.isSecureContext ? "This browser can't receive notifications." : "Open the app from its secure address to turn these on. The laptop's Settings page has the QR code.")
+    : ps.permission === "denied" ? "Blocked in your phone's Settings." : "";
+  const swatch = (bg, icon) => `<span class="icn" style="background:${bg}">${ic(icon)}</span>`;
+
+  render(largeTitle("Alerts") + `<div class="page" style="margin-top:14px">
+    ${offlineNotice()}
+    ${!isStandalone() && isIOS() ? `<div class="notice info">${ic("plus")}<div>Install the app first: tap Share, then Add to Home Screen. iPhone sends notifications only to installed apps.</div></div>` : ""}
+    <div class="group"><div class="cell" style="--inset:86px;padding:14px 16px"><span class="avatar">${esc(initials)}</span><div class="grow"><div style="font-size:20px;font-weight:600">${esc(me.name)}</div><div class="sub l2">${esc(me.email)}${me.is_admin ? " · owner" : ""}</div></div></div></div>
+
+    <p class="gh-sm">Morning alert</p>
+    <div class="group" style="--inset:58px">
+      <label class="cell">${swatch("#ff3b30", "bell")}<span class="grow">Notifications on this phone</span><span class="sw"><input type="checkbox" id="pushT" ${ps.sub ? "checked" : ""} ${!ps.supported ? "disabled" : ""}><i></i></span></label>
+      <label class="cell">${swatch("#ff9500", "spark")}<span class="grow">Send it</span><select id="notify">
+        <option value="passes" ${p.notify === "passes" ? "selected" : ""}>When a deal passes</option>
         <option value="always" ${p.notify === "always" ? "selected" : ""}>Every morning</option>
-        <option value="passes" ${p.notify === "passes" ? "selected" : ""}>Only when a deal passes</option>
-        <option value="off" ${p.notify === "off" ? "selected" : ""}>Never</option></select></div>
-      ${me.is_admin ? `<div class="field"><label>Scan &amp; notify at (laptop time)</label><div style="display:flex;gap:8px"><input type="time" id="time" value="${esc(settings?.config?.schedule?.time || "07:30")}"><button class="btn" id="timeSave">Set</button></div>
-        <div class="tiny muted" style="margin-top:4px">${sched ? (sched.installed ? `Daily run installed on your ${esc(sched.platform)} laptop at ${esc(sched.time)}.` : "The daily run isn't installed on the laptop yet — tap Set.") : ""}</div></div>` : ""}
-      <button class="btn block" id="testPush" ${ps.sub ? "" : "disabled"}>Send me today's digest now</button>
+        <option value="off" ${p.notify === "off" ? "selected" : ""}>Never</option></select></label>
+      ${me.is_admin ? `<label class="cell">${swatch("#5ac8fa", "clock")}<span class="grow">Scan at</span><input type="time" id="time" value="${esc(settings?.config?.schedule?.time || "07:30")}" style="color:var(--tint)"></label>` : ""}
+      <button class="cell" id="testPush" ${ps.sub ? "" : "disabled"} style="${ps.sub ? "" : "opacity:.4"}">${swatch("#34c759", "send")}<span class="grow" style="color:var(--tint)">Send this morning's alert now</span></button>
     </div>
+    <p class="gf">${pushNote || (sched ? (sched.installed ? `Your ${esc(sched.platform)} laptop scans at ${esc(sched.time)} and the alert follows when it's done.` : "The daily scan isn't set up on the laptop yet. Pick a time above to set it.") : "The alert follows the laptop's morning scan.")}</p>
 
-    <div class="box"><h3>What counts as a deal for me</h3>
-      ${Object.entries(groups).map(([g, codes]) => `<div class="field"><label>${g[0].toUpperCase() + g.slice(1)} postcodes <span class="tiny">(none selected = all)</span></label><div class="chips">${codes.map((c) => `<button class="chip ${p.outcodes.includes(c) ? "on" : ""}" data-oc="${c}">${c}</button>`).join("")}</div></div>`).join("")}
-      <div class="field"><label>Property categories</label><div class="chips">${["residential","commercial","mixed-use"].map((c) => `<button class="chip ${p.categories.includes(c) ? "on" : ""}" data-cat="${c}" style="text-transform:capitalize">${c}</button>`).join("")}</div></div>
-      <div class="field"><label>Max cash I can put in (£)</label><input type="number" id="maxCash" inputmode="numeric" step="5000" placeholder="any" value="${p.max_cash_in ?? ""}"></div>
-      <div class="field"><label>Min return on cash left in — ROCE (%)</label><input type="number" id="minRoce" inputmode="numeric" placeholder="any" value="${p.min_roce ?? ""}"></div>
-      <div class="switch"><div><b>Only new listings</b><div class="small muted">Digest shows deals first seen in the latest scan</div></div><label class="toggle"><input type="checkbox" id="onlyNew" ${p.only_new ? "checked" : ""}><span></span></label></div>
-      <button class="btn primary block" id="savePrefs" style="margin-top:8px">Save</button>
+    <p class="gh-sm">What counts for me</p>
+    <div class="group">
+      ${Object.entries(groups).map(([g, codes]) => `<div class="cell" style="display:block"><div class="fn l2" style="margin-bottom:8px">${g === "medway" ? "Medway" : g === "thanet" ? "Thanet" : esc(g)}</div><div style="display:flex;flex-wrap:wrap;gap:8px">${codes.map((c) => `<button class="capsule ${p.outcodes.includes(c) ? "on" : ""}" data-oc="${c}">${c}</button>`).join("")}</div></div>`).join("")}
+      <div class="cell" style="display:block"><div class="fn l2" style="margin-bottom:8px">Property</div><div style="display:flex;flex-wrap:wrap;gap:8px">${[["residential", "Residential"], ["commercial", "Commercial"], ["mixed-use", "Shop and flat"]].map(([v, lab]) => `<button class="capsule ${p.categories.includes(v) ? "on" : ""}" data-cat="${v}">${lab}</button>`).join("")}</div></div>
+      <label class="cell"><span class="grow">Most cash I can put in</span><input type="number" id="maxCash" inputmode="numeric" step="5000" placeholder="Any" value="${p.max_cash_in ?? ""}"></label>
+      <label class="cell"><span class="grow">Lowest return on cash (%)</span><input type="number" id="minRoce" inputmode="numeric" placeholder="Any" value="${p.min_roce ?? ""}"></label>
+      <label class="cell"><span class="grow">Only listings new that morning</span><span class="sw"><input type="checkbox" id="onlyNew" ${p.only_new ? "checked" : ""}><i></i></span></label>
     </div>
+    <p class="gf">No postcode picked means all eleven. Changes save as you make them.</p>
 
-    ${me.is_admin ? `<div class="box"><h3>Scan now</h3><div class="small muted" style="margin-bottom:8px">Runs on your laptop (portals take a while). Notifications aren't sent for manual scans.</div>
-      <button class="btn block" id="scanNow">Start a scan</button><div class="small muted" id="scanMsg" style="margin-top:6px"></div></div>` : ""}
+    ${me.is_admin ? `<p class="gh-sm">Laptop</p><div class="group" style="--inset:58px">
+      <button class="cell" id="scanNow">${swatch("#8e8e93", "laptop")}<span class="grow" style="color:var(--tint)">Scan now</span><span class="val fn" id="scanMsg"></span></button></div>
+      <p class="gf">A scan you start here doesn't send an alert. Reading the portals takes a few minutes.</p>` : ""}
 
-    <div class="box"><h3>Profile</h3>
-      <div class="field"><label>Name</label><input id="name" value="${esc(me.name)}"></div>
-      <div class="small muted">${esc(me.email)}${me.is_admin ? " · owner" : ""}</div>
-      <details style="margin-top:10px"><summary class="small">Change password</summary>
-        <div class="field"><label>Current password</label><input type="password" id="pw0" autocomplete="current-password"></div>
-        <div class="field"><label>New password</label><input type="password" id="pw1" autocomplete="new-password" minlength="8"></div>
-        <button class="btn" id="pwSave">Update password</button></details>
-      <button class="btn block" id="logout" style="margin-top:14px;color:var(--fail)">Sign out</button>
+    <p class="gh-sm">Account</p>
+    <div class="group" style="--inset:58px">
+      <label class="cell">${swatch("#8e8e93", "lock")}<span class="grow">Name</span><input id="name" value="${esc(me.name)}" aria-label="Name"></label>
+      <button class="cell" id="pwBtn">${swatch("#8e8e93", "lock")}<span class="grow">Change password</span>${ic("chev", "i chev")}</button>
+      <button class="cell" id="logout">${swatch("#ff3b30", "out")}<span class="grow red">Sign out</span></button>
     </div>
-    <p class="tiny muted" style="text-align:center">Kent BRRR Scout · your data stays on your laptop</p>
+    <p class="gf" style="text-align:center;margin:26px 0 8px">Your deals and keys stay on your laptop.</p>
   </div>`);
 
-  const pushT = $("#pushT");
-  if (pushT) pushT.onchange = async () => {
-    try { if (pushT.checked) { await enablePush(); toast("Notifications on"); } else { await disablePush(); toast("Notifications off"); } viewMe(); }
-    catch (e) { pushT.checked = !pushT.checked; toast(e.message, 6000); }
-  };
-  $("#testPush").onclick = async () => { try { const r = await api("/api/push/test", { method: "POST" }); toast(r.message); } catch (e) { toast(e.message, 5000); } };
-  document.querySelectorAll("[data-oc],[data-cat]").forEach((b) => b.onclick = () => b.classList.toggle("on"));
-  $("#savePrefs").onclick = async () => {
+  const savePrefs = async (silent) => {
     const prefs = {
       notify: $("#notify").value,
-      outcodes: [...document.querySelectorAll("[data-oc].on")].map((b) => b.dataset.oc),
-      categories: [...document.querySelectorAll("[data-cat].on")].map((b) => b.dataset.cat),
+      outcodes: $$("[data-oc].on").map((b) => b.dataset.oc),
+      categories: $$("[data-cat].on").map((b) => b.dataset.cat),
       max_cash_in: $("#maxCash").value ? Number($("#maxCash").value) : null,
       min_roce: $("#minRoce").value ? Number($("#minRoce").value) : null,
       only_new: $("#onlyNew").checked,
     };
-    try { state.user = await api("/api/auth/me", { method: "PUT", body: { prefs, name: $("#name").value } }); toast("Saved"); } catch (e) { toast(e.message); }
+    try { state.user = await api("/api/auth/me", { method: "PUT", body: { prefs, name: $("#name").value } }); if (!silent) toast("Saved"); }
+    catch (e) { toast(e.message, "info"); }
   };
-  $("#notify").onchange = () => $("#savePrefs").click();
-  if ($("#timeSave")) $("#timeSave").onclick = async () => {
-    try { const r = await api("/api/schedule/install", { method: "POST", body: { time: $("#time").value } }); toast(r.message, 5000); viewMe(); }
-    catch (e) { toast(e.message, 6000); }
+  $$("[data-oc],[data-cat]").forEach((b) => b.onclick = () => { b.classList.toggle("on"); savePrefs(true); });
+  ["#notify", "#maxCash", "#minRoce", "#onlyNew", "#name"].forEach((s) => $(s).addEventListener("change", () => savePrefs()));
+  const pushT = $("#pushT");
+  pushT.onchange = async () => {
+    try { if (pushT.checked) { await enablePush(); toast("Notifications on", "bell"); } else { await disablePush(); toast("Notifications off", "bell"); } viewMe(); }
+    catch (e) { pushT.checked = !pushT.checked; toast(e.message, "info", 5000); }
+  };
+  $("#testPush").onclick = async () => { try { const res = await api("/api/push/test", { method: "POST" }); toast(res.message, "send"); } catch (e) { toast(e.message, "info", 4500); } };
+  if ($("#time")) $("#time").onchange = async () => {
+    try { const res = await api("/api/schedule/install", { method: "POST", body: { time: $("#time").value } }); toast(`Scans at ${$("#time").value}`, "clock"); viewMe(); }
+    catch (e) { toast(e.message, "info", 5000); }
   };
   if ($("#scanNow")) $("#scanNow").onclick = async () => {
-    try { await api("/api/scan", { method: "POST", body: { sources: null } }); $("#scanMsg").textContent = "Scan started…"; pollScan(); }
-    catch (e) { toast(e.message); }
+    try { await api("/api/scan", { method: "POST", body: { sources: null } }); $("#scanMsg").textContent = "Starting"; pollScan(); }
+    catch (e) { toast(e.message, "info"); }
   };
-  $("#pwSave").onclick = async () => { try { await api("/api/auth/me", { method: "PUT", body: { password: $("#pw1").value, current_password: $("#pw0").value } }); toast("Password updated — sign in again"); location.hash = "#/login"; } catch (e) { toast(e.message); } };
+  $("#pwBtn").onclick = () => {
+    openSheet(`<h2>Change password<button class="gbtn glass" id="pwx" aria-label="Close">${ic("x")}</button></h2>
+      <div class="group"><label class="cell"><input type="password" id="pw0" autocomplete="current-password" placeholder="Current password" style="text-align:left;color:var(--label)"></label>
+      <label class="cell"><input type="password" id="pw1" autocomplete="new-password" placeholder="New password, 8 or more characters" style="text-align:left;color:var(--label)"></label></div>
+      <p class="gf">You'll sign in again on your other devices.</p>
+      <div class="actions"><button class="btn fill" id="pwSave">Update password</button></div>`);
+    $("#pwx").onclick = closeSheet;
+    $("#pwSave").onclick = async () => {
+      try { await api("/api/auth/me", { method: "PUT", body: { password: $("#pw1").value, current_password: $("#pw0").value } }); closeSheet(); toast("Password updated, sign in again", "lock"); location.hash = "#/login"; }
+      catch (e) { toast(e.message, "info"); }
+    };
+  };
   $("#logout").onclick = async () => {
     await disablePush().catch(() => {});
     await api("/api/auth/logout", { method: "POST" }).catch(() => {});
@@ -653,10 +853,10 @@ async function viewMe() {
 }
 async function pollScan() {
   try {
-    const j = await api("/api/job");
-    const el = $("#scanMsg");
-    if (j && j.running) { if (el) el.textContent = j.message; setTimeout(pollScan, 2000); }
-    else if (j && el) el.textContent = j.error ? "Failed: " + j.error : `Done: ${j.result.fetched} listings, ${j.result.passed} pass.`;
+    const j = await api("/api/job"), el = $("#scanMsg");
+    if (j && j.running) { if (el) el.textContent = (j.message || "").slice(0, 28); setTimeout(pollScan, 2000); }
+    else if (j && el) el.textContent = j.error ? "Failed" : `${j.result.passed} pass`;
+    if (j && !j.running && !j.error) toast(`Scan finished: ${j.result.fetched} listings, ${j.result.passed} pass`);
   } catch {}
 }
 

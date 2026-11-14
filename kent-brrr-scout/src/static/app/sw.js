@@ -1,5 +1,5 @@
 /* Kent BRRR Scout service worker: offline app shell, cached data, push notifications. */
-const VERSION = "brrr-v1";
+const VERSION = "brrr-v2";
 const SHELL = ["/app/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/badge-96.png"];
 const CACHED_API = [/^\/api\/digest$/, /^\/api\/deals(\?.*)?$/, /^\/api\/deals\/[^/]+$/, /^\/api\/auth\/me$/,
                     /^\/api\/meta$/, /^\/api\/summary$/];
