@@ -34,7 +34,7 @@ from .config import (
 )
 from .models import Deal, RefurbTier
 from .storage import Storage
-from .underwriting import UnderwritingParams, estimate_refurb_cost, underwrite
+from .underwriting import UnderwritingParams, estimate_refurb_cost
 
 STATIC = Path(__file__).parent / "static"
 log = logging.getLogger("brrr.web")
@@ -66,6 +66,7 @@ def deal_row(d: Deal, meta: dict[str, Any] | None = None) -> dict[str, Any]:
         "net_refi_proceeds": r.net_refi_proceeds, "sdlt": r.sdlt,
         "cash_to_buy": round(r.all_in_cost + r.bridging_costs, 2),
         "monthly_rent": round(r.annual_rent / 12, 2),
+        "plan": r.plan_label, "ownership": r.ownership,
     }
 
 
@@ -139,11 +140,28 @@ class StatusUpdate(BaseModel):
 
 
 class WhatIf(BaseModel):
+    plan: str | None = None
     asking_price: float | None = None
     refurb_tier: RefurbTier | None = None
     refurb_cost: float | None = None
     monthly_rent: float | None = None
     arv: float | None = None
+
+
+class FinanceUpdate(BaseModel):
+    products: dict[str, dict[str, Any]] = {}
+    default_plan: str | None = None
+    personal_tax_rate: float | None = None
+    months_until_refinance: int | None = None
+
+
+# Allowed ranges for finance product fields (fractions for rates and fees).
+FINANCE_NUMERIC = {
+    "ltv": (0.0, 0.95), "rate": (0.0, 0.25), "fee_pct": (0.0, 0.1), "fixed_costs": (0, 50_000),
+    "term_years": (1, 40), "icr": (0.5, 3.0), "stress_rate": (0.0, 0.25), "erc_pct": (0.0, 0.1),
+    "rate_loading": (0.0, 0.05), "monthly_rate": (0.0, 0.05), "arrangement_fee_pct": (0.0, 0.1),
+    "exit_fee_pct": (0.0, 0.1), "funds_refurb_pct": (0.0, 1.0),
+}
 
 
 class SettingsUpdate(BaseModel):
@@ -222,42 +240,105 @@ def create_app() -> FastAPI:
             "portal_status": st.kv_get("portal_status"),
         }
 
-    @app.get("/api/summary")
-    def summary() -> list[dict[str, Any]]:
-        return storage().outcode_summary()
+    def plan_for(request: Request, plan: str | None) -> str | None:
+        if plan:
+            return plan
+        user = getattr(request.state, "user", None)
+        return (user or {}).get("prefs", {}).get("plan") or None
 
-    # -- deals ------------------------------------------------------------------
+    SORT_KEYS = {
+        "roce_pct": lambda r: (r["deal"].result.roce_pct is None, r["deal"].result.roce_pct or 0),
+        "gross_yield": lambda r: r["deal"].result.gross_yield,
+        "net_monthly_cashflow": lambda r: r["deal"].result.net_monthly_cashflow,
+        "discount": lambda r: r["deal"].result.conservative_arv - r["deal"].result.asking_price,
+        "price_drop_pct": lambda r: r["deal"].price_drop_pct or 0,
+        "newest": lambda r: r["first_seen"] or "",
+        "asking_price": lambda r: -r["deal"].result.asking_price,
+    }
+
+    def planned_rows(request: Request, plan: str | None, outcode=None, category=None, ptype=None,
+                     passed_only=False, include_ineligible=False, min_roce=None, max_price=None,
+                     min_yield=None, status=None, hide_rejected=False, new_only=False, q=None,
+                     sort="roce_pct", limit=500) -> list[dict[str, Any]]:
+        """Saved deals re-underwritten under a finance plan and the current settings, then
+        filtered and sorted on the recalculated numbers."""
+        from .finance import reunderwrite
+
+        cfg = load_config()
+        pid = plan_for(request, plan)
+        base = filters(outcode, category, ptype, False, include_ineligible, None, max_price, None,
+                       status, hide_rejected, new_only, q, "roce_pct", 100_000)
+        rows = storage().query_deal_rows(**base)
+        for r in rows:
+            r["deal"] = r["deal"].model_copy(update={"result": reunderwrite(r["deal"], cfg, pid)})
+        out = []
+        for r in rows:
+            res = r["deal"].result
+            if passed_only and not (res.passed and res.eligible):
+                continue
+            if min_roce is not None and res.roce_pct is not None and res.roce_pct < min_roce:
+                continue
+            if min_yield is not None and res.gross_yield < min_yield:
+                continue
+            out.append(r)
+        key = SORT_KEYS.get(sort, SORT_KEYS["roce_pct"])
+        out.sort(key=lambda r: (r["deal"].result.passed and r["deal"].result.eligible, key(r)), reverse=True)
+        return out[:limit]
+
+    @app.get("/api/summary")
+    def summary(request: Request, plan: str | None = None) -> list[dict[str, Any]]:
+        rows = planned_rows(request, plan, limit=100_000)
+        by: dict[str, dict[str, Any]] = {}
+        for r in rows:
+            res = r["deal"].result
+            s_ = by.setdefault(res.outcode, {"outcode": res.outcode, "listings": 0, "passing": 0,
+                                             "yields": [], "best_roce_pct": None, "infinite_roce_deals": 0})
+            s_["listings"] += 1
+            s_["yields"].append(res.gross_yield)
+            if res.passed and res.eligible:
+                s_["passing"] += 1
+                if res.roce_pct is None:
+                    s_["infinite_roce_deals"] += 1
+                elif s_["best_roce_pct"] is None or res.roce_pct > s_["best_roce_pct"]:
+                    s_["best_roce_pct"] = res.roce_pct
+        out = []
+        for s_ in by.values():
+            ys = s_.pop("yields")
+            s_["avg_yield_pct"] = round(sum(ys) / len(ys) * 100, 2) if ys else None
+            out.append(s_)
+        return sorted(out, key=lambda x: (-x["passing"], x["outcode"]))
 
     @app.get("/api/deals")
     def deals(
+        request: Request,
         outcode: list[str] | None = Query(None), category: list[str] | None = Query(None),
         ptype: list[str] | None = Query(None), passed_only: bool = False,
         include_ineligible: bool = False, min_roce: float | None = None,
         max_price: float | None = None, min_yield: float | None = None,
         status: list[str] | None = Query(None), hide_rejected: bool = False, new_only: bool = False,
-        q: str | None = None, sort: str = "roce_pct", limit: int = 500,
+        q: str | None = None, sort: str = "roce_pct", limit: int = 500, plan: str | None = None,
     ) -> list[dict[str, Any]]:
-        rows = storage().query_deal_rows(**filters(
-            outcode, category, ptype, passed_only, include_ineligible, min_roce, max_price, min_yield,
-            status, hide_rejected, new_only, q, sort, limit))
+        rows = planned_rows(request, plan, outcode, category, ptype, passed_only, include_ineligible,
+                            min_roce, max_price, min_yield, status, hide_rejected, new_only, q, sort, limit)
         return [deal_row(r["deal"], r) for r in rows]
 
     @app.get("/api/deals.csv")
     def deals_csv(
+        request: Request,
         outcode: list[str] | None = Query(None), category: list[str] | None = Query(None),
         ptype: list[str] | None = Query(None), passed_only: bool = False,
         include_ineligible: bool = False, min_roce: float | None = None,
         max_price: float | None = None, min_yield: float | None = None,
         status: list[str] | None = Query(None), hide_rejected: bool = False, new_only: bool = False,
-        q: str | None = None, sort: str = "roce_pct",
+        q: str | None = None, sort: str = "roce_pct", plan: str | None = None,
     ) -> Response:
-        rows = storage().query_deal_rows(**filters(
-            outcode, category, ptype, passed_only, include_ineligible, min_roce, max_price, min_yield,
-            status, hide_rejected, new_only, q, sort, 100_000))
-        cols = ["listing_id", "status", "passed", "outcode", "postcode", "address", "property_type",
+        rows = planned_rows(request, plan, outcode, category, ptype, passed_only, include_ineligible,
+                            min_roce, max_price, min_yield, status, hide_rejected, new_only, q, sort, 100_000)
+        cols = ["listing_id", "status", "passed", "plan", "outcode", "postcode", "address", "property_type",
                 "bedrooms", "tenure", "asking_price", "max_offer_price", "conservative_arv", "refurb_tier",
-                "refurb_cost", "gross_yield", "net_monthly_cashflow", "roce_pct", "capital_recycled_pct",
-                "money_left_in", "price_drop_pct", "first_seen", "url", "notes"]
+                "refurb_cost", "cash_to_buy", "refi_loan", "money_left_in", "gross_yield",
+                "net_monthly_cashflow", "roce_pct", "capital_recycled_pct", "price_drop_pct", "first_seen",
+                "url", "notes"]
         buf = io.StringIO()
         w = csv.DictWriter(buf, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
@@ -267,13 +348,30 @@ def create_app() -> FastAPI:
             "Content-Disposition": f'attachment; filename="brrr-deals-{datetime.now():%Y%m%d}.csv"'})
 
     @app.get("/api/deals/{listing_id}")
-    def deal_detail(listing_id: str) -> dict[str, Any]:
+    def deal_detail(listing_id: str, request: Request, plan: str | None = None) -> dict[str, Any]:
+        from .finance import build_plan, reunderwrite
+
         st = storage()
         deal = st.get_deal(listing_id)
         if deal is None:
             raise HTTPException(404, "deal not found")
+        cfg = load_config()
+        pid = plan_for(request, plan)
+        deal = deal.model_copy(update={"result": reunderwrite(deal, cfg, pid)})
+        fp = build_plan(cfg, pid)
         return {**deal.model_dump(mode="json"), "price_history": st.price_history(listing_id),
-                "pipeline": st.get_status(listing_id), "first_seen": st.first_seen(listing_id)}
+                "pipeline": st.get_status(listing_id), "first_seen": st.first_seen(listing_id),
+                "plan": {"id": fp.id, "label": fp.label, "note": fp.note, "months": fp.months,
+                         "purchase": fp.purchase}}
+
+    @app.get("/api/deals/{listing_id}/plans")
+    def deal_plans(listing_id: str) -> list[dict[str, Any]]:
+        from .finance import compare_plans
+
+        deal = storage().get_deal(listing_id)
+        if deal is None:
+            raise HTTPException(404, "deal not found")
+        return compare_plans(deal, load_config())
 
     @app.put("/api/deals/{listing_id}/status")
     def set_status(listing_id: str, body: StatusUpdate) -> dict[str, Any]:
@@ -282,25 +380,79 @@ def create_app() -> FastAPI:
         return storage().set_status(listing_id, body.status, body.notes)
 
     @app.post("/api/deals/{listing_id}/whatif")
-    def whatif(listing_id: str, body: WhatIf) -> dict[str, Any]:
+    def whatif(listing_id: str, body: WhatIf, request: Request) -> dict[str, Any]:
+        from .finance import reunderwrite
+
         deal = storage().get_deal(listing_id)
         if deal is None:
             raise HTTPException(404, "deal not found")
-        lst, comps = deal.listing, deal.comps
-        p = UnderwritingParams.from_config(config_for_outcode(load_config(), lst.outcode))
-        tier = body.refurb_tier or deal.refurb.tier
-        res = underwrite(
-            listing_id=lst.listing_id, outcode=lst.outcode,
-            asking_price=body.asking_price or lst.asking_price,
-            conservative_arv=body.arv or comps.conservative_arv,
-            monthly_rent=body.monthly_rent or comps.conservative_monthly_rent,
-            floor_area_sqft=comps.floor_area_sqft, refurb_tier=tier, params=p, category=lst.category,
-            refurb_cost_override=body.refurb_cost,
-        )
+        cfg = load_config()
+        res = reunderwrite(deal, cfg, plan_for(request, body.plan), asking_price=body.asking_price,
+                           refurb_tier=body.refurb_tier, refurb_cost=body.refurb_cost,
+                           monthly_rent=body.monthly_rent, arv=body.arv)
+        p = UnderwritingParams.from_config(config_for_outcode(cfg, deal.listing.outcode))
         out = res.model_dump(mode="json")
-        out["tier_costs"] = {t: estimate_refurb_cost(t, comps.floor_area_sqft, p)
+        out["tier_costs"] = {t: estimate_refurb_cost(t, deal.comps.floor_area_sqft, p)
                              for t in ("light", "medium", "heavy", "structural")}
         return out
+
+    # -- finance products and plans ------------------------------------------------
+
+    @app.get("/api/finance")
+    def finance(request: Request) -> dict[str, Any]:
+        from .finance import finance_overview
+
+        out = finance_overview(load_config())
+        out["my_plan"] = plan_for(request, None) or out["default_plan"]
+        out["can_edit"] = bool((getattr(request.state, "user", None) or {}).get("is_admin"))
+        return out
+
+    @app.put("/api/finance")
+    def put_finance(body: FinanceUpdate, request: Request) -> dict[str, Any]:
+        from .finance import finance_overview
+
+        require_admin(request)
+        cfg = load_config()
+        products = cfg.get("finance_products") or {}
+        updates: dict[str, Any] = {}
+        for key, vals in (body.products or {}).items():
+            if key not in products or not isinstance(vals, dict):
+                raise HTTPException(400, f"unknown product {key}")
+            clean = {}
+            for k, v in vals.items():
+                if k not in FINANCE_NUMERIC and k != "repayment":
+                    continue
+                if k == "repayment":
+                    clean[k] = bool(v)
+                    continue
+                try:
+                    num = float(v)
+                except (TypeError, ValueError) as exc:
+                    raise HTTPException(400, f"{key}.{k} must be a number") from exc
+                lo, hi = FINANCE_NUMERIC[k]
+                if not lo <= num <= hi:
+                    raise HTTPException(400, f"{key}.{k} must be between {lo} and {hi}")
+                clean[k] = int(num) if k in ("term_years",) else num
+            if clean:
+                updates.setdefault("finance_products", {})[key] = clean
+        fin = {}
+        if body.default_plan is not None:
+            if body.default_plan not in {p_["id"] for p_ in cfg.get("finance_plans", [])}:
+                raise HTTPException(400, "unknown plan")
+            fin["default_plan"] = body.default_plan
+        if body.personal_tax_rate is not None:
+            if not 0 <= body.personal_tax_rate <= 0.6:
+                raise HTTPException(400, "personal tax rate must be between 0 and 0.6")
+            fin["personal_tax_rate"] = body.personal_tax_rate
+        if body.months_until_refinance is not None:
+            if not 1 <= body.months_until_refinance <= 36:
+                raise HTTPException(400, "months must be between 1 and 36")
+            fin["months_until_refinance"] = int(body.months_until_refinance)
+        if fin:
+            updates["finance"] = fin
+        if updates:
+            save_user_overrides(updates)
+        return finance_overview(load_config())
 
     # -- jobs -------------------------------------------------------------------
 

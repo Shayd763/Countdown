@@ -19,6 +19,7 @@ from typing import Any
 from .claude_analyst import ClaudeAnalyst, heuristic_assessment, make_analyst
 from .config import all_outcodes, config_for_outcode, load_config, load_dotenv
 from .enrichment import enrich
+from .finance import build_plan
 from .http import DataClient, FixtureClient, PropertyDataClient
 from .ingestion import check_eligibility, fetch_rss, fetch_sourced
 from .models import Deal, RawListing, Tenure
@@ -83,6 +84,7 @@ def process_listing(
         return None
 
     params = UnderwritingParams.from_config(ocfg)
+    plan = build_plan(ocfg)  # the configured default finance plan
 
     def evaluate(lst: RawListing):
         comps = enrich(lst, client, ocfg, use_external_fallbacks=use_external_fallbacks)
@@ -92,6 +94,7 @@ def process_listing(
             listing_id=lst.listing_id, outcode=lst.outcode, asking_price=lst.asking_price,
             conservative_arv=comps.conservative_arv, monthly_rent=comps.conservative_monthly_rent,
             floor_area_sqft=comps.floor_area_sqft, params=params, category=lst.category,
+            plan=plan,
         )
         return comps, common, underwrite(refurb_tier="light", **common)
 
@@ -337,7 +340,7 @@ def rescore_all(storage: Storage, config_path: str | None = None) -> int:
             listing_id=lst.listing_id, outcode=lst.outcode, asking_price=lst.asking_price,
             conservative_arv=comps.conservative_arv, monthly_rent=comps.conservative_monthly_rent,
             floor_area_sqft=comps.floor_area_sqft, refurb_tier=refurb.tier,
-            params=UnderwritingParams.from_config(ocfg), category=lst.category)
+            params=UnderwritingParams.from_config(ocfg), category=lst.category, plan=build_plan(ocfg))
         eligible, reasons = check_eligibility(lst, ocfg)
         if refurb.is_excluded_type:
             eligible = False

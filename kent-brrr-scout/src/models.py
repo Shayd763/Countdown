@@ -128,6 +128,16 @@ class UnderwritingResult(BaseModel):
     passed: bool
     eligible: bool = True
     eligibility_reasons: list[str] = Field(default_factory=list)
+    # finance plan (defaults keep deals saved before plans existed loadable)
+    plan_id: str = "bridge_btl_ltd"
+    plan_label: str = "Bridge, then Ltd buy-to-let"
+    ownership: str = "ltd"  # "ltd" | "personal"
+    purchase_method: str = "bridging"  # "cash" | "bridging" | a mortgage product key
+    purchase_loan: float = 0.0
+    long_term_product: str = "Buy-to-let mortgage (Ltd)"
+    annual_mortgage_payment: float = 0.0  # interest, plus capital on a repayment loan
+    annual_capital_repaid: float = 0.0
+    tax_label: str = "Corporation tax"
     underwritten_at: datetime = Field(default_factory=_now)
 
     @property

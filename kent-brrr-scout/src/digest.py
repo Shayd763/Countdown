@@ -9,10 +9,9 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from .config import config_for_outcode, load_config
+from .config import load_config
 from .models import Deal
 from .storage import Storage
-from .underwriting import UnderwritingParams, underwrite
 
 log = logging.getLogger(__name__)
 
@@ -71,17 +70,23 @@ def _matches(d: Deal, prefs: dict[str, Any]) -> bool:
 
 
 def build_digest(st: Storage, prefs: dict[str, Any]) -> dict[str, Any]:
+    from .finance import build_plan, reunderwrite
+
     runs = [r for r in st.recent_runs(10) if r["status"] != "running"]
     last = runs[0] if runs else None
     new_since = last["started_at"] if (last and prefs.get("only_new")) else None
+    cfg = load_config()
+    plan_id = prefs.get("plan") or None
     rows = st.query_deal_rows(hide_rejected=True, limit=2000, sort="roce_pct")
+    for r in rows:  # every number under the person's chosen finance plan and current settings
+        r["deal"] = r["deal"].model_copy(update={"result": reunderwrite(r["deal"], cfg, plan_id)})
     rows = [r for r in rows if _matches(r["deal"], prefs)]
+    rows.sort(key=lambda r: (r["deal"].result.roce_pct is None, r["deal"].result.roce_pct or 0), reverse=True)
     if new_since:
         rows = [r for r in rows if (r["first_seen"] or "") >= new_since]
 
     passing = [r for r in rows if r["deal"].result.passed and r["deal"].result.eligible]
     # Near misses: eligible deals that would pass all four gates at the max offer price.
-    cfg = load_config()
     near: list[dict[str, Any]] = []
     for r in rows:
         d = r["deal"]
@@ -90,12 +95,7 @@ def build_digest(st: Storage, prefs: dict[str, Any]) -> dict[str, Any]:
         gap = 1 - d.result.max_offer_price / d.result.asking_price
         if gap > 0.25:
             continue
-        lst, c = d.listing, d.comps
-        alt = underwrite(
-            listing_id=lst.listing_id, outcode=lst.outcode, asking_price=d.result.max_offer_price,
-            conservative_arv=c.conservative_arv, monthly_rent=c.conservative_monthly_rent,
-            floor_area_sqft=c.floor_area_sqft, refurb_tier=d.refurb.tier, category=lst.category,
-            params=UnderwritingParams.from_config(config_for_outcode(cfg, lst.outcode)))
+        alt = reunderwrite(d, cfg, plan_id, asking_price=d.result.max_offer_price)
         if alt.passed:
             near.append(card(d, r, offer_gap_pct=round(gap * 100, 1),
                              at_offer_cashflow=alt.net_monthly_cashflow,
@@ -105,7 +105,9 @@ def build_digest(st: Storage, prefs: dict[str, Any]) -> dict[str, Any]:
     size = int(prefs.get("digest_size") or 5)
     best = [card(r["deal"], r) for r in passing[:size]]
     summary = last.get("summary") if last else None
+    plan = build_plan(cfg, plan_id)
     return {
+        "plan": {"id": plan.id, "label": plan.label},
         "run": {"started_at": last["started_at"], "finished_at": last.get("finished_at"),
                 "status": last["status"], "sources": last.get("sources"),
                 "fetched": (summary or {}).get("fetched"),

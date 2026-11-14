@@ -162,6 +162,17 @@ input[type=range].slider::-moz-range-thumb { width: 28px; height: 28px; border: 
 .rowx { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
 .rowx::-webkit-scrollbar { display: none; }
 
+/* ---------- finance plan picker ---------- */
+.planbar { margin: 12px 0 2px; }
+.planbar .lbl { font-size: 13px; color: var(--label-2); margin: 0 4px 7px; letter-spacing: 0; display: flex; justify-content: space-between; }
+.planbar .lbl a { color: var(--tint); }
+.planbar .capsule.on { background: var(--tint); color: #fff; }
+.plan-row .grow b { font-weight: 600; display: block; }
+.plan-row.cur { background: color-mix(in srgb, var(--tint) 9%, var(--cell)); }
+.field-grid .cell input { width: 96px; }
+.unit { color: var(--label-3); font-size: 15px; margin-left: 4px; min-width: 22px; }
+.sugg { font-size: 12px; color: var(--label-2); letter-spacing: 0; display: block; margin-top: 2px; }
+
 /* ---------- deal cards ---------- */
 .card { display: block; background: var(--cell); border-radius: var(--r-xl); overflow: hidden; color: var(--label); margin-bottom: 14px;
   transition: transform .14s var(--ease); }
@@ -357,7 +368,27 @@ function toast(msg, icon = "check", ms = 2600) {
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), ms);
 }
 
-const state = { user: null, offline: false, cachedAt: null, filters: null };
+const state = { user: null, offline: false, cachedAt: null, filters: null, finance: null };
+async function finance(force = false) {
+  if (!state.finance || force) { try { state.finance = await api("/api/finance"); } catch { state.finance = state.finance || { plans: [], my_plan: null }; } }
+  return state.finance;
+}
+const myPlan = () => (state.user && state.user.prefs && state.user.prefs.plan) || (state.finance && state.finance.default_plan) || null;
+function planBar(f, current) {
+  if (!f.plans || !f.plans.length) return "";
+  return `<div class="planbar"><div class="lbl"><span>Financing</span>${state.user && state.user.is_admin ? `<a href="#/me" onclick="sessionStorage.setItem('openRates','1')">Rates</a>` : ""}</div>
+    <div class="rowx" id="planbar">${f.plans.map((p) => `<button class="capsule ${p.id === current ? "on" : ""}" data-plan="${p.id}" title="${esc(p.label)}">${esc(p.short)}</button>`).join("")}</div></div>`;
+}
+function bindPlanBar(rerender) {
+  const bar = $("#planbar"); if (!bar) return;
+  const on = bar.querySelector(".on"); if (on) on.scrollIntoView({ inline: "center", block: "nearest" });
+  bar.onclick = async (e) => {
+    const b = e.target.closest("[data-plan]"); if (!b) return;
+    $$("#planbar .capsule").forEach((x) => x.classList.toggle("on", x === b));
+    try { state.user = await api("/api/auth/me", { method: "PUT", body: { prefs: { plan: b.dataset.plan } } }); } catch {}
+    rerender();
+  };
+}
 const DEFAULT_FILTERS = { outcodes: [], category: "residential", passOnly: true, sort: "roce_pct", q: "", maxCash: "", minRoce: "" };
 try { state.filters = { ...DEFAULT_FILTERS, ...JSON.parse(localStorage.getItem("brrr-mf") || "{}") }; } catch { state.filters = { ...DEFAULT_FILTERS }; }
 const saveFilters = () => { try { localStorage.setItem("brrr-mf", JSON.stringify(state.filters)); } catch {} };
@@ -504,13 +535,17 @@ async function viewToday() {
   else if (nm) lead = `Nothing passes at asking price, but <em class="o">${nm} deal${nm > 1 ? "s" : ""}</em> work${nm > 1 ? "" : "s"} at a lower offer.`;
   else lead = run ? "Nothing passes today." : "No deals yet.";
   const totals = n > 1 ? `<div class="figs" style="margin:0 18px;padding-bottom:16px"><div><span>Cash for all ${n}</span><b>${gbpk(dg.totals.cash_needed_all_passing)}</b></div><div><span>Monthly, all ${n}</span><b class="green">${gbp(dg.totals.monthly_cashflow_all_passing)}</b></div><div><span>New today</span><b>${run && run.new_passing != null ? run.new_passing : "–"}</b></div></div>` : "";
-  render(largeTitle("Today", day()) + `<div class="page" style="margin-top:14px">
+  const fin = await finance();
+  render(largeTitle("Today", day()) + `<div class="page">
+    ${planBar(fin, dg.plan ? dg.plan.id : myPlan())}
+    <div style="height:12px"></div>
     ${offlineNotice()}
     <div class="group"><div class="summary"><div class="lead">${lead}</div><p>${scanned}${!n && dg.counts.matching ? ` ${dg.counts.matching} listings match your filters.` : ""}</p></div>${totals}</div>
     ${dg.best.length ? `<h2 class="gh">Best return<a href="#/deals">See all</a></h2>${dg.best.map((d) => dealCard(d)).join("")}` : ""}
     ${dg.near_misses.length ? `<h2 class="gh">Worth an offer</h2>${dg.near_misses.map((d) => dealCard(d, true)).join("")}` : ""}
-    ${!dg.best.length && !dg.near_misses.length ? `<div class="empty">${ic("search")}Nothing to act on this morning.<br>Loosen your filters in Alerts, or browse every listing.<div style="margin-top:16px"><a class="btn tinted" href="#/deals">Browse deals</a></div></div>` : ""}
+    ${!dg.best.length && !dg.near_misses.length ? `<div class="empty">${ic("search")}Nothing to act on with ${esc(dg.plan ? dg.plan.label.toLowerCase() : "this plan")}.<br>Try another way of financing above, or<br>loosen your filters in Alerts.<div style="margin-top:16px"><a class="btn tinted" href="#/deals">Browse deals</a></div></div>` : ""}
   </div>`);
+  bindPlanBar(viewToday);
 }
 
 /* ======================= deals ======================= */
@@ -518,8 +553,10 @@ async function viewDeals() {
   chrome({ tab: "deals", title: "Deals", right: gb("sliders", "Filters", 'id="fbtn"') });
   const f = state.filters;
   const cats = [["residential", "Residential"], ["commercial", "Commercial"], ["mixed-use", "Shop and flat"], ["", "Any type"]];
+  const fin = await finance();
   render(largeTitle("Deals") + `<div class="page">
-    <label class="search">${ic("search")}<input type="search" id="q" placeholder="Street, town or postcode" value="${esc(f.q)}" aria-label="Search"></label>
+    ${planBar(fin, myPlan())}
+    <label class="search" style="margin-top:12px">${ic("search")}<input type="search" id="q" placeholder="Street, town or postcode" value="${esc(f.q)}" aria-label="Search"></label>
     <div class="seg" id="seg" style="margin-bottom:10px"><button data-p="1" class="${f.passOnly ? "on" : ""}">Passing</button><button data-p="0" class="${f.passOnly ? "" : "on"}">Everything</button></div>
     <div class="rowx" id="cats">${cats.map(([v, l]) => `<button class="capsule ${f.category === v ? "on" : ""}" data-c="${v}">${l}</button>`).join("")}${f.outcodes.length ? `<button class="capsule on" data-oc="1">${esc(f.outcodes.join(", "))} ${ic("x", "i")}</button>` : ""}</div>
     <div id="list" style="margin-top:14px"><div class="skel" style="height:260px"></div></div>
@@ -529,6 +566,7 @@ async function viewDeals() {
   $("#cats").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.oc) f.outcodes = []; else f.category = b.dataset.c; saveFilters(); viewDeals(); };
   let t; $("#q").oninput = (e) => { clearTimeout(t); t = setTimeout(() => { f.q = e.target.value.trim(); saveFilters(); loadList(); }, 250); };
   $("#fbtn").onclick = openFilters;
+  bindPlanBar(loadList);
   loadList();
 }
 async function loadList() {
@@ -544,7 +582,7 @@ async function loadList() {
     let rows = await api("/api/deals?" + p);
     if (f.maxCash) rows = rows.filter((d) => d.cash_to_buy <= Number(f.maxCash));
     el.innerHTML = offlineNotice() + (rows.length
-      ? `<p class="gf" style="margin:0 4px 8px">${rows.length} ${rows.length === 1 ? "deal" : "deals"}, sorted by ${SORTS.find((s) => s[0] === f.sort)?.[1].toLowerCase() || "return"}</p><div class="group">${rows.map(listRow).join("")}</div>`
+      ? `<p class="gf" style="margin:0 4px 8px">${rows.length} ${rows.length === 1 ? "deal" : "deals"} with ${esc((rows[0].plan || "").toLowerCase())}, sorted by ${SORTS.find((s) => s[0] === f.sort)?.[1].toLowerCase() || "return"}</p><div class="group">${rows.map(listRow).join("")}</div>`
       : `<div class="empty">${ic("search")}No deals match.${f.passOnly ? "<br>Switch to Everything to see the near misses." : ""}</div>`);
   } catch (e) { el.innerHTML = `<div class="empty">${ic("laptop")}${esc(e.message)}</div>`; }
 }
@@ -576,11 +614,19 @@ function closeSheet() { $("#sheet").classList.remove("open"); $("#scrim").classL
 $("#scrim").onclick = closeSheet;
 
 /* ======================= deal ======================= */
-async function viewDeal(id) {
+async function viewDeal(raw) {
+  const [id, qs] = raw.split("?");
+  const dealPlan = new URLSearchParams(qs || "").get("plan") || null;
   chrome({ hideNav: true });
   render(`<div class="hero none"></div><div class="sheet-top"><div class="skel" style="height:120px"></div><div class="skel"></div></div>`);
   let d;
-  try { d = await api("/api/deals/" + encodeURIComponent(id)); }
+  let plans = [];
+  try {
+    [d, plans] = await Promise.all([
+      api("/api/deals/" + encodeURIComponent(id) + (dealPlan ? "?plan=" + encodeURIComponent(dealPlan) : "")),
+      api("/api/deals/" + encodeURIComponent(id) + "/plans").catch(() => []),
+    ]);
+  }
   catch (e) {
     chrome({ title: "Deal", left: gb("back", "Back", 'onclick="history.back()"') });
     return render(`<div class="page"><div class="empty">${ic("laptop")}${esc(e.message)}</div></div>`);
@@ -610,31 +656,42 @@ async function viewDeal(id) {
     ${offlineNotice()}
     <div class="group"><div class="verdict">${verdict}</div></div>
 
-    <div class="group" style="margin-top:14px">
+    <p class="gf" style="margin:14px 4px 7px">Financed by ${esc(d.plan.label.toLowerCase())}${dealPlan && dealPlan !== myPlan() ? ` <a href="#/deal/${encodeURIComponent(id)}">(back to my plan)</a>` : ""}</p>
+    <div class="group">
       <div class="bignum"><span>Cash to buy and refurbish</span><b>${gbp(cashToBuy)}</b></div>
       <div class="figs" style="margin:0 16px;padding:12px 0 14px">
         <div><span>Asking</span><b>${gbpk(r.asking_price)}</b></div>
-        <div><span>Refinance</span><b>${gbpk(r.refi_loan)}</b></div>
+        <div><span>${d.plan.purchase !== "mortgage" && r.refi_loan && r.long_term_product !== "No mortgage" ? "Refinance" : "Mortgage"}</span><b>${gbpk(r.refi_loan)}</b></div>
         <div><span>Per month</span><b class="${r.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(r.net_monthly_cashflow)}</b></div>
       </div>
     </div>
 
+    ${plans.length ? `<h2 class="gh">Ways to fund it</h2>
+    <div class="group">${plans.map((p) => `<a class="cell plan-row ${p.plan_id === r.plan_id ? "cur" : ""}" href="#/deal/${encodeURIComponent(id)}?plan=${p.plan_id}">
+        <i class="dot ${p.passed ? "g" : "r"}"></i>
+        <div class="grow"><b>${esc(p.label)}</b><span class="fn l2 num">${gk(p.cash_to_buy)} to buy · ${p.money_left_in <= 0 ? "all cash back" : gk(p.money_left_in) + " left in"} · <span class="${p.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(p.net_monthly_cashflow)}</span>/mo</span></div>
+        <span class="val num">${roce(p.roce_pct)}</span>${ic("chev", "i chev")}</a>`).join("")}</div>
+    <p class="gf">Return on cash left in, on the right. Tap one to see this deal's numbers financed that way.</p>` : ""}
+
     <h2 class="gh">Buying it</h2>
     <div class="group">
       ${row("Purchase price", gbp(r.asking_price))}
-      ${row("Stamp duty, with the 5% surcharge", gbp(r.sdlt))}
+      ${row(d.plan.id === "residential" ? "Stamp duty, as your main home" : "Stamp duty, with the 5% surcharge", gbp(r.sdlt))}
       ${row(`Refurb, ${esc(r.refurb_tier)}, with contingency`, gbp(r.refurb_cost))}
       ${row("Legal, survey and broker", gbp(r.fixed_acquisition_costs))}
-      ${row("Bridging loan interest and fees", gbp(r.bridging_costs))}
+      ${d.plan.purchase === "bridging" ? row(`Bridging loan of ${gk(r.purchase_loan)}: ${d.plan.months} months' interest and fees`, gbp(r.bridging_costs))
+        : d.plan.purchase === "mortgage" ? row(`Mortgage of ${gk(r.purchase_loan)}: ${d.plan.months} months' payments and fees`, gbp(r.bridging_costs)) : ""}
       ${row("Cash to buy and refurbish", gbp(cashToBuy), "total")}
+      ${r.purchase_loan ? row(d.plan.purchase === "bridging" ? "Borrowed on the bridge" : "Borrowed on the mortgage", gbp(-r.purchase_loan)) + row("Your own cash needed", gbp(cashToBuy - r.purchase_loan), "total") : ""}
     </div>
 
-    <h2 class="gh">Refinancing</h2>
+    <h2 class="gh">${r.long_term_product === "No mortgage" ? "No mortgage" : d.plan.purchase === "mortgage" && r.purchase_loan === r.refi_loan ? "Keeping the mortgage" : "Refinancing"}</h2>
     <div class="group">
       ${row("Value once refurbished", gbp(r.conservative_arv))}
-      ${row("Buy-to-let mortgage at 75%", gbp(r.refi_loan))}
-      ${row("Lender and refinance fees", gbp(-r.refi_costs))}
-      ${row("Cash back to you", gbp(r.net_refi_proceeds))}
+      ${r.long_term_product === "No mortgage" ? "" : row(`${esc(r.long_term_product)}, ${pct(r.refi_loan / r.conservative_arv, 0)} of value`, gbp(r.refi_loan))}
+      ${r.refi_costs ? row("Lender and refinance fees", gbp(-r.refi_costs)) : ""}
+      ${r.purchase_loan && r.refi_loan && !(d.plan.purchase === "mortgage" && r.purchase_loan === r.refi_loan) ? row(d.plan.purchase === "bridging" ? "Repays the bridge" : "Repays the purchase mortgage", gbp(-r.purchase_loan)) : ""}
+      ${r.refi_loan && !(d.plan.purchase === "mortgage" && r.purchase_loan === r.refi_loan) ? row("Cash back to you", gbp(r.net_refi_proceeds - r.purchase_loan)) : ""}
       ${r.money_left_in <= 0 ? row("Left in the deal", "None", "total") + row("Extra cash out to you", `<span class="green">${gbp(-r.money_left_in)}</span>`) : row("Left in the deal", gbp(r.money_left_in), "total")}
     </div>
     <p class="gf">You get back ${pct(r.capital_recycled_pct, 0)} of the ${gbp(r.total_cash_deployed)} you put in.</p>
@@ -643,11 +700,11 @@ async function viewDeal(id) {
     <div class="group">
       ${row("Rent", gbp(r.annual_rent / 12))}
       ${row("Management, voids and repairs", gbp(-r.annual_opex / 12))}
-      ${row("Mortgage interest", gbp(-r.annual_interest / 12))}
-      ${row("Corporation tax", gbp(-r.corporation_tax / 12))}
+      ${r.annual_mortgage_payment ? row(r.annual_capital_repaid > 0.5 ? `Mortgage payment, ${gbp(r.annual_capital_repaid / 12)} of it repaying the loan` : "Mortgage interest", gbp(-r.annual_mortgage_payment / 12)) : ""}
+      ${row(esc(r.tax_label), gbp(-r.corporation_tax / 12))}
       ${row("Cashflow each month", `<span class="${r.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(r.net_monthly_cashflow)}</span>`, "total")}
     </div>
-    <p class="gf">${gbp(r.net_annual_cashflow)} a year. Gross yield ${pct(r.gross_yield, 2)}, rent covers the stressed interest ${r.icr.toFixed(2)} times, return on cash left in ${roce(r.roce_pct)}.</p>
+    <p class="gf">${gbp(r.net_annual_cashflow)} a year. Gross yield ${pct(r.gross_yield, 2)}${r.annual_interest ? `, rent covers the ${d.plan.purchase === "cash" && !r.refi_loan ? "" : "stressed "}interest ${r.icr.toFixed(2)} times` : ""}, return on cash left in ${roce(r.roce_pct)}.${r.ownership === "personal" ? " Owned in your own name, so mortgage interest only earns a 20% tax credit (Section 24)." : " Owned by your Ltd company; taking the profit out as dividends is taxed separately."}${d.plan.note ? " " + esc(d.plan.note) : ""}</p>
 
     <h2 class="gh">Try an offer</h2>
     <div class="group">
@@ -700,7 +757,7 @@ async function viewDeal(id) {
     $("#wiPct").textContent = Math.abs(diff) < 0.5 ? "asking price" : `${Math.abs(diff).toFixed(0)}% ${diff < 0 ? "under" : "over"} asking`;
     paint();
     try {
-      const w = await api(`/api/deals/${encodeURIComponent(id)}/whatif`, { method: "POST", body: { asking_price: price, refurb_tier: tier } });
+      const w = await api(`/api/deals/${encodeURIComponent(id)}/whatif`, { method: "POST", body: { asking_price: price, refurb_tier: tier, plan: dealPlan || undefined } });
       $("#wiOut").innerHTML = `<div><span>Cash in</span><b>${gk(w.all_in_cost + w.bridging_costs)}</b></div>
         <div>${w.money_left_in <= 0 ? `<span>Cash out</span><b class="green">+${gk(-w.money_left_in)}</b>` : `<span>Left in</span><b>${gk(w.money_left_in)}</b>`}</div>
         <div><span>Per month</span><b class="${w.net_monthly_cashflow > 0 ? "green" : "red"}">${gbp(w.net_monthly_cashflow)}</b></div>
@@ -752,6 +809,7 @@ async function viewMe() {
   chrome({ tab: "me", title: "Alerts" });
   render(largeTitle("Alerts") + `<div class="page" style="margin-top:14px"><div class="skel" style="height:90px"></div><div class="skel" style="height:220px"></div></div>`);
   let me, meta = null, settings = null;
+  const fin = await finance(true);
   try { me = await api("/api/auth/me"); state.user = me; } catch { return; }
   try { meta = await api("/api/meta"); } catch {}
   if (me.is_admin) { try { settings = await api("/api/settings"); } catch {} }
@@ -790,6 +848,15 @@ async function viewMe() {
       <label class="cell"><span class="grow">Only listings new that morning</span><span class="sw"><input type="checkbox" id="onlyNew" ${p.only_new ? "checked" : ""}><i></i></span></label>
     </div>
     <p class="gf">No postcode picked means all eleven. Changes save as you make them.</p>
+
+    <p class="gh-sm">Finance</p>
+    <div class="group" style="--inset:58px">
+      <label class="cell">${swatch("#007aff", "pound")}<span class="grow">My plan</span><select id="planSel">${(fin.plans || []).map((pl) => `<option value="${pl.id}" ${pl.id === (p.plan || fin.default_plan) ? "selected" : ""}>${esc(pl.short)}</option>`).join("")}</select></label>
+      ${me.is_admin ? `<button class="cell" id="ratesBtn">${swatch("#34c759", "percent")}<span class="grow">Rates and costs</span><span class="val fn">Edit</span>${ic("chev", "i chev")}</button>
+      <label class="cell">${swatch("#8e8e93", "info")}<span class="grow">My income tax rate</span><input type="number" id="ptr" inputmode="decimal" step="1" value="${Math.round((fin.personal_tax_rate ?? 0.4) * 100)}" style="width:64px"><span class="unit">%</span></label>
+      <label class="cell">${swatch("#8e8e93", "clock")}<span class="grow">Purchase to refinance</span><input type="number" id="months" inputmode="numeric" step="1" value="${fin.months_until_refinance ?? 6}" style="width:64px"><span class="unit">mo</span></label>` : ""}
+    </div>
+    <p class="gf">Your plan sets how every deal is costed in Today, Deals and your morning alert. You can still compare all the ways to fund a deal on its page.${me.is_admin ? " Your income tax rate is only used for plans in your own name." : ""}</p>
 
     ${me.is_admin ? `<p class="gh-sm">Laptop</p><div class="group" style="--inset:58px">
       <button class="cell" id="scanNow">${swatch("#8e8e93", "laptop")}<span class="grow" style="color:var(--tint)">Scan now</span><span class="val fn" id="scanMsg"></span></button></div>
@@ -844,6 +911,16 @@ async function viewMe() {
       catch (e) { toast(e.message, "info"); }
     };
   };
+  $("#planSel").onchange = async () => {
+    try { state.user = await api("/api/auth/me", { method: "PUT", body: { prefs: { plan: $("#planSel").value } } }); toast("Plan saved", "pound"); } catch (e) { toast(e.message, "info"); }
+  };
+  if ($("#ratesBtn")) {
+    $("#ratesBtn").onclick = openRates;
+    const saveFin = async (body, msg) => { try { state.finance = { ...state.finance, ...(await api("/api/finance", { method: "PUT", body })) }; toast(msg, "check"); } catch (e) { toast(e.message, "info", 4500); } };
+    $("#ptr").onchange = () => saveFin({ personal_tax_rate: Number($("#ptr").value) / 100 }, "Tax rate saved");
+    $("#months").onchange = () => saveFin({ months_until_refinance: Number($("#months").value) }, "Saved");
+    if (sessionStorage.getItem("openRates")) { sessionStorage.removeItem("openRates"); openRates(); }
+  }
   $("#logout").onclick = async () => {
     await disablePush().catch(() => {});
     await api("/api/auth/logout", { method: "POST" }).catch(() => {});
@@ -851,6 +928,60 @@ async function viewMe() {
     state.user = null; location.hash = "#/login";
   };
 }
+/* ---------- finance rates editor ---------- */
+const MORTGAGE_FIELDS = [
+  ["rate", "Interest rate", "%", 100, 2], ["ltv", "Loan to value", "%", 100, 0], ["fee_pct", "Arrangement fee", "%", 100, 2],
+  ["fixed_costs", "Valuation, legal and broker", "£", 1, 0], ["term_years", "Term", "yrs", 1, 0],
+  ["icr", "Rent cover needed (ICR)", "%", 100, 0], ["stress_rate", "Stress test rate", "%", 100, 2],
+  ["erc_pct", "Early repayment charge", "%", 100, 2], ["rate_loading", "Consent-to-let loading", "%", 100, 2],
+];
+const BRIDGE_FIELDS = [
+  ["monthly_rate", "Monthly interest", "%", 100, 2], ["ltv", "Loan to purchase price", "%", 100, 0],
+  ["arrangement_fee_pct", "Arrangement fee", "%", 100, 2], ["exit_fee_pct", "Exit fee", "%", 100, 2],
+  ["fixed_costs", "Valuation and legal", "£", 1, 0], ["funds_refurb_pct", "Share of refurb it funds", "%", 100, 0],
+];
+const fmtField = (v, scale, dp) => v == null ? "" : +(v * scale).toFixed(dp);
+function productSummary(key, pr) {
+  if (key === "bridging") return `${fmtField(pr.monthly_rate, 100, 2)}% a month · ${fmtField(pr.ltv, 100, 0)}% · ${fmtField(pr.arrangement_fee_pct, 100, 1)}% fee`;
+  return `${fmtField(pr.rate, 100, 2)}% · ${fmtField(pr.ltv, 100, 0)}% LTV · ${pr.fee_pct ? fmtField(pr.fee_pct, 100, 1) + "% fee" : gbp(pr.fixed_costs) + " fees"} · ${pr.repayment ? "repayment" : "interest only"}`;
+}
+async function openRates() {
+  const f = await finance(true);
+  const sug = (f.suggested && f.suggested.products) || {};
+  const order = ["btl_ltd", "btl_personal", "commercial_ltd", "residential", "bridging"].filter((k) => f.products[k]);
+  openSheet(`<h2>Rates and costs<button class="gbtn glass" id="rx" aria-label="Close">${ic("x")}</button></h2>
+    <div class="group">${order.map((k) => {
+      const pr = f.products[k], sg = sug[k] || {}, rateKey = k === "bridging" ? "monthly_rate" : "rate";
+      const differs = sg[rateKey] != null && Math.abs(sg[rateKey] - pr[rateKey]) > 1e-9;
+      return `<button class="cell" data-prod="${k}"><div class="grow"><div style="font-weight:600">${esc(pr.label)}</div><span class="fn l2 num">${productSummary(k, pr)}</span>${differs ? `<span class="sugg">Suggested ${fmtField(sg[rateKey], 100, 2)}%${k === "bridging" ? " a month" : ""}</span>` : ""}</div>${ic("chev", "i chev")}</button>`; }).join("")}</div>
+    <p class="gf">Suggested values were checked in ${esc(f.suggested?.as_of || "")}. Lenders reprice often, so use your broker's quotes when you have them.</p>
+    ${(f.suggested?.sources || []).length ? `<p class="gf">Sources: ${f.suggested.sources.map((src) => `<a href="${esc(src.url)}" target="_blank" rel="noopener">${esc(src.name)}</a>`).join(", ")}</p>` : ""}`);
+  $("#rx").onclick = closeSheet;
+  $$("#sheet [data-prod]").forEach((b) => b.onclick = () => openProduct(b.dataset.prod));
+}
+async function openProduct(key) {
+  const f = state.finance, pr = f.products[key], sg = (f.suggested?.products || {})[key] || {};
+  const fields = (key === "bridging" ? BRIDGE_FIELDS : MORTGAGE_FIELDS).filter(([k]) => k in pr);
+  openSheet(`<h2><button class="gbtn glass" id="pb" aria-label="Back">${ic("back")}</button><span style="flex:1;margin-left:10px;font-size:18px">${esc(pr.label)}</span></h2>
+    ${sg.note ? `<p class="gf" style="margin:0 4px 12px">${esc(sg.note)}</p>` : ""}
+    <div class="group field-grid">${fields.map(([k, label, unit, scale, dp]) => `<label class="cell"><span class="grow">${label}${sg[k] != null ? `<span class="sugg">Suggested ${unit === "£" ? gbp(sg[k]) : fmtField(sg[k], scale, dp) + (unit === "yrs" ? " years" : unit)}</span>` : ""}</span>${unit === "£" ? `<span class="unit">£</span>` : ""}<input type="number" inputmode="decimal" step="any" data-k="${k}" data-scale="${scale}" value="${fmtField(pr[k], scale, dp)}" aria-label="${label}">${unit !== "£" ? `<span class="unit">${unit}</span>` : ""}</label>`).join("")}
+      ${"repayment" in pr ? `<label class="cell"><span class="grow">Repayment mortgage<span class="sugg">Off means interest only</span></span><span class="sw"><input type="checkbox" id="rep" ${pr.repayment ? "checked" : ""}><i></i></span></label>` : ""}
+    </div>
+    <div class="actions">${Object.keys(sg).some((k) => k in pr) ? `<button class="btn tinted" id="useSug">Use suggested</button>` : ""}<button class="btn fill" id="saveProd">Save</button></div>`);
+  $("#pb").onclick = openRates;
+  if ($("#useSug")) $("#useSug").onclick = () => {
+    $$("#sheet [data-k]").forEach((inp) => { const k = inp.dataset.k; if (sg[k] != null) inp.value = +(sg[k] * Number(inp.dataset.scale)).toFixed(4); });
+    toast("Suggested values filled in. Save to use them.", "info");
+  };
+  $("#saveProd").onclick = async () => {
+    const vals = {};
+    $$("#sheet [data-k]").forEach((inp) => { if (inp.value !== "") vals[inp.dataset.k] = Number(inp.value) / Number(inp.dataset.scale); });
+    if ($("#rep")) vals.repayment = $("#rep").checked;
+    try { state.finance = { ...state.finance, ...(await api("/api/finance", { method: "PUT", body: { products: { [key]: vals } } })) }; toast(`${pr.label} saved`); openRates(); }
+    catch (e) { toast(e.message, "info", 5000); }
+  };
+}
+
 async function pollScan() {
   try {
     const j = await api("/api/job"), el = $("#scanMsg");

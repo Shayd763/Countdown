@@ -32,6 +32,9 @@ finance:
   refi_fee_pct_of_loan: 0.02         # lender product fee (added to cost, not loan)
   refi_fixed_costs: 1500             # valuation, broker, legal on refinance
   use_bridging: true
+  default_plan: bridge_btl_ltd     # the plan alerts and gates use unless a person picks another
+  personal_tax_rate: 0.40          # your marginal income tax rate, for plans in your own name
+  months_until_refinance: 6        # purchase to refinance (bridge term / interest during works)
   bridging_ltv: 0.70                 # of purchase price
   bridging_monthly_rate: 0.0085
   bridging_arrangement_fee_pct: 0.02
@@ -146,3 +149,43 @@ local_comps:
 schedule:
   time: "07:30"                 # local time on the laptop
   sources: [portals, rss, propertydata]
+
+# ---------------------------------------------------------------------------
+# Finance products: YOUR current rates and costs (edit here or in Settings).
+# Rates are annual unless named monthly; fees as fractions (0.02 = 2%).
+# Defaults keep the original spec's figures (5.25% BTL, 0.85%/month bridge).
+# ---------------------------------------------------------------------------
+finance_products:
+  btl_ltd:        {label: "Buy-to-let mortgage (Ltd company)", ltv: 0.75, rate: 0.0525, fee_pct: 0.02, fixed_costs: 1500, repayment: false, term_years: 25, icr: 1.25, stress_rate: 0.055, erc_pct: 0.0, owner: ltd, kind: btl}
+  btl_personal:   {label: "Buy-to-let mortgage (your name)", ltv: 0.75, rate: 0.0495, fee_pct: 0.03, fixed_costs: 1500, repayment: false, term_years: 25, icr: 1.45, stress_rate: 0.055, erc_pct: 0.0, owner: personal, kind: btl}
+  commercial_ltd: {label: "Commercial mortgage (Ltd company)", ltv: 0.70, rate: 0.0675, fee_pct: 0.02, fixed_costs: 3000, repayment: true, term_years: 20, icr: 1.0, stress_rate: 0.0675, erc_pct: 0.0, owner: ltd, kind: commercial}
+  residential:    {label: "Residential mortgage (you live in it)", ltv: 0.75, rate: 0.044, fee_pct: 0.0, fixed_costs: 1999, repayment: true, term_years: 25, icr: 1.0, stress_rate: 0.044, erc_pct: 0.0, rate_loading: 0.01, owner: personal, kind: residential}
+  bridging:       {label: "Bridging loan", ltv: 0.70, monthly_rate: 0.0085, arrangement_fee_pct: 0.02, exit_fee_pct: 0.01, fixed_costs: 0, funds_refurb_pct: 0.0}
+
+# Suggested starting points (researched November 2026; lender pricing moves weekly,
+# confirm with a broker). Shown beside each product with a "use suggested" button.
+finance_suggested:
+  as_of: "November 2026"
+  products:
+    btl_ltd:        {rate: 0.052, ltv: 0.75, fee_pct: 0.03, fixed_costs: 1500, note: "75% LTV five-year fixes at Accord and The Mortgage Works sit around 5.1-5.2% with a 3-5% fee."}
+    btl_personal:   {rate: 0.0495, ltv: 0.75, fee_pct: 0.03, fixed_costs: 1500, icr: 1.45, note: "Usually a little cheaper than company lending; higher-rate taxpayers are tested at 145% ICR."}
+    commercial_ltd: {rate: 0.0675, ltv: 0.70, fee_pct: 0.02, fixed_costs: 3000, term_years: 20, note: "Commonly 6-8.5% at 65-75% LTV, on a repayment basis over 15-25 years; personal guarantees are usual."}
+    residential:    {rate: 0.044, ltv: 0.75, fee_pct: 0.0, fixed_costs: 1999, note: "75% LTV five-year fixes from mainstream lenders; averages vary by source, so check before relying on it."}
+    bridging:       {monthly_rate: 0.0085, ltv: 0.70, arrangement_fee_pct: 0.02, exit_fee_pct: 0.005, fixed_costs: 2000, note: "Standard first-charge bridges run 0.75-1.25% a month, 1-2% arrangement, 0-1% exit, plus legal and valuation."}
+  sources:
+    - {name: "Property118, Accord rate cuts (Nov 2026)", url: "https://www.property118.com/buy-to-let-mortgage-deals-expand-as-accord-cuts-rates/"}
+    - {name: "Mortgage One Finance, TMW rates", url: "https://www.mortgageonefinance.co.uk/the-mortgage-works-mortgage-rates"}
+    - {name: "Spark Finance bridging rate index (2026)", url: "https://www.sparkfinance.co.uk/data/bridging-loan-rate-index"}
+    - {name: "Capitalise, bridging loan rates 2026", url: "https://capitalise.com/gb/insights/property-finance/bridging-loan-rates"}
+    - {name: "Funding Guru, commercial mortgage rates 2026", url: "https://fundingguru.com/?p=39509"}
+
+# Ways to fund a deal: how you buy it, then what you refinance onto.
+finance_plans:
+  - {id: bridge_btl_ltd,      short: "Bridge → Ltd BTL",      label: "Bridge, then Ltd buy-to-let",           purchase: bridging,     refinance: btl_ltd}
+  - {id: cash_btl_ltd,        short: "Cash → Ltd BTL",        label: "Cash, then Ltd buy-to-let",             purchase: cash,         refinance: btl_ltd}
+  - {id: btl_ltd_day_one,     short: "Ltd BTL from day one",  label: "Ltd buy-to-let from day one",           purchase: btl_ltd,      refinance: btl_ltd, note: "Most lenders won't lend on a property that's unmortgageable before the works."}
+  - {id: bridge_btl_personal, short: "Bridge → BTL own name", label: "Bridge, then buy-to-let in your name",  purchase: bridging,     refinance: btl_personal}
+  - {id: btl_personal_day_one, short: "BTL own name",         label: "Buy-to-let in your name from day one",  purchase: btl_personal, refinance: btl_personal}
+  - {id: bridge_commercial,   short: "Bridge → Commercial",   label: "Bridge, then commercial mortgage (Ltd)", purchase: bridging,    refinance: commercial_ltd}
+  - {id: residential,         short: "Residential",           label: "Residential mortgage, live in then let", purchase: residential, refinance: residential, main_residence: true, note: "Assumes it's your main home when you buy (no stamp duty surcharge) and that your lender agrees consent to let, which adds the rate loading."}
+  - {id: cash_only,           short: "All cash",              label: "All cash, no mortgage",                  purchase: cash,        refinance: none}

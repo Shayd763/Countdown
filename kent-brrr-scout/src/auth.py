@@ -26,6 +26,7 @@ DEFAULT_PREFS: dict[str, Any] = {
     "outcodes": [],            # [] = all target outcodes
     "categories": ["residential"],
     "digest_size": 5,
+    "plan": None,              # finance plan id for this person's views and alerts; None = default
 }
 
 

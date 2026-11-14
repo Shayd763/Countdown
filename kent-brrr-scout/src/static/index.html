@@ -216,6 +216,7 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
         <div class="cards" id="cards"></div>
         <div class="toolbar">
           <input type="search" id="q" placeholder="Search address or postcode" />
+          <label class="small" style="display:flex;gap:6px;align-items:center">Financing <select id="planSel" style="width:auto"></select></label>
           <span class="small" id="count"></span>
           <span class="spacer"></span>
           <a class="btn" id="csvBtn" href="#">Export CSV</a>
@@ -279,6 +280,10 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
     <div class="panel" id="phonePanel">
       <h3 class="sec">Phone app</h3>
       <div id="phoneBody" class="small">Loading…</div>
+    </div>
+    <div class="panel" style="margin-top:16px" id="finPanel">
+      <h3 class="sec" style="display:flex;justify-content:space-between;align-items:center">Finance products <span class="small" id="finAsOf"></span></h3>
+      <div id="finBody" class="small">Loading…</div>
     </div>
     <div class="cols" style="margin-top:16px">
       <div>
@@ -345,18 +350,12 @@ pre.log { background: var(--bg); border: 1px solid var(--line); border-radius: 8
             <div class="field"><span>Min lease on flats (yrs)</span><input type="number" step="1" data-cfg="eligibility.min_lease_years_flats" /></div>
           </div>
           <label class="row"><input type="checkbox" data-cfg="eligibility.include_commercial" /> Include commercial &amp; mixed-use</label>
-          <h3 class="sec">Finance</h3>
+          <h3 class="sec">Running costs and tax</h3>
           <div class="grid2">
-            <div class="field"><span>Refi LTV %</span><input type="number" step="1" data-cfg="finance.refi_ltv" data-pct /></div>
-            <div class="field"><span>BTL interest %</span><input type="number" step="0.05" data-cfg="finance.btl_interest_rate" data-pct /></div>
             <div class="field"><span>Operating costs % of rent</span><input type="number" step="1" data-cfg="finance.operating_cost_drag_pct" data-pct /></div>
             <div class="field"><span>Corporation tax %</span><input type="number" step="1" data-cfg="finance.corporation_tax_rate" data-pct /></div>
-            <div class="field"><span>Refi fixed costs £</span><input type="number" step="100" data-cfg="finance.refi_fixed_costs" /></div>
-            <div class="field"><span>Lender fee % of loan</span><input type="number" step="0.1" data-cfg="finance.refi_fee_pct_of_loan" data-pct /></div>
-            <div class="field"><span>Bridging rate %/month</span><input type="number" step="0.05" data-cfg="finance.bridging_monthly_rate" data-pct /></div>
-            <div class="field"><span>Bridging months</span><input type="number" step="1" data-cfg="finance.bridging_months" /></div>
           </div>
-          <label class="row"><input type="checkbox" data-cfg="finance.use_bridging" /> Use bridging finance for the purchase</label>
+          <p class="small">Mortgage and bridging rates now live in <b>Finance products</b> below.</p>
           <h3 class="sec">Costs</h3>
           <div class="grid2">
             <div class="field"><span>Fixed acquisition costs £</span><input type="number" step="100" data-cfg="costs.fixed_acquisition_costs" /></div>
@@ -438,7 +437,7 @@ function show(view) {
   document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
   document.querySelectorAll(".view").forEach((v) => v.classList.toggle("on", v.id === "view-" + view));
   if (view === "runs") loadRuns();
-  if (view === "settings") { loadSettings(); loadPhone(); loadPeople(); }
+  if (view === "settings") { loadSettings(); loadPhone(); loadPeople(); loadFinance(); }
   if (view === "deals") refresh();
 }
 
@@ -484,8 +483,20 @@ function query() {
   if (f.passedOnly) q.set("passed_only", "true"); if (f.inclIneligible) q.set("include_ineligible", "true");
   if (f.minRoce) q.set("min_roce", f.minRoce); if (f.minYield) q.set("min_yield", f.minYield / 100);
   if (f.maxPrice) q.set("max_price", f.maxPrice); if (f.q) q.set("q", f.q);
-  q.set("sort", f.sort); return q;
+  q.set("sort", f.sort);
+  if (state.plan) q.set("plan", state.plan);
+  return q;
 }
+async function loadPlans() {
+  try { state.fin = await api("/api/finance"); } catch { return; }
+  state.plan = state.plan || state.fin.my_plan;
+  $("planSel").innerHTML = state.fin.plans.map((pl) => `<option value="${pl.id}" ${pl.id === state.plan ? "selected" : ""}>${esc(pl.label)}</option>`).join("");
+}
+$("planSel").addEventListener("change", async () => {
+  state.plan = $("planSel").value;
+  try { await api("/api/auth/me", { method: "PUT", body: { prefs: { plan: state.plan } } }); } catch {}
+  refresh();
+});
 
 /* ---------------- deals view ---------------- */
 async function loadMeta() {
@@ -574,8 +585,13 @@ async function refresh() {
 
 /* ---------------- deal drawer ---------------- */
 let current = null, wiTimer = null;
-async function openDeal(id) {
-  const d = await api("/api/deals/" + encodeURIComponent(id)); current = d;
+async function openDeal(id, planOverride) {
+  const pid = planOverride || state.plan;
+  const [d, plans] = await Promise.all([
+    api("/api/deals/" + encodeURIComponent(id) + (pid ? "?plan=" + encodeURIComponent(pid) : "")),
+    api("/api/deals/" + encodeURIComponent(id) + "/plans").catch(() => []),
+  ]);
+  current = d; current._plan = pid;
   const r = d.result, l = d.listing, f = d.refurb, c = d.comps, p = d.pipeline;
   const hist = d.price_history.map((h) => `${h.seen_at.slice(0, 10)}: ${gbp(h.price)}`).join(" → ");
   const img = (l.image_urls || [])[0];
@@ -614,6 +630,12 @@ async function openDeal(id) {
         <div class="out" id="wi_out"></div>
       </div>
 
+      <h4>Ways to fund it</h4>
+      <div class="table-wrap"><table><thead><tr><th>Plan</th><th class="num">Cash to buy</th><th class="num">Left in</th><th class="num">Per month</th><th class="num">ROCE</th><th></th></tr></thead><tbody>
+        ${plans.map((pl) => `<tr data-plan="${pl.plan_id}" style="cursor:pointer;${pl.plan_id === r.plan_id ? "background:var(--accent-soft)" : ""}"><td style="white-space:normal">${esc(pl.label)}</td><td class="num">${gbp(pl.cash_to_buy)}</td><td class="num">${gbp(pl.money_left_in)}</td><td class="num">${gbp(pl.net_monthly_cashflow)}</td><td class="num">${pl.roce_pct == null ? "∞" : pl.roce_pct.toFixed(0) + "%"}</td><td><span class="badge ${pl.passed ? "b-pass" : "b-fail"}">${pl.passed ? "Pass" : "Fail"}</span></td></tr>`).join("")}
+      </tbody></table></div>
+      <p class="small">Showing this deal financed by <b>${esc(d.plan.label.toLowerCase())}</b>. Click a row to switch.${d.plan.note ? " " + esc(d.plan.note) : ""}</p>
+
       <h4>Acquisition</h4>
       <div class="kv">
         <div>Asking price</div><div>${gbp(r.asking_price)}</div>
@@ -621,20 +643,21 @@ async function openDeal(id) {
         <div>SDLT (inc. surcharge)</div><div>${gbp(r.sdlt)}</div>
         <div>Fixed acquisition costs</div><div>${gbp(r.fixed_acquisition_costs)}</div>
         <div class="total">All-in (gate 1 basis)</div><div class="total">${gbp(r.all_in_cost)}</div>
-        <div>Bridging finance</div><div>${gbp(r.bridging_costs)}</div>
+        ${d.plan.purchase !== "cash" ? `<div>${d.plan.purchase === "bridging" ? "Bridging" : "Purchase mortgage"} (${gbp(r.purchase_loan)}, ${d.plan.months} months)</div><div>${gbp(r.bridging_costs)}</div>` : ""}
         <div>Refinance costs</div><div>${gbp(r.refi_costs)}</div>
         <div class="total">Total cash deployed</div><div class="total">${gbp(r.total_cash_deployed)}</div>
+        ${r.purchase_loan ? `<div>Your own cash at purchase</div><div>${gbp(r.all_in_cost + r.bridging_costs - r.purchase_loan)}</div>` : ""}
         <div>Max offer to clear the cap</div><div>${gbp(r.max_offer_price)}</div>
       </div>
-      <h4>Refinance &amp; hold (SPV)</h4>
+      <h4>Refinance &amp; hold (${r.ownership === "ltd" ? "Ltd company" : "your own name"})</h4>
       <div class="kv">
         <div>Conservative ARV</div><div>${gbp(r.conservative_arv)}</div>
-        <div>Refi loan</div><div>${gbp(r.refi_loan)}</div>
+        <div>${esc(r.long_term_product)}</div><div>${gbp(r.refi_loan)}</div>
         <div>Money left in</div><div>${gbp(r.money_left_in)}</div>
         <div>Annual rent</div><div>${gbp(r.annual_rent)}</div>
         <div>Operating costs</div><div>${gbp(-r.annual_opex)}</div>
-        <div>Mortgage interest</div><div>${gbp(-r.annual_interest)}</div>
-        <div>Corporation tax</div><div>${gbp(-r.corporation_tax)}</div>
+        <div>${r.annual_capital_repaid > 0.5 ? `Mortgage payments (${gbp(r.annual_capital_repaid)} capital)` : "Mortgage interest"}</div><div>${gbp(-r.annual_mortgage_payment)}</div>
+        <div>${esc(r.tax_label)}</div><div>${gbp(-r.corporation_tax)}</div>
         <div class="total">Net cashflow / year</div><div class="total">${gbp(r.net_annual_cashflow)}</div>
         <div>ICR at stress rate</div><div>${r.icr.toFixed(2)}x ${r.icr_pass ? "" : "⚠️"}</div>
         <div>ROCE</div><div>${r.roce_pct == null ? "∞" : r.roce_pct.toFixed(1) + "%"}</div>
@@ -655,6 +678,7 @@ async function openDeal(id) {
       <h4>Description</h4><p class="small" style="white-space:pre-wrap">${esc(l.description)}</p>
     </div>`;
   $("closeBtn").onclick = closeDeal;
+  $("drawer").querySelectorAll("tr[data-plan]").forEach((tr) => tr.onclick = () => openDeal(id, tr.dataset.plan));
   renderStatusbar(p.status);
   $("notes").addEventListener("change", async () => { await api(`/api/deals/${encodeURIComponent(id)}/status`, { method: "PUT", body: { notes: $("notes").value } }); toast("Notes saved"); });
   ["wi_price", "wi_tier", "wi_refurb", "wi_rent", "wi_arv"].forEach((k) => $(k).addEventListener("input", () => { clearTimeout(wiTimer); wiTimer = setTimeout(whatIf, 250); }));
@@ -672,7 +696,7 @@ function renderStatusbar(active) {
 async function whatIf() {
   if (!current) return;
   const num = (id) => $(id).value === "" ? null : Number($(id).value);
-  const body = { asking_price: num("wi_price"), refurb_tier: $("wi_tier").value, refurb_cost: num("wi_refurb"), monthly_rent: num("wi_rent"), arv: num("wi_arv") };
+  const body = { asking_price: num("wi_price"), refurb_tier: $("wi_tier").value, refurb_cost: num("wi_refurb"), monthly_rent: num("wi_rent"), arv: num("wi_arv"), plan: current._plan || undefined };
   try {
     const r = await api(`/api/deals/${encodeURIComponent(current.listing.listing_id)}/whatif`, { method: "POST", body });
     $("wi_refurb").placeholder = Math.round(r.tier_costs[$("wi_tier").value]);
@@ -838,6 +862,53 @@ $("schedInstall").onclick = async () => {
 };
 $("schedRemove").onclick = async () => { const r = await api("/api/schedule/remove", { method: "POST" }); toast(r.message); loadSettings(); };
 
+/* ---------------- finance products ---------------- */
+const MF = [["rate","Rate","%",100,2],["ltv","LTV","%",100,0],["fee_pct","Fee","%",100,2],["fixed_costs","Fixed £","£",1,0],
+  ["term_years","Term yrs","",1,0],["icr","ICR","%",100,0],["stress_rate","Stress","%",100,2],["erc_pct","ERC","%",100,2],["rate_loading","Loading","%",100,2]];
+const BF = [["monthly_rate","Monthly","%",100,2],["ltv","LTV","%",100,0],["arrangement_fee_pct","Arrangement","%",100,2],
+  ["exit_fee_pct","Exit","%",100,2],["fixed_costs","Fixed £","£",1,0],["funds_refurb_pct","Funds refurb","%",100,0]];
+const fv = (v, sc, dp) => v == null ? "" : +(v * sc).toFixed(dp);
+async function loadFinance() {
+  let f; try { f = await api("/api/finance"); } catch (e) { $("finBody").textContent = e.message; return; }
+  const sug = f.suggested?.products || {};
+  $("finAsOf").textContent = f.suggested?.as_of ? `Suggested values checked ${f.suggested.as_of}` : "";
+  const order = ["btl_ltd","btl_personal","commercial_ltd","residential","bridging"].filter((k) => f.products[k]);
+  const ro = f.can_edit ? "" : "disabled";
+  $("finBody").innerHTML = `
+    <div class="grid3" style="margin-bottom:10px">
+      <div class="field"><span>Default plan (gates and alerts)</span><select id="fin_default" ${ro}>${f.plans.map((pl) => `<option value="${pl.id}" ${pl.id === f.default_plan ? "selected" : ""}>${esc(pl.label)}</option>`).join("")}</select></div>
+      <div class="field"><span>Your income tax rate % (plans in your name)</span><input type="number" id="fin_ptr" value="${fv(f.personal_tax_rate,100,0)}" ${ro}></div>
+      <div class="field"><span>Months from purchase to refinance</span><input type="number" id="fin_months" value="${f.months_until_refinance}" ${ro}></div>
+    </div>
+    ${order.map((k) => { const pr = f.products[k], sg = sug[k] || {}; const fields = (k === "bridging" ? BF : MF).filter(([x]) => x in pr);
+      return `<div class="panel" style="padding:12px;margin-top:10px;box-shadow:none" data-prod="${k}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><b>${esc(pr.label)}</b>
+          <span style="display:flex;gap:6px">${Object.keys(sg).some((x) => x in pr) && f.can_edit ? `<button data-use="${k}">Use suggested</button>` : ""}${f.can_edit ? `<button class="primary" data-save="${k}">Save</button>` : ""}</span></div>
+        <div class="grid4" style="grid-template-columns:repeat(${Math.min(fields.length + ("repayment" in pr ? 1 : 0), 10)},minmax(70px,1fr));margin-top:8px">
+          ${fields.map(([x, lab, unit, sc, dp]) => `<div class="field"><span>${lab}${unit === "%" ? " %" : ""}</span><input type="number" step="any" data-k="${x}" data-sc="${sc}" value="${fv(pr[x], sc, dp)}" ${ro}>${sg[x] != null ? `<span class="small" style="display:block;margin-top:2px">Suggested ${unit === "£" ? gbp(sg[x]) : fv(sg[x], sc, dp)}</span>` : ""}</div>`).join("")}
+          ${"repayment" in pr ? `<div class="field"><span>Repayment</span><label class="row"><input type="checkbox" data-rep ${pr.repayment ? "checked" : ""} ${ro}> on</label></div>` : ""}
+        </div>
+        ${sg.note ? `<div class="small" style="margin-top:4px">${esc(sg.note)}</div>` : ""}
+      </div>`; }).join("")}
+    ${(f.suggested?.sources || []).length ? `<p class="small" style="margin-top:10px">Sources for suggestions: ${f.suggested.sources.map((src) => `<a href="${esc(src.url)}" target="_blank" rel="noopener">${esc(src.name)}</a>`).join(", ")}. Lenders reprice often; use your broker's quotes when you have them.</p>` : ""}`;
+  if (!f.can_edit) return;
+  const put = async (body, msg) => { try { await api("/api/finance", { method: "PUT", body }); toast(msg); if (state.view === "deals") refresh(); } catch (e) { toast(e.message, 6000); } };
+  $("fin_default").onchange = () => put({ default_plan: $("fin_default").value }, "Default plan saved");
+  $("fin_ptr").onchange = () => put({ personal_tax_rate: Number($("fin_ptr").value) / 100 }, "Tax rate saved");
+  $("fin_months").onchange = () => put({ months_until_refinance: Number($("fin_months").value) }, "Saved");
+  $("finBody").querySelectorAll("[data-use]").forEach((b) => b.onclick = () => {
+    const k = b.dataset.use, sg = sug[k] || {}, box = $("finBody").querySelector(`[data-prod="${k}"]`);
+    box.querySelectorAll("[data-k]").forEach((inp) => { if (sg[inp.dataset.k] != null) inp.value = +(sg[inp.dataset.k] * Number(inp.dataset.sc)).toFixed(4); });
+    toast("Suggested values filled in. Click Save to use them.");
+  });
+  $("finBody").querySelectorAll("[data-save]").forEach((b) => b.onclick = async () => {
+    const k = b.dataset.save, box = $("finBody").querySelector(`[data-prod="${k}"]`), vals = {};
+    box.querySelectorAll("[data-k]").forEach((inp) => { if (inp.value !== "") vals[inp.dataset.k] = Number(inp.value) / Number(inp.dataset.sc); });
+    const rep = box.querySelector("[data-rep]"); if (rep) vals.repayment = rep.checked;
+    await put({ products: { [k]: vals } }, "Saved"); loadFinance();
+  });
+}
+
 /* ---------------- phone app & people ---------------- */
 async function loadPhone() {
   const el = $("phoneBody");
@@ -877,7 +948,7 @@ $("phoneBtn").onclick = (e) => { e.preventDefault(); show("settings"); setTimeou
 $("logoutBtn").onclick = async () => { await api("/api/auth/logout", { method: "POST" }).catch(() => {}); location.href = "/app/#/login?next=%2F"; };
 
 /* ---------------- boot ---------------- */
-(async () => { loadFilters(); await refresh(); pollJob(); })();
+(async () => { loadFilters(); await loadPlans(); await refresh(); pollJob(); })();
 </script>
 </body>
 </html>

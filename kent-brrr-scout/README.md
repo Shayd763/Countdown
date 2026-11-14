@@ -103,6 +103,40 @@ on their own phone with their own profile, filters and notifications.
 
 ---
 
+## Financing plans
+
+Every deal can be costed under different ways of funding it. Pick one at the top of Today or
+Deals (phone), or with **Financing** on the laptop's Deals screen. Every number, the four gates and
+your morning alert follow that choice. Each deal's page also has **Ways to fund it**, which shows
+every plan side by side: cash to buy, money left in, monthly cashflow, return on cash, and pass or fail.
+
+| Plan | How you buy | Long-term loan | Owner |
+|---|---|---|---|
+| Bridge, then Ltd buy-to-let (default) | bridging loan | Ltd buy-to-let on the new value | Ltd company |
+| Cash, then Ltd buy-to-let | your cash | Ltd buy-to-let | Ltd company |
+| Ltd buy-to-let from day one | buy-to-let mortgage | remortgage on the new value | Ltd company |
+| Bridge, then buy-to-let in your name | bridging loan | personal buy-to-let | you |
+| Buy-to-let in your name from day one | buy-to-let mortgage | remortgage | you |
+| Bridge, then commercial mortgage (Ltd) | bridging loan | commercial, repayment | Ltd company |
+| Residential mortgage, live in then let | residential mortgage | residential remortgage, plus consent-to-let loading | you |
+| All cash, no mortgage | your cash | none | Ltd company |
+
+How each plan changes the maths:
+- **Tax.** Ltd plans pay corporation tax on profit after interest. Plans in your own name pay income
+  tax at your rate, and the mortgage interest only earns a 20% credit (Section 24).
+- **Repayment loans.** On a repayment mortgage, the capital you repay counts against cashflow, but it
+  isn't tax-deductible.
+- **Living in it first.** The residential plan has no stamp duty surcharge, because it assumes the
+  property is your main home when you buy.
+
+**Rates and costs** are set per product in **Settings → Finance products** (laptop) or
+**Alerts → Rates and costs** (phone; owner only). The products are Ltd buy-to-let, buy-to-let in your
+name, commercial, residential and bridging. Each field shows a suggested value, researched in November
+2026 with the sources listed. **Use suggested** fills those values in, and **Save** applies them.
+Until you change them, the defaults are your original spec (5.25% buy-to-let, 0.85% a month bridging).
+
+---
+
 ## What the daily run does
 
 ```
@@ -166,7 +200,7 @@ browser (on your laptop)
 
 ```bash
 pip install -e ".[dev]"
-pytest                                         # 69 tests incl. real-browser portal run, push encryption vs RFC 8291
+pytest                                         # 79 tests incl. real-browser portal run, push encryption vs RFC 8291
 python -m src.main --sample --dry-run          # sample data, prints deal memos
 python -m src.main --sources portals --outcode ME4 --dry-run
 python -m src.main --daily                     # what the schedule runs
