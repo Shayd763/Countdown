@@ -65,7 +65,7 @@ def save_user_overrides(updates: dict[str, Any]) -> dict[str, Any]:
     current = (yaml.safe_load(USER_OVERRIDES.read_text()) or {}) if USER_OVERRIDES.exists() else {}
     merged = _deep_merge(current, updates)
     USER_OVERRIDES.write_text(
-        "# Written by the Kent BRRR Scout Settings page. Overrides config/postcodes.yaml.\n"
+        "# Written by the Gatehouse Settings page. Overrides config/postcodes.yaml.\n"
         + yaml.safe_dump(merged, sort_keys=False)
     )
     return merged

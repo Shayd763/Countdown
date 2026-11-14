@@ -8,12 +8,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="BRRR Scout" />
+<meta name="apple-mobile-web-app-title" content="Gatehouse" />
 <meta name="description" content="BRRR deals in Medway and Thanet, checked every morning: cost to buy, refinance and cashflow for each." />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 <link rel="icon" href="/icons/icon-192.png" />
-<title>BRRR Scout</title>
+<title>Gatehouse</title>
 <style>
 /* ---------- tokens: iOS system colours, one radius scale, one glass recipe ---------- */
 :root {
@@ -421,7 +421,7 @@ async function viewLogin() {
   try { setup = (await api("/api/auth/status")).setup_needed; } catch {}
   render(`<div class="login">
     <img class="appicon" src="/icons/icon-192.png" alt="">
-    <h1>${setup ? "Create your profile" : "BRRR Scout"}</h1>
+    <h1>${setup ? "Create your profile" : "Gatehouse"}</h1>
     <p class="intro">${setup ? "You'll be the owner. You can add someone else later from the laptop." : "Sign in to see this morning's Medway and Thanet deals."}</p>
     <form id="f" novalidate>
       <div class="group">

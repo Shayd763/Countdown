@@ -1,4 +1,7 @@
-# Kent BRRR Scout
+# Gatehouse
+
+Gatehouse finds BRRR deals in Medway and Thanet and only shows you the ones that get through all four
+financial gates. (The project folder is still called `kent-brrr-scout`.)
 
 This app runs on your own laptop. Every morning it reads the newest Rightmove, Zoopla and OnTheMarket
 listings for Medway (`ME1 ME2 ME4 ME5 ME7 ME8`) and Thanet (`CT8 CT9 CT10 CT11 CT12`). It checks each one
@@ -24,9 +27,9 @@ human pace.
    On Windows, tick "Add python.exe to PATH". Having Google Chrome installed is recommended. If it isn't,
    the app downloads its own browser.
 3. **Start the app.**
-   - Mac: double-click **`Start Kent BRRR Scout.command`**. The first time, macOS may say it's from an
+   - Mac: double-click **`Start Gatehouse.command`**. The first time, macOS may say it's from an
      unidentified developer. Right-click the file, choose **Open**, then **Open** again.
-   - Windows: double-click **`Start Kent BRRR Scout (Windows).bat`**.
+   - Windows: double-click **`Start Gatehouse (Windows).bat`**.
    - If double-clicking doesn't work, open Terminal and run `cd ~/kent-brrr-scout && bash start.sh`.
 
    The first start takes 2–5 minutes while it installs. After that it opens your browser at

@@ -1,5 +1,5 @@
 @echo off
-REM Kent BRRR Scout - Windows launcher. Double-click to start.
+REM Gatehouse - Windows launcher. Double-click to start.
 REM First run sets everything up (2-5 minutes); after that it opens in a few seconds.
 cd /d "%~dp0"
 
@@ -36,6 +36,6 @@ if not exist .venv\.installed (
 if not exist .env copy .env.example .env >nul
 
 echo.
-echo Kent BRRR Scout is running at http://127.0.0.1:8000  (keep this window open; close it to stop)
+echo Gatehouse is running at http://127.0.0.1:8000  (keep this window open; close it to stop)
 python -m src.web --open
 pause

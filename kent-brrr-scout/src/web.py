@@ -175,7 +175,7 @@ def _mask(v: str | None) -> dict[str, Any]:
 
 def create_app() -> FastAPI:
     load_dotenv()
-    app = FastAPI(title="Kent BRRR Scout")
+    app = FastAPI(title="Gatehouse")
     jobs = Jobs()
 
     def storage() -> Storage:

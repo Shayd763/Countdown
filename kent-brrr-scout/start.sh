@@ -1,5 +1,5 @@
 #!/bin/bash
-# Kent BRRR Scout — macOS / Linux launcher. Double-click (Mac) or run ./start.sh (Linux).
+# Gatehouse — macOS / Linux launcher. Double-click (Mac) or run ./start.sh (Linux).
 # First run sets everything up (2–5 minutes); after that it opens in a few seconds.
 set -e
 cd "$(dirname "$0")"
@@ -37,5 +37,5 @@ fi
 [ -f .env ] || cp .env.example .env
 
 echo ""
-echo "Kent BRRR Scout is running at http://127.0.0.1:8000  (this window must stay open; close it to stop)"
+echo "Gatehouse is running at http://127.0.0.1:8000  (this window must stay open; close it to stop)"
 python -m src.web --open

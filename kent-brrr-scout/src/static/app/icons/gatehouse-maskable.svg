@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="g-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22313B"/><stop offset="1" stop-color="#0E161C"/></linearGradient>
+    <radialGradient id="g-door" cx=".5" cy=".75" r=".75"><stop offset="0" stop-color="#C9FFDF"/><stop offset=".45" stop-color="#52E39A"/><stop offset="1" stop-color="#1F9E62"/></radialGradient>
+    <radialGradient id="g-spill" cx=".5" cy="1" r=".6"><stop offset="0" stop-color="#52E39A" stop-opacity=".35"/><stop offset="1" stop-color="#52E39A" stop-opacity="0"/></radialGradient>
+  </defs><rect width="1024" height="1024" fill="url(#g-bg)"/><g transform="translate(512 512) scale(.8) translate(-512 -540)">
+  
+  <ellipse cx="512" cy="820" rx="360" ry="120" fill="url(#g-spill)"/>
+  <g fill="none" stroke-width="46" stroke-linecap="butt">
+    <path d="M232 820 V470 a280 280 0 0 1 560 0 V820" stroke="#41535F"/>
+    <path d="M300 820 V490 a212 212 0 0 1 424 0 V820" stroke="#4E6A6B"/>
+    <path d="M368 820 V512 a144 144 0 0 1 288 0 V820" stroke="#3E9A72"/>
+  </g>
+  <path d="M414 820 V530 a98 98 0 0 1 196 0 V820 Z" fill="url(#g-door)"/>
+  <rect x="180" y="818" width="664" height="10" rx="5" fill="#56E3A0" fill-opacity=".55"/>
+</g></svg>

@@ -1,13 +1,13 @@
 {
-  "name": "Kent BRRR Scout",
-  "short_name": "BRRR Scout",
-  "description": "Daily BRRR deals in Medway & Thanet — cost to buy, refinance and cashflow at a glance.",
+  "name": "Gatehouse",
+  "short_name": "Gatehouse",
+  "description": "BRRR deals in Medway and Thanet, checked every morning: cost to buy, refinance and cashflow for each.",
   "id": "/app/",
   "start_url": "/app/#/today",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f2f2f7",
+  "background_color": "#0e161c",
   "theme_color": "#f2f2f7",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

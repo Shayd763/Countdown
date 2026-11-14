@@ -106,7 +106,7 @@ def _mac_status() -> dict[str, Any]:
 def _win_xml(hour: int, minute: int) -> str:
     return f"""<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
-  <RegistrationInfo><Description>Kent BRRR Scout - daily property scan</Description></RegistrationInfo>
+  <RegistrationInfo><Description>Gatehouse - daily property scan</Description></RegistrationInfo>
   <Triggers>
     <CalendarTrigger>
       <StartBoundary>2026-01-01T{hour:02d}:{minute:02d}:00</StartBoundary>

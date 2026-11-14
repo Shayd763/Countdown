@@ -1,5 +1,5 @@
-/* Kent BRRR Scout service worker: offline app shell, cached data, push notifications. */
-const VERSION = "brrr-v2";
+/* Gatehouse service worker: offline app shell, cached data, push notifications. */
+const VERSION = "brrr-v3";
 const SHELL = ["/app/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/badge-96.png"];
 const CACHED_API = [/^\/api\/digest$/, /^\/api\/deals(\?.*)?$/, /^\/api\/deals\/[^/]+$/, /^\/api\/auth\/me$/,
                     /^\/api\/meta$/, /^\/api\/summary$/];
@@ -48,8 +48,8 @@ self.addEventListener("fetch", (e) => {
 
 self.addEventListener("push", (e) => {
   let msg = {};
-  try { msg = e.data ? e.data.json() : {}; } catch { msg = { title: "Kent BRRR Scout", body: e.data && e.data.text() }; }
-  const title = msg.title || "Kent BRRR Scout";
+  try { msg = e.data ? e.data.json() : {}; } catch { msg = { title: "Gatehouse", body: e.data && e.data.text() }; }
+  const title = msg.title || "Gatehouse";
   const work = [self.registration.showNotification(title, {
     body: msg.body || "", tag: msg.tag || "brrr", renotify: true,
     icon: "/icons/icon-192.png", badge: "/icons/badge-96.png",
