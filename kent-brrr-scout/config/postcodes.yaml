@@ -1,0 +1,115 @@
+# Kent BRRR Scout — target geography, cost assumptions and gate thresholds.
+# Every number the underwriting engine uses lives here so you can tune without code changes.
+
+outcodes:
+  medway: [ME1, ME2, ME4, ME5, ME7, ME8]
+  thanet: [CT8, CT9, CT10, CT11, CT12]
+
+# Optional per-outcode overrides of any key under `thresholds` or `costs`.
+outcode_overrides:
+  CT9:   # Margate — higher yields, softer ARV evidence
+    costs:
+      arv_haircut_pct: 0.07
+  ME1:
+    thresholds:
+      min_gross_yield: 0.07
+
+thresholds:
+  all_in_cap_pct_of_arv: 0.75        # Gate 1: (price + refurb + SDLT + fixed) <= 75% ARV
+  min_gross_yield: 0.068             # Gate 2: annual rent / ARV
+  min_net_monthly_cashflow: 0.0      # Gate 3: post-tax SPV cashflow must be > this (GBP / month)
+  min_capital_recycled_pct: 0.55     # Gate 4: net refi proceeds / total cash deployed
+  min_roce_pct: 0.0                  # default CLI --min-roce
+  icr_required: 1.25                 # Ltd-co BTL ICR (informational unless icr_caps_loan)
+  icr_stress_rate: 0.055
+
+finance:
+  refi_ltv: 0.75
+  btl_interest_rate: 0.0525
+  operating_cost_drag_pct: 0.22      # management, voids, maintenance, insurance
+  corporation_tax_rate: 0.19
+  icr_caps_loan: false               # true = refi loan limited by ICR stress test
+  refi_fee_pct_of_loan: 0.02         # lender product fee (added to cost, not loan)
+  refi_fixed_costs: 1500             # valuation, broker, legal on refinance
+  use_bridging: true
+  bridging_ltv: 0.70                 # of purchase price
+  bridging_monthly_rate: 0.0085
+  bridging_arrangement_fee_pct: 0.02
+  bridging_exit_fee_pct: 0.01
+  bridging_months: 6
+
+costs:
+  fixed_acquisition_costs: 3500      # legal, searches, survey, broker on purchase
+  sdlt_surcharge_pct: 0.05           # additional dwelling / company surcharge (from 31 Oct 2024)
+  refurb_contingency_pct: 0.10
+  arv_haircut_pct: 0.05              # conservative discount on blended comps
+  rent_haircut_pct: 0.05
+  # Refurb cost per sq ft (GBP) by tier — Kent contractor rates, inc. VAT
+  refurb_per_sqft:
+    light: 18        # paint, carpets, light fittings
+    medium: 45       # new kitchen + bathroom, partial rewire, decor
+    heavy: 75        # full strip-out, rewire, replumb, heating, windows
+    structural: 120  # underpinning, roof, damp tanking, extensions
+  refurb_minimum:
+    light: 4000
+    medium: 15000
+    heavy: 30000
+    structural: 50000
+
+# Fallback internal floor areas (sq ft) when listing, PropertyData and EPC all fail
+default_floor_area_sqft:
+  flat: {1: 480, 2: 650, 3: 800}
+  terraced: {1: 550, 2: 750, 3: 950, 4: 1150}
+  semi-detached: {2: 800, 3: 1000, 4: 1250}
+  detached: {2: 900, 3: 1200, 4: 1500, 5: 1900}
+  commercial: {0: 1000}
+
+# Eligibility rules (deterministic, applied before any API spend on enrichment)
+eligibility:
+  allowed_residential_types: [terraced, end-terrace, semi-detached, flat, maisonette]
+  min_lease_years_flats: 90
+  include_commercial: true          # commercial / mixed-use go through a separate valuation path
+  exclude_keywords:
+    - retirement
+    - over 55
+    - over 60
+    - age restricted
+    - shared ownership
+    - houseboat
+    - park home
+    - mobile home
+    - lodge
+    - holiday let restriction
+    - non-standard construction
+    - cash buyers only due to mortgage
+    - help to buy only
+
+# Commercial valuation path (rent from £/sq ft, ARV = rent / net initial yield)
+commercial:
+  rent_per_sqft_pa:
+    default: 12.0
+    ME4: 14.0
+    CT9: 11.0
+  valuation_yield: 0.085
+
+ingestion:
+  propertydata_base_url: https://api.propertydata.co.uk
+  # PropertyData /sourced-properties lists to pull per outcode
+  sourced_lists:
+    - repossessed-properties
+    - unmodernised-properties
+    - auction-properties
+    - reduced-properties
+    - cash-buyers-only
+  max_price: 350000
+  # Auction / RSS feeds (Clive Emson etc.). Any RSS 2.0 / Atom URL.
+  rss_feeds:
+    - https://www.cliveemson.co.uk/feed/
+  epc_base_url: https://epc.opendatacommunities.org/api/v1
+  land_registry_sparql: https://landregistry.data.gov.uk/landregistry/query
+  request_delay_seconds: 0.4        # be polite to rate limits
+
+claude:
+  model: claude-opus-5-5
+  effort: medium
+  max_images: 6

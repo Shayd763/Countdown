@@ -1,0 +1,1804 @@
+{
+ "by_outcode": {
+  "ME1": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 106000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 130000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 152000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 182000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 145750.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 193000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 237000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 276000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 331000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 265000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 228000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 280000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 325000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 390000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 312700.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 289000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 356000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 413000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 496000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 397500.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 265000
+       }
+      }
+     }
+    }
+   }
+  },
+  "ME2": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 114000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 140000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 163000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 196000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 156750.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 207000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 255000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 296000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 356000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 285000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 245000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 301000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 350000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 420000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 336300.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 311000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 382000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 445000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 534000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 427500.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 285000
+       }
+      }
+     }
+    }
+   }
+  },
+  "ME4": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 102000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 125000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 146000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 175000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 140250.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 186000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 228000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 265000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 318000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 255000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 219000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 269000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 313000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 376000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 300900.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 278000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 342000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 398000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 477000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 382500.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 255000
+       }
+      }
+     }
+    }
+   }
+  },
+  "ME5": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 118000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 145000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 169000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 202000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 162250.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 215000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 264000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 307000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 368000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 295000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 253000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 311000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 362000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 434000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 348100.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 322000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 396000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 460000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 552000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 442500.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 295000
+       }
+      }
+     }
+    }
+   }
+  },
+  "ME7": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 100000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 123000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 143000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 172000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 137500.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 182000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 224000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 260000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 312000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 250000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 215000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 264000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 307000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 368000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 295000.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 273000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 335000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 390000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 468000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 375000.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 250000
+       }
+      }
+     }
+    }
+   }
+  },
+  "ME8": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 120000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 148000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 172000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 206000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 165000.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 218000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 268000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 312000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 374000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 300000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 258000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 317000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 368000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 442000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 354000.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 328000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 402000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 468000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 562000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 450000.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 300000
+       }
+      }
+     }
+    }
+   }
+  },
+  "CT8": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 110000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 135000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 157000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 189000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 151250.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 200000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 246000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 286000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 343000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 275000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 236000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 290000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 337000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 405000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 324500.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 300000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 369000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 429000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 515000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 412500.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 275000
+       }
+      }
+     }
+    }
+   }
+  },
+  "CT9": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 102000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 125000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 146000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 175000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 140250.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 186000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 228000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 265000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 318000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 255000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 219000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 269000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 313000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 376000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 300900.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 278000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 342000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 398000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 477000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 382500.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 255000
+       }
+      }
+     }
+    }
+   }
+  },
+  "CT10": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 120000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 148000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 172000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 206000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 165000.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 218000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 268000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 312000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 374000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 300000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 258000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 317000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 368000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 442000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 354000.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 328000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 402000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 468000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 562000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 450000.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 300000
+       }
+      }
+     }
+    }
+   }
+  },
+  "CT11": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 114000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 140000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 163000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 196000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 156750.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 207000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 255000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 296000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 356000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 285000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 245000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 301000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 350000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 420000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 336300.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 311000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 382000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 445000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 534000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 427500.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 285000
+       }
+      }
+     }
+    }
+   }
+  },
+  "CT12": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 104000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 128000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 149000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 178000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 143000.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 189000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 233000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 270000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 324000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 260000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 223000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 274000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 319000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 383000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 306800.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 284000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 349000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 406000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 487000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 390000.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 260000
+       }
+      }
+     }
+    }
+   }
+  },
+  "default": {
+   "by_type": {
+    "flat": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 102000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 125000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 146000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 175000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 140250.0
+       }
+      }
+     }
+    },
+    "terraced_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 186000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 228000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 265000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 318000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 255000.0
+       }
+      }
+     }
+    },
+    "semi-detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 219000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 269000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 313000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 376000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 300900.0
+       }
+      }
+     }
+    },
+    "detached_house": {
+     "by_bedrooms": {
+      "1": {
+       "status": "success",
+       "data": {
+        "average": 278000.0
+       }
+      },
+      "2": {
+       "status": "success",
+       "data": {
+        "average": 342000.0
+       }
+      },
+      "3": {
+       "status": "success",
+       "data": {
+        "average": 398000.0
+       }
+      },
+      "4": {
+       "status": "success",
+       "data": {
+        "average": 477000.0
+       }
+      },
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 382500.0
+       }
+      }
+     }
+    },
+    "default": {
+     "by_bedrooms": {
+      "default": {
+       "status": "success",
+       "data": {
+        "average": 255000
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

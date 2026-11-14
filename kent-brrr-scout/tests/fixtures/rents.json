@@ -1,0 +1,832 @@
+{
+ "by_outcode": {
+  "ME1": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 925,
+       "70pc_range": [
+        832.5,
+        1017.5000000000001
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1250,
+       "70pc_range": [
+        1125.0,
+        1375.0
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1525,
+       "70pc_range": [
+        1372.5,
+        1677.5000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1800,
+       "70pc_range": [
+        1620.0,
+        1980.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1250,
+       "70pc_range": [
+        1125.0,
+        1375.0
+       ]
+      }
+     }
+    }
+   }
+  },
+  "ME2": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 950,
+       "70pc_range": [
+        855.0,
+        1045.0
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1275,
+       "70pc_range": [
+        1147.5,
+        1402.5
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1550,
+       "70pc_range": [
+        1395.0,
+        1705.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1850,
+       "70pc_range": [
+        1665.0,
+        2035.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1275,
+       "70pc_range": [
+        1147.5,
+        1402.5
+       ]
+      }
+     }
+    }
+   }
+  },
+  "ME4": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 950,
+       "70pc_range": [
+        855.0,
+        1045.0
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1300,
+       "70pc_range": [
+        1170.0,
+        1430.0000000000002
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1600,
+       "70pc_range": [
+        1440.0,
+        1760.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1850,
+       "70pc_range": [
+        1665.0,
+        2035.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1300,
+       "70pc_range": [
+        1170.0,
+        1430.0000000000002
+       ]
+      }
+     }
+    }
+   }
+  },
+  "ME5": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 925,
+       "70pc_range": [
+        832.5,
+        1017.5000000000001
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1275,
+       "70pc_range": [
+        1147.5,
+        1402.5
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1550,
+       "70pc_range": [
+        1395.0,
+        1705.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1850,
+       "70pc_range": [
+        1665.0,
+        2035.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1275,
+       "70pc_range": [
+        1147.5,
+        1402.5
+       ]
+      }
+     }
+    }
+   }
+  },
+  "ME7": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 925,
+       "70pc_range": [
+        832.5,
+        1017.5000000000001
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1275,
+       "70pc_range": [
+        1147.5,
+        1402.5
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1550,
+       "70pc_range": [
+        1395.0,
+        1705.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1800,
+       "70pc_range": [
+        1620.0,
+        1980.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1275,
+       "70pc_range": [
+        1147.5,
+        1402.5
+       ]
+      }
+     }
+    }
+   }
+  },
+  "ME8": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 950,
+       "70pc_range": [
+        855.0,
+        1045.0
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1300,
+       "70pc_range": [
+        1170.0,
+        1430.0000000000002
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1575,
+       "70pc_range": [
+        1417.5,
+        1732.5000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1900,
+       "70pc_range": [
+        1710.0,
+        2090.0
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1300,
+       "70pc_range": [
+        1170.0,
+        1430.0000000000002
+       ]
+      }
+     }
+    }
+   }
+  },
+  "CT8": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 850,
+       "70pc_range": [
+        765.0,
+        935.0000000000001
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1150,
+       "70pc_range": [
+        1035.0,
+        1265.0
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1400,
+       "70pc_range": [
+        1260.0,
+        1540.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1700,
+       "70pc_range": [
+        1530.0,
+        1870.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1150,
+       "70pc_range": [
+        1035.0,
+        1265.0
+       ]
+      }
+     }
+    }
+   }
+  },
+  "CT9": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 900,
+       "70pc_range": [
+        810.0,
+        990.0000000000001
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1250,
+       "70pc_range": [
+        1125.0,
+        1375.0
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1550,
+       "70pc_range": [
+        1395.0,
+        1705.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1800,
+       "70pc_range": [
+        1620.0,
+        1980.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1250,
+       "70pc_range": [
+        1125.0,
+        1375.0
+       ]
+      }
+     }
+    }
+   }
+  },
+  "CT10": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 900,
+       "70pc_range": [
+        810.0,
+        990.0000000000001
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1225,
+       "70pc_range": [
+        1102.5,
+        1347.5
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1500,
+       "70pc_range": [
+        1350.0,
+        1650.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1800,
+       "70pc_range": [
+        1620.0,
+        1980.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1225,
+       "70pc_range": [
+        1102.5,
+        1347.5
+       ]
+      }
+     }
+    }
+   }
+  },
+  "CT11": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 900,
+       "70pc_range": [
+        810.0,
+        990.0000000000001
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1300,
+       "70pc_range": [
+        1170.0,
+        1430.0000000000002
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1550,
+       "70pc_range": [
+        1395.0,
+        1705.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1800,
+       "70pc_range": [
+        1620.0,
+        1980.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1300,
+       "70pc_range": [
+        1170.0,
+        1430.0000000000002
+       ]
+      }
+     }
+    }
+   }
+  },
+  "CT12": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 850,
+       "70pc_range": [
+        765.0,
+        935.0000000000001
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1150,
+       "70pc_range": [
+        1035.0,
+        1265.0
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1400,
+       "70pc_range": [
+        1260.0,
+        1540.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1700,
+       "70pc_range": [
+        1530.0,
+        1870.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1150,
+       "70pc_range": [
+        1035.0,
+        1265.0
+       ]
+      }
+     }
+    }
+   }
+  },
+  "default": {
+   "by_bedrooms": {
+    "1": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 950,
+       "70pc_range": [
+        855.0,
+        1045.0
+       ]
+      }
+     }
+    },
+    "2": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1300,
+       "70pc_range": [
+        1170.0,
+        1430.0000000000002
+       ]
+      }
+     }
+    },
+    "3": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1600,
+       "70pc_range": [
+        1440.0,
+        1760.0000000000002
+       ]
+      }
+     }
+    },
+    "4": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1850,
+       "70pc_range": [
+        1665.0,
+        2035.0000000000002
+       ]
+      }
+     }
+    },
+    "default": {
+     "status": "success",
+     "data": {
+      "long_let": {
+       "units": "gbp_per_month",
+       "average": 1300,
+       "70pc_range": [
+        1170.0,
+        1430.0000000000002
+       ]
+      }
+     }
+    }
+   }
+  }
+ }
+}

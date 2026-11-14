@@ -1,0 +1,6400 @@
+{
+ "by_outcode": {
+  "ME1": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 105000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 107000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 96000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 106000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 94000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 114000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 118000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 128000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 118000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 123000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 148000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 153000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 152000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 159000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 171000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 171000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 189000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 194000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 172000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 209000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 243000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 245000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 231000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 207000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 279000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 284000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 259000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 272000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 247000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 300000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 331000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 325000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 320000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 297000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 209000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 207000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 234000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 207000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 232000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 256000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 291000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 289000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 253000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 263000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 290000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 297000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 315000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 308000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 306000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 413000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 376000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 394000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 349000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 397000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 284000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 272000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 280000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 298000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 288000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 354000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 359000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 315000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 318000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 373000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 435000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 398000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 427000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 425000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 406000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 465000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 481000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 517000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 460000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 440000.0,
+      "date": "2026-06-15"
+     }
+    ]
+   }
+  },
+  "ME2": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 118000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 104000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 118000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 101000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 117000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 142000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 126000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 145000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 147000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 165000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 163000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 172000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 155000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 155000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 189000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 180000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 189000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 180000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 189000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 263000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 246000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 253000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 247000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 249000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 301000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 267000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 294000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 281000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 306000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 354000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 312000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 363000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 325000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 344000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 232000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 234000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 233000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 216000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 251000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 314000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 270000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 288000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 312000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 282000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 321000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 322000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 347000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 313000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 317000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 410000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 368000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 368000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 402000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 376000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 274000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 273000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 310000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 293000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 284000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 334000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 362000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 372000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 400000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 380000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 405000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 396000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 424000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 386000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 470000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 469000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 514000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 557000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 552000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 491000.0,
+      "date": "2026-08-15"
+     }
+    ]
+   }
+  },
+  "ME4": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 105000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 100000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 89000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 94000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 107000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 115000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 126000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 115000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 114000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 113000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 140000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 152000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 129000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 149000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 126000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 183000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 166000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 180000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 181000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 163000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 221000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 223000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 216000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 211000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 237000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 264000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 248000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 275000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 279000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 277000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 328000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 329000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 286000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 323000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 324000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 201000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 206000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 226000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 198000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 204000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 244000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 254000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 278000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 251000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 254000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 291000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 278000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 282000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 273000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 297000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 356000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 333000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 339000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 376000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 363000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 278000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 260000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 292000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 274000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 280000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 329000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 318000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 333000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 324000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 341000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 391000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 375000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 367000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 377000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 391000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 456000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 475000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 457000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 474000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 460000.0,
+      "date": "2026-10-15"
+     }
+    ]
+   }
+  },
+  "ME5": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 110000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 118000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 121000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 103000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 125000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 149000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 138000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 131000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 130000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 175000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 171000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 152000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 161000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 154000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 205000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 213000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 210000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 211000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 203000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 251000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 266000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 251000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 271000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 267000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 294000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 282000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 308000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 282000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 318000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 328000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 346000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 369000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 348000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 357000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 222000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 238000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 265000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 261000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 238000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 326000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 315000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 302000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 317000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 299000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 344000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 340000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 364000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 377000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 350000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 425000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 383000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 387000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 391000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 408000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 307000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 326000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 296000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 294000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 308000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 346000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 360000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 402000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 400000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 358000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 453000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 409000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 448000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 439000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 466000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 542000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 561000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 580000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 539000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 539000.0,
+      "date": "2026-07-15"
+     }
+    ]
+   }
+  },
+  "ME7": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 94000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 88000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 89000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 103000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 102000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 125000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 119000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 108000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 107000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 126000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 136000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 141000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 143000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 129000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 150000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 179000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 185000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 173000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 167000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 187000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 205000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 204000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 218000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 208000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 230000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 249000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 265000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 239000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 260000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 253000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 327000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 284000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 299000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 311000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 297000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 190000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 203000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 198000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 201000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 208000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 279000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 245000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 242000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 240000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 244000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 322000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 277000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 282000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 323000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 301000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 378000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 335000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 340000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 328000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 388000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 252000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 270000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 242000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 266000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 261000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 302000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 307000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 298000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 316000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 327000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 349000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 409000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 412000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 379000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 383000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 425000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 439000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 432000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 494000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 456000.0,
+      "date": "2026-01-15"
+     }
+    ]
+   }
+  },
+  "ME8": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 118000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 126000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 118000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 119000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 109000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 130000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 141000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 134000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 148000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 151000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 179000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 170000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 163000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 156000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 227000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 192000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 222000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 220000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 228000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 239000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 268000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 258000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 255000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 234000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 314000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 285000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 284000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 305000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 330000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 365000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 358000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 390000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 396000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 370000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 271000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 240000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 239000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 266000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 243000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 292000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 324000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 276000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 293000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 281000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 380000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 365000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 351000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 332000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 363000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 435000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 400000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 393000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 420000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 393000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 334000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 303000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 318000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 298000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 313000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 398000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 387000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 388000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 380000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 424000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 446000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 440000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 451000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 483000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 475000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 523000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 515000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 517000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 576000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 594000.0,
+      "date": "2026-08-15"
+     }
+    ]
+   }
+  },
+  "CT8": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 114000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 107000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 102000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 103000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 114000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 132000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 118000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 135000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 127000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 151000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 140000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 146000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 163000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 174000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 189000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 176000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 186000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 198000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 253000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 231000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 242000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 254000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 242000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 282000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 302000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 271000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 289000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 272000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 357000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 318000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 316000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 325000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 332000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 235000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 212000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 232000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 233000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 227000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 259000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 287000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 265000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 301000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 301000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 302000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 353000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 311000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 337000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 347000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 428000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 359000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 395000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 374000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 352000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 276000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 310000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 312000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 308000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 305000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 362000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 335000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 363000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 364000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 341000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 374000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 432000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 446000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 433000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 388000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 532000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 498000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 528000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 536000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 541000.0,
+      "date": "2026-05-15"
+     }
+    ]
+   }
+  },
+  "CT9": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 103000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 104000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 107000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 103000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 105000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 132000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 117000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 109000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 112000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 125000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 143000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 129000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 151000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 135000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 169000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 183000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 193000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 184000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 166000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 211000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 202000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 236000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 214000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 227000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 251000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 275000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 272000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 250000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 231000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 289000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 334000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 281000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 309000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 279000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 198000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 230000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 193000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 217000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 230000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 274000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 284000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 244000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 244000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 275000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 291000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 318000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 271000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 330000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 286000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 333000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 334000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 382000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 367000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 338000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 248000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 269000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 266000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 268000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 265000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 358000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 344000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 316000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 300000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 352000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 397000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 399000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 350000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 369000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 349000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 470000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 463000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 448000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 462000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 460000.0,
+      "date": "2026-07-15"
+     }
+    ]
+   }
+  },
+  "CT10": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 106000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 124000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 121000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 114000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 114000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 137000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 147000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 155000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 130000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 152000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 173000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 175000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 150000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 167000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 206000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 225000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 230000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 202000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 213000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 240000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 244000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 250000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 251000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 262000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 321000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 307000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 272000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 272000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 312000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 390000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 324000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 365000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 329000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 331000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 234000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 246000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 241000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 262000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 253000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 283000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 277000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 291000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 304000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 299000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 372000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 343000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 339000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 353000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 322000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 466000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 383000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 463000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 447000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 410000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 315000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 295000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 317000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 315000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 288000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 382000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 420000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 393000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 380000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 371000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 407000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 420000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 446000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 413000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 427000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 529000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 529000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 567000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 522000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 494000.0,
+      "date": "2026-02-15"
+     }
+    ]
+   }
+  },
+  "CT11": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 110000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 119000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 106000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 104000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 104000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 138000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 126000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 134000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 142000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 140000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 161000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 151000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 146000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 156000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 166000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 182000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 183000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 198000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 194000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 183000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 251000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 239000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 248000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 243000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 253000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 291000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 265000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 282000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 312000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 285000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 310000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 376000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 344000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 333000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 334000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 244000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 249000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 215000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 238000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 225000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 311000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 265000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 313000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 316000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 268000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 323000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 346000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 357000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 309000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 337000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 392000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 440000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 440000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 379000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 376000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 320000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 300000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 319000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 272000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 322000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 341000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 342000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 392000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 390000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 384000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 420000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 468000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 409000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 405000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 411000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 554000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 499000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 563000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 541000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 513000.0,
+      "date": "2026-07-15"
+     }
+    ]
+   }
+  },
+  "CT12": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 109000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 106000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 108000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 103000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 101000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 128000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 132000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 113000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 117000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 114000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 131000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 152000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 155000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 130000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 139000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 200000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 172000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 198000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 193000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 165000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 232000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 235000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 221000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 242000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 213000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 263000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 261000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 274000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 250000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 246000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 309000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 333000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 318000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 320000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 296000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 206000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 220000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 218000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 222000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 216000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 241000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 266000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 267000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 284000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 271000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 292000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 298000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 297000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 323000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 284000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 372000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 392000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 404000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 378000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 336000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 248000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 248000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 294000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 297000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 267000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 334000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 352000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 321000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 360000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 320000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 385000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 409000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 377000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 390000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 380000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 446000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 489000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 462000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 472000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 431000.0,
+      "date": "2026-06-15"
+     }
+    ]
+   }
+  },
+  "default": {
+   "status": "success",
+   "data": {
+    "points_analysed": 75,
+    "raw_data": [
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 105000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 100000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 89000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 94000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 107000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 115000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 126000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 115000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 114000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 113000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 140000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 152000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 129000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 149000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "flat",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 126000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 183000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 166000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 180000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 181000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 163000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 221000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 223000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 216000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 211000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 237000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 264000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 248000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 275000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 279000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 277000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 328000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 329000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 286000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 323000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "terraced_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 324000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 201000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 206000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 226000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 198000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 204000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 244000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 254000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 278000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 251000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 254000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 291000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 278000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 282000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 273000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 297000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 356000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 333000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 339000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 376000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "semi-detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 363000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 278000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 260000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 292000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 274000.0,
+      "date": "2026-02-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 1,
+      "tenure": "freehold",
+      "price": 280000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 329000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 318000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 333000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 324000.0,
+      "date": "2026-07-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 2,
+      "tenure": "freehold",
+      "price": 341000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 391000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 375000.0,
+      "date": "2026-01-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 367000.0,
+      "date": "2026-04-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 377000.0,
+      "date": "2026-10-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 3,
+      "tenure": "freehold",
+      "price": 391000.0,
+      "date": "2026-06-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 456000.0,
+      "date": "2026-08-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 475000.0,
+      "date": "2026-09-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 457000.0,
+      "date": "2026-03-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 474000.0,
+      "date": "2026-05-15"
+     },
+     {
+      "type": "detached_house",
+      "bedrooms": 4,
+      "tenure": "freehold",
+      "price": 460000.0,
+      "date": "2026-10-15"
+     }
+    ]
+   }
+  }
+ }
+}
