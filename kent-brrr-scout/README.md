@@ -88,6 +88,10 @@ It has four screens:
 
 1. Start the app on your laptop as above. The first screen asks you to **create your profile** (name,
    email, password). That becomes the owner account.
+   - **Windows:** the phone app needs the laptop app running. So you don't have to keep the black
+     window open, run this once in the folder and it starts quietly in the background whenever you log in:
+     `.venv\Scripts\python -m src.scheduler install-app` (undo with `remove-app`). The launcher then
+     just opens the browser.
 2. Install **Tailscale** (free) on the laptop and on your phone, and sign in to both with the same
    account. Tailscale creates a private, encrypted link between your own devices. Nothing is put on the
    public internet.

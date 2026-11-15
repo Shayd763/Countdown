@@ -98,6 +98,15 @@ def run_checks(include_portals: bool = True) -> list[dict[str, Any]]:
     out.append(_check("Daily schedule", st.get("installed", False),
                       f"{st.get('platform')}: daily at {st.get('time')}" if st.get("installed")
                       else "not installed", "Settings › Daily run › Install"))
+
+    from .scheduler import app_status
+
+    ap = app_status()
+    if ap.get("supported"):
+        out.append(_check("App at logon", ap.get("installed", False),
+                          f"Windows task: {ap.get('state') or 'installed'}" if ap.get("installed")
+                          else "not installed (the phone app only works while the launcher window is open)",
+                          "python -m src.scheduler install-app"))
     return out
 
 

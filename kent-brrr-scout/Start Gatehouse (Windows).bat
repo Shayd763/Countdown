@@ -35,6 +35,13 @@ if not exist .venv\.installed (
 
 if not exist .env copy .env.example .env >nul
 
+REM Already running in the background (python -m src.scheduler install-app)? Just open it.
+python -c "import socket,sys; s=socket.socket(); s.settimeout(1); sys.exit(0 if s.connect_ex(('127.0.0.1',8000))==0 else 1)"
+if not errorlevel 1 (
+  start "" http://127.0.0.1:8000/
+  exit /b 0
+)
+
 echo.
 echo Gatehouse is running at http://127.0.0.1:8000  (keep this window open; close it to stop)
 python -m src.web --open

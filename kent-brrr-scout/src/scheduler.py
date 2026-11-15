@@ -3,6 +3,7 @@
     python -m src.scheduler install --time 07:30
     python -m src.scheduler status
     python -m src.scheduler remove
+    python -m src.scheduler install-app   # Windows: app server at logon, for the phone app
 
 macOS  → a LaunchAgent (runs at the time; if the Mac was asleep, runs on wake)
 Windows → a Task Scheduler task with "run as soon as possible after a missed start"
@@ -27,6 +28,7 @@ from .config import PROJECT_ROOT
 
 LABEL = "uk.kentbrrr.scout.daily"
 WIN_TASK = "KentBRRRScoutDaily"
+WIN_APP_TASK = "KentBRRRScoutApp"
 CRON_MARK = "# kent-brrr-scout daily"
 LOG_DIR = PROJECT_ROOT / "data" / "logs"
 
@@ -163,6 +165,72 @@ def _win_status() -> dict[str, Any]:
             "next_run": nxt, "where": f"Task Scheduler › {WIN_TASK}"}
 
 
+def _win_app_xml() -> str:
+    """Start the web app quietly at logon so the phone app always has something to talk to.
+    The trigger names this user: an any-user logon trigger needs admin rights."""
+    user = f"{os.environ.get('USERDOMAIN', '')}\\{os.environ.get('USERNAME', '')}".lstrip("\\")
+    return f"""<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo><Description>Gatehouse - app server for laptop and phone</Description></RegistrationInfo>
+  <Triggers><LogonTrigger><Enabled>true</Enabled><UserId>{escape(user)}</UserId><Delay>PT30S</Delay>
+  </LogonTrigger></Triggers>
+  <Principals><Principal id="Author"><LogonType>InteractiveToken</LogonType>
+    <RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <RestartOnFailure><Interval>PT1M</Interval><Count>5</Count></RestartOnFailure>
+    <Enabled>true</Enabled>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>{escape(_python())}</Command>
+      <Arguments>-m src.web</Arguments>
+      <WorkingDirectory>{escape(str(PROJECT_ROOT))}</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>"""
+
+
+def install_app(start_now: bool = True) -> str:
+    if platform.system() != "Windows":
+        raise RuntimeError("Starting the app at logon is set up for Windows only; on a Mac, use the launcher.")
+    with tempfile.NamedTemporaryFile("w", suffix=".xml", delete=False, encoding="utf-16") as fh:
+        fh.write(_win_app_xml())
+        xml_path = fh.name
+    try:
+        r = _run(["schtasks", "/Create", "/TN", WIN_APP_TASK, "/XML", xml_path, "/F"])
+    finally:
+        os.unlink(xml_path)
+    if r.returncode != 0:
+        raise RuntimeError(f"schtasks failed: {r.stderr.strip() or r.stdout.strip()}")
+    if start_now:
+        _run(["schtasks", "/Run", "/TN", WIN_APP_TASK])
+    return f"Scheduled task '{WIN_APP_TASK}' installed: the app starts in the background whenever you log in"
+
+
+def remove_app() -> str:
+    if platform.system() != "Windows":
+        return "Nothing to remove"
+    _run(["schtasks", "/End", "/TN", WIN_APP_TASK])
+    r = _run(["schtasks", "/Delete", "/TN", WIN_APP_TASK, "/F"])
+    return "App-at-logon task removed" if r.returncode == 0 else "App-at-logon task was not installed"
+
+
+def app_status() -> dict[str, Any]:
+    if platform.system() != "Windows":
+        return {"installed": False, "supported": False}
+    try:
+        r = _run(["schtasks", "/Query", "/TN", WIN_APP_TASK, "/FO", "LIST"])
+    except FileNotFoundError:
+        return {"installed": False, "supported": False}
+    info = dict(re.findall(r"^([^:\r\n]+):\s+(.*)$", r.stdout, re.M)) if r.returncode == 0 else {}
+    return {"installed": r.returncode == 0, "supported": True, "state": info.get("Status", "")}
+
+
 # -- Linux --------------------------------------------------------------------
 
 def _cron_lines() -> list[str]:
@@ -235,6 +303,8 @@ def main() -> None:
     i.add_argument("--time", default=None, help="HH:MM, default from config schedule.time")
     sub.add_parser("remove")
     sub.add_parser("status")
+    sub.add_parser("install-app", help="Windows: start the app in the background at logon (for the phone app)")
+    sub.add_parser("remove-app")
     args = ap.parse_args()
     if args.cmd == "install":
         from .config import load_config
@@ -242,6 +312,10 @@ def main() -> None:
         print(install(args.time or load_config().get("schedule", {}).get("time", "07:30")))
     elif args.cmd == "remove":
         print(remove())
+    elif args.cmd == "install-app":
+        print(install_app())
+    elif args.cmd == "remove-app":
+        print(remove_app())
     else:
         print(status())
 

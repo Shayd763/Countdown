@@ -96,7 +96,7 @@ class FixtureClient:
         path = self.fixture_dir / f"{endpoint.strip('/').replace('-', '_')}.json"
         if not path.exists():
             raise PropertyDataError(f"no fixture for {endpoint}")
-        data = json.loads(path.read_text())
+        data = json.loads(path.read_text(encoding="utf-8"))
         outcode = str(params.get("postcode", "")).split(" ")[0].upper()
         if endpoint.strip("/") == "sourced-properties":
             wanted_list = params.get("list")

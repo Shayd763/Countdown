@@ -197,9 +197,9 @@ ingestion:
     - cash-buyers-only
   max_price: 350000
   max_price_commercial: 750000
-  # Auction / RSS feeds (Clive Emson etc.). Any RSS 2.0 / Atom URL.
-  rss_feeds:
-    - https://www.cliveemson.co.uk/feed/
+  # Auction / RSS feeds. Any RSS 2.0 / Atom URL. (Clive Emson's /feed/ was removed from their
+  # site in 2026 and now returns 404; add another auction house's feed here if you have one.)
+  rss_feeds: []
   epc_base_url: https://epc.opendatacommunities.org/api/v1
   land_registry_sparql: https://landregistry.data.gov.uk/landregistry/query
   request_delay_seconds: 0.4        # be polite to rate limits

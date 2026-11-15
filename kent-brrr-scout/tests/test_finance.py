@@ -138,3 +138,14 @@ def test_finance_settings_validate_and_apply(client):
     assert r.status_code == 200 and r.json()["products"]["btl_ltd"]["rate"] == 0.0625
     after = c.get(f"/api/deals/{lid}").json()["result"]["annual_interest"]
     assert after == pytest.approx(before / 0.0525 * 0.0625, rel=1e-6)
+
+
+def test_config_reads_utf8_regardless_of_locale(monkeypatch):
+    """Windows' default codepage turned 'Bridge → Ltd BTL' into 'Bridge â†’ Ltd BTL'."""
+    import locale
+
+    from src.config import load_config
+
+    monkeypatch.setattr(locale, "getpreferredencoding", lambda do_setlocale=True: "cp1252")
+    shorts = [p["short"] for p in load_config()["finance_plans"]]
+    assert "Bridge → Ltd BTL" in shorts

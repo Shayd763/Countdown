@@ -72,6 +72,15 @@ class LocalMarketClient:
             med, n = self._median(oc, "rent", ptype, beds)
             if med is None:  # fall back to any type with the same bedroom count
                 med, n = self._median(oc, "rent", None, beds)
+            b = int(beds) if beds not in (None, "", "None") else None
+            if med is None and b:
+                # One page of rentals per district often has <3 at this exact size. Borrow the
+                # next size down unadjusted: it understates rent, so the gates stay conservative.
+                med, n = self._median(oc, "rent", None, b - 1)
+            if med is None and b is not None and b <= 1:
+                # Studios / 1-beds have nothing smaller: take the next size up at a 20% discount.
+                up, n = self._median(oc, "rent", None, b + 1)
+                med = up * 0.8 if up is not None else None
             if med is None:
                 raise PropertyDataError(f"only {n} local rents for {oc} {beds}b")
             return {"status": "success", "data": {"long_let": {

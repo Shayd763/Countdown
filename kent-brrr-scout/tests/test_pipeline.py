@@ -174,3 +174,35 @@ def test_web_api(tmp_path, monkeypatch):
     assert _wait_job(c)["result"]["rescored"] == 12
     assert c.get("/api/runs").json()[0]["status"] == "ok"
     monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
+
+
+def test_cli_survives_redirected_output_on_windows_codepage(tmp_path):
+    """Scheduled/redirected runs used to die on the first '£' or '✅' under cp1252."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    env = {k: v for k, v in os.environ.items() if k not in ("PYTHONIOENCODING", "PYTHONUTF8")}
+    env["PYTHONIOENCODING"] = "cp1252"  # what Windows gives a redirected process
+    env["BRRR_DB_PATH"] = str(tmp_path / "t.db")
+    root = Path(__file__).resolve().parents[1]
+    with open(tmp_path / "out.txt", "wb") as out:
+        r = subprocess.run([sys.executable, "-m", "src.main", "--sample", "--dry-run", "--no-claude"],
+                           cwd=root, env=env, stdout=out, stderr=subprocess.STDOUT, timeout=300)
+    text = (tmp_path / "out.txt").read_bytes().decode("utf-8", "replace")
+    assert r.returncode == 0, text[-2000:]
+    assert "Run failed" not in text
+
+
+def test_streams_exist_under_pythonw(monkeypatch):
+    """pythonw (Task Scheduler) has no stdout/stderr; uvicorn's logging setup crashed on that."""
+    import sys
+
+    from src import logs
+
+    monkeypatch.setattr(sys, "stdout", None)
+    monkeypatch.setattr(sys, "stderr", None)
+    logs._utf8_streams()
+    assert sys.stdout is not None and sys.stderr is not None
+    print("£ ✅ → fine")  # must not raise

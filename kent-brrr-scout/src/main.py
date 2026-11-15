@@ -422,8 +422,10 @@ def main(argv: list[str] | None = None) -> None:
         trigger="schedule" if args.daily else "cli", areas=args.area,
         kinds=args.kinds.split(",") if args.kinds else None,
     )
+    scope = summary.areas or summary.outcodes
+    scope_text = ", ".join(scope) if len(scope) <= 6 else f"{len(scope)} counties"
     print(
-        f"\nScanned {', '.join(summary.outcodes)} via {', '.join(summary.sources)} — fetched "
+        f"\nScanned {scope_text} via {', '.join(summary.sources)} — fetched "
         f"{summary.fetched}, pre-screen rejected {summary.pre_screen_rejected}, underwritten "
         f"{summary.underwritten}, passed all gates {summary.passed} ({summary.new_passing} new), "
         f"alerts sent {summary.alerted}, Claude calls {summary.claude_calls}, "

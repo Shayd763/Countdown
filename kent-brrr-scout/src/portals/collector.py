@@ -26,6 +26,14 @@ def _noop(*_a: Any, **_k: Any) -> None:
     pass
 
 
+def areas_tonight(areas: list[str], cycle_nights: int, today) -> list[str]:
+    """Tonight's share of a rotating search. Never more slots than counties, or a small
+    coverage (e.g. Kent only) would get nights with nothing to search."""
+    ordered = sorted(areas)
+    n = max(1, min(int(cycle_nights), len(ordered)))
+    return ordered[today.toordinal() % n::n]
+
+
 def to_raw_listing(item: dict, portal: Portal, outcode: str, *, channel: str = "residential",
                    search_area: str = "", search_kind: str = "new") -> RawListing:
     from ..geo import parse_postcode
@@ -265,9 +273,7 @@ class PortalSession:
         market: list[dict] = []
 
         def tonight(spec: dict) -> list[str]:
-            n = max(1, int(spec.get("cycle_nights", 7)))
-            ordered = sorted(areas)
-            return ordered[date.today().toordinal() % n::n]
+            return areas_tonight(areas, int(spec.get("cycle_nights", 7)), date.today())
 
         plan: list[tuple[str, list[str], list[str], str, int]] = []  # (kind, areas, keywords, sort, pages)
         if "reduced" in kinds and (searches.get("reduced") or {}).get("enabled"):
@@ -312,6 +318,7 @@ class PortalSession:
 
                         items = self._pages(portal, "", "sale", pages, url_for=url_for, stop_at_seen=False,
                                             label=f"{area} {kind}{' ' + kw if kw else ''}")
+                        st["listings"] += len(items)
                         for item in items:
                             if item.get("sstc"):
                                 continue
@@ -334,6 +341,8 @@ class PortalSession:
                             by_address.add(key)
                             found[lst.listing_id] = lst
                             st["extra"][kind] += 1
+                if st["state"] in ("pending", "running"):
+                    st["state"] = "ok" if st["listings"] else "empty"
         if market:
             self.storage.record_market(market)
         return self.locate(list(found.values()))
@@ -391,6 +400,8 @@ class PortalSession:
             for channel in todo:
                 items = self._pages(portal, oc, channel, 1)
                 rows = [self._market_row(portal, oc, channel, to_raw_listing(i, portal, oc)) for i in items]
+                if channel == "rent":
+                    self.status[portal.name]["rentals"] += len(rows)
                 self.storage.record_market(rows)
                 self.storage.kv_set(f"comps_fetch:{channel}:{oc}", datetime.now(UTC).isoformat(timespec="seconds"))
             return True

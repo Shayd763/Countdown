@@ -269,3 +269,45 @@ def test_sample_run_funnel():
     assert t["possible"] >= t["passed"] and t["worth_offer"] >= 1
     assert s["funnel"]["by_region"]["South East"]["seen"] == 17
     assert any(k.startswith("Fails:") for k in s["funnel"]["reasons"])
+
+
+def test_rotation_never_leaves_small_coverage_empty():
+    from datetime import date, timedelta
+
+    from src.portals.collector import areas_tonight
+
+    start = date(2026, 11, 15)
+    for i in range(7):  # Kent only: searched every night, not one night in seven
+        assert areas_tonight(["Kent"], 7, start + timedelta(days=i)) == ["Kent"]
+    three = ["Essex", "Kent", "Surrey"]
+    seen = set()
+    for i in range(3):
+        tonight = areas_tonight(three, 7, start + timedelta(days=i))
+        assert len(tonight) == 1
+        seen |= set(tonight)
+    assert seen == set(three)
+    counties = [f"C{i:02d}" for i in range(47)]
+    week = [areas_tonight(counties, 7, start + timedelta(days=i)) for i in range(7)]
+    assert sorted(sum(week, [])) == counties
+
+
+class _FakeStorage:
+    def __init__(self, rents):  # {beds: [prices]}
+        self.rents = rents
+
+    def market_prices(self, oc, channel, ptype, beds, since):
+        return list(self.rents.get(beds, [])) if channel == "rent" and ptype is None else []
+
+
+def test_rent_fallbacks_stay_conservative():
+    from src.local_comps import LocalMarketClient
+
+    cfg = {"local_comps": {"min_samples": 3}}
+    # 3-bed thin, 2-bed plentiful: borrow 2-bed rent unadjusted
+    c = LocalMarketClient(_FakeStorage({3: [1400], 2: [1000, 1100, 1200]}), cfg)
+    r = c.get("rents", postcode="TN24", type="terraced_house", bedrooms=3)
+    assert r["data"]["long_let"]["average"] == 1100
+    # studio with no studios: 1-bed at 80%
+    c = LocalMarketClient(_FakeStorage({1: [800, 900, 1000]}), cfg)
+    r = c.get("rents", postcode="CT1", type="flat", bedrooms=0)
+    assert r["data"]["long_let"]["average"] == 720

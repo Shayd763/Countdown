@@ -18,7 +18,7 @@ def load_dotenv(path: Path | None = None) -> None:
     path = path or PROJECT_ROOT / ".env"
     if not path.exists():
         return
-    for line in path.read_text().splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -44,10 +44,10 @@ ENV_PATH = PROJECT_ROOT / ".env"
 
 @lru_cache(maxsize=4)
 def _load_config_cached(path: str, user_mtime: float) -> dict[str, Any]:
-    with Path(path).open() as fh:
+    with Path(path).open(encoding="utf-8") as fh:
         cfg = yaml.safe_load(fh)
     if user_mtime and USER_OVERRIDES.exists():
-        cfg = _deep_merge(cfg, yaml.safe_load(USER_OVERRIDES.read_text()) or {})
+        cfg = _deep_merge(cfg, yaml.safe_load(USER_OVERRIDES.read_text(encoding="utf-8")) or {})
     return cfg
 
 
@@ -62,11 +62,11 @@ def load_config(path: str | None = None) -> dict[str, Any]:
 
 
 def save_user_overrides(updates: dict[str, Any]) -> dict[str, Any]:
-    current = (yaml.safe_load(USER_OVERRIDES.read_text()) or {}) if USER_OVERRIDES.exists() else {}
+    current = (yaml.safe_load(USER_OVERRIDES.read_text(encoding="utf-8")) or {}) if USER_OVERRIDES.exists() else {}
     merged = _deep_merge(current, updates)
     USER_OVERRIDES.write_text(
         "# Written by the Gatehouse Settings page. Overrides config/postcodes.yaml.\n"
-        + yaml.safe_dump(merged, sort_keys=False)
+        + yaml.safe_dump(merged, sort_keys=False, allow_unicode=True), encoding="utf-8"
     )
     return merged
 
@@ -79,7 +79,7 @@ SECRET_KEYS = [
 
 def save_env(values: dict[str, str]) -> None:
     """Update .env in place (keeps unrelated lines) and the live process environment."""
-    lines = ENV_PATH.read_text().splitlines() if ENV_PATH.exists() else []
+    lines = ENV_PATH.read_text(encoding="utf-8").splitlines() if ENV_PATH.exists() else []
     remaining = dict(values)
     out = []
     for line in lines:
@@ -89,7 +89,7 @@ def save_env(values: dict[str, str]) -> None:
         else:
             out.append(line)
     out += [f"{k}={v}" for k, v in remaining.items()]
-    ENV_PATH.write_text("\n".join(out) + "\n")
+    ENV_PATH.write_text("\n".join(out) + "\n", encoding="utf-8")
     try:
         ENV_PATH.chmod(0o600)
     except OSError:
