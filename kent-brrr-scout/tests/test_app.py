@@ -190,3 +190,22 @@ def test_push_encryption_matches_rfc8291_vector():
     assert b64u(body) == (
         "DGv6ra1nlYgDCS1FRnbzlwAAEABBBP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A_"
         "yl95bQpu6cVPTpK4Mqgkf1CXztLVBSt2Ks3oZwbuwXPXLWyouBWLVWGNWQexSgSxsj_Qulcy4a-fN")
+
+
+def test_phone_enable_returns_tailscale_approval_link(monkeypatch):
+    """First-time `tailscale serve` waits for browser approval; we must hand back the link, not fail."""
+    import subprocess
+
+    from src import web_account
+
+    def fake_run(cmd, **kw):
+        if "serve" in cmd and "--bg" in cmd:
+            raise subprocess.TimeoutExpired(cmd, kw.get("timeout"), output=(
+                "Serve is not enabled on your tailnet.\nTo enable, visit:\n\n"
+                "         https://login.tailscale.com/f/serve?node=abc123\n"))
+        return subprocess.CompletedProcess(cmd, 0, stdout="{}", stderr="")
+
+    monkeypatch.setattr(web_account, "tailscale_bin", lambda: "tailscale")
+    monkeypatch.setattr(web_account.subprocess, "run", fake_run)
+    r = web_account.tailscale_enable(8000)
+    assert r["approve_url"] == "https://login.tailscale.com/f/serve?node=abc123"

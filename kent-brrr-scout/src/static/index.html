@@ -1029,7 +1029,16 @@ async function loadPhone() {
   <p class="small">On the same Wi-Fi you can also browse at this laptop's address, but installing and notifications need the https address above. Notifications arrive even when you're out; tapping one shows the morning's deals even if the laptop has gone to sleep.</p>`;
   if ($("tsEnable")) $("tsEnable").onclick = async () => {
     $("tsOut").textContent = "Working…";
-    try { const r = await api("/api/phone/enable", { method: "POST" }); $("tsOut").textContent = r.output || ""; loadPhone(); }
+    try {
+      const r = await api("/api/phone/enable", { method: "POST" });
+      if (r.approve_url) {  // one-time approval on the Tailscale website, then press the button again
+        $("tsOut").innerHTML = `<b>One more step:</b> Tailscale needs you to allow this once. ` +
+          `<a href="${esc(r.approve_url)}" target="_blank" rel="noopener">Open the Tailscale approval page</a>, ` +
+          `click <b>Enable</b>, then press <b>Turn on the secure phone address</b> again.`;
+        return;
+      }
+      $("tsOut").textContent = r.output || ""; loadPhone();
+    }
     catch (e) { $("tsOut").textContent = e.message; }
   };
 }

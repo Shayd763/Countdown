@@ -119,9 +119,22 @@ def tailscale_enable(port: int) -> dict[str, Any]:
     ts = tailscale_bin()
     if not ts:
         raise HTTPException(400, "Install Tailscale on this laptop first (tailscale.com/download)")
-    r = subprocess.run([ts, "serve", "--bg", str(port)], capture_output=True, text=True, timeout=60)
-    out = (r.stdout + "\n" + r.stderr).strip()
-    if r.returncode != 0:
+    import re
+
+    def _text(v: Any) -> str:
+        return v.decode("utf-8", "replace") if isinstance(v, bytes) else (v or "")
+
+    try:
+        r = subprocess.run([ts, "serve", "--bg", str(port)], capture_output=True, text=True, timeout=20)
+        out, ok = (r.stdout + "\n" + r.stderr).strip(), r.returncode == 0
+    except subprocess.TimeoutExpired as exc:
+        # First time on a tailnet, `serve` (or HTTPS certificates) must be approved in the browser,
+        # and the CLI waits for that forever. Hand the approval link to the user instead.
+        out, ok = (_text(exc.stdout) + "\n" + _text(exc.stderr)).strip(), False
+    link = re.search(r"https://login\.tailscale\.com/\S+", out)
+    if link:
+        return {"output": out, "approve_url": link.group(0), **tailscale_info(port)}
+    if not ok:
         raise HTTPException(500, out or "tailscale serve failed")
     return {"output": out, **tailscale_info(port)}
 
