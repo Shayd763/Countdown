@@ -49,8 +49,14 @@ def _parse_time(t: str) -> tuple[int, int]:
     return int(m.group(1)), int(m.group(2))
 
 
+# The app runs windowless (pythonw); without this every console tool it calls
+# (tailscale, schtasks) flashes up an empty terminal window.
+NO_WINDOW: dict = ({"creationflags": subprocess.CREATE_NO_WINDOW, "stdin": subprocess.DEVNULL}
+                   if hasattr(subprocess, "CREATE_NO_WINDOW") else {})
+
+
 def _run(cmd: list[str]) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, capture_output=True, text=True)
+    return subprocess.run(cmd, capture_output=True, text=True, **NO_WINDOW)
 
 
 # -- macOS ------------------------------------------------------------------

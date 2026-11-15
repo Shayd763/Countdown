@@ -78,6 +78,12 @@ def _set_cookie(resp: Response, request: Request, token: str) -> None:
 # ---------------------------------------------------------------------------
 
 
+# The app runs windowless (pythonw); without this every console tool it calls
+# (tailscale, schtasks) flashes up an empty terminal window.
+NO_WINDOW: dict = ({"creationflags": subprocess.CREATE_NO_WINDOW, "stdin": subprocess.DEVNULL}
+                   if hasattr(subprocess, "CREATE_NO_WINDOW") else {})
+
+
 def tailscale_bin() -> str | None:
     found = shutil.which("tailscale")
     if found:
@@ -99,7 +105,7 @@ def tailscale_info(port: int) -> dict[str, Any]:
         info["message"] = "Tailscale isn't installed on this laptop."
         return info
     try:
-        st = json.loads(subprocess.run([ts, "status", "--json"], capture_output=True, text=True,
+        st = json.loads(subprocess.run([ts, "status", "--json"], capture_output=True, **NO_WINDOW, text=True,
                                        timeout=10).stdout or "{}")
         self_node = st.get("Self") or {}
         dns = (self_node.get("DNSName") or "").rstrip(".")
@@ -107,7 +113,8 @@ def tailscale_info(port: int) -> dict[str, Any]:
         info["dns_name"] = dns or None
         if dns:
             info["url"] = f"https://{dns}/app/"
-        serve = subprocess.run([ts, "serve", "status", "--json"], capture_output=True, text=True, timeout=10)
+        serve = subprocess.run([ts, "serve", "status", "--json"], capture_output=True, text=True,
+                               timeout=10, **NO_WINDOW)
         cfg = json.loads(serve.stdout or "{}") if serve.returncode == 0 else {}
         info["serving"] = str(port) in json.dumps(cfg)
     except (OSError, ValueError, subprocess.SubprocessError) as exc:
@@ -125,7 +132,7 @@ def tailscale_enable(port: int) -> dict[str, Any]:
         return v.decode("utf-8", "replace") if isinstance(v, bytes) else (v or "")
 
     try:
-        r = subprocess.run([ts, "serve", "--bg", str(port)], capture_output=True, text=True, timeout=20)
+        r = subprocess.run([ts, "serve", "--bg", str(port)], capture_output=True, **NO_WINDOW, text=True, timeout=20)
         out, ok = (r.stdout + "\n" + r.stderr).strip(), r.returncode == 0
     except subprocess.TimeoutExpired as exc:
         # First time on a tailnet, `serve` (or HTTPS certificates) must be approved in the browser,
