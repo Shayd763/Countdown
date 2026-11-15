@@ -240,14 +240,15 @@ def normalise_json_listing(d: dict, base_url: str, channel: str) -> dict | None:
         return None
     if channel == "rent" and freq == "weekly":
         price = price * 52 / 12
-    url = _first(d, "propertyUrl", "detailUrl", "url", "listingUrl", "uri")
+    url = _first(d, "propertyUrl", "detailUrl", "details-url", "url", "listingUrl", "uri")
     if isinstance(d.get("listingUris"), dict):
         url = url or d["listingUris"].get("detail")
     addr = _address(_first(d, "displayAddress", "address", "displayable_address", "addressLine",
                            "streetAddress", "title"))
     type_text = " ".join(str(x) for x in [
         _first(d, "propertySubType", "propertyType", "propertyTypeFullDescription", "property_type",
-               "propertyTypeDisplay"), d.get("title"), d.get("summary")] if x)
+               "propertyTypeDisplay", "humanised-property-type"), d.get("title"), d.get("property-title"),
+        d.get("summary")] if x)
     beds = _first(d, "bedrooms", "numBedrooms", "num_beds", "beds", "numberOfBedrooms")
     try:
         beds = int(beds) if beds is not None else None
@@ -255,6 +256,8 @@ def normalise_json_listing(d: dict, base_url: str, channel: str) -> dict | None:
         beds = None
     loc = d.get("location") if isinstance(d.get("location"), dict) else {}
     summary = str(_first(d, "summary", "description", "shortDescription", "propertyDescription") or "")
+    if not summary and isinstance(d.get("features"), list):  # OnTheMarket: tenure etc. live in features
+        summary = ". ".join(str(f) for f in d["features"] if f)
     text_all = f"{type_text} {summary} {d.get('displayStatus') or ''}".lower()
     upd = d.get("listingUpdate") if isinstance(d.get("listingUpdate"), dict) else {}
     date_text = " ".join(str(x) for x in (d.get("addedOrReduced"), d.get("addedOn"), d.get("addedOrReducedDate")) if x)
@@ -273,7 +276,7 @@ def normalise_json_listing(d: dict, base_url: str, channel: str) -> dict | None:
         "summary": htmllib.unescape(re.sub(r"<[^>]+>", " ", summary)).strip(),
         "images": _images(d),
         "lat": loc.get("latitude") or loc.get("lat"),
-        "lng": loc.get("longitude") or loc.get("lng"),
+        "lng": loc.get("longitude") or loc.get("lng") or loc.get("lon"),
         "is_auction": bool(d.get("auction")) or "auction" in text_all,
         "sstc": "sold stc" in text_all or "under offer" in text_all or bool(d.get("sstc")),
     }

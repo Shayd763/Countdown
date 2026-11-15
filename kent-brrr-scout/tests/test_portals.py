@@ -155,3 +155,42 @@ def test_full_pipeline_with_portals_and_local_comps(monkeypatch, tmp_path):
         assert st.recent_runs()[0]["status"] == "partial"  # a portal was blocked
     finally:
         srv.shutdown()
+
+
+def test_onthemarket_kebab_case_listing():
+    """OnTheMarket's search JSON uses kebab-case keys and keeps tenure in `features`."""
+    from src.portals.collector import to_raw_listing
+    from src.portals.extract import normalise_json_listing
+    from src.portals.sites import OnTheMarket
+
+    d = {"id": "20637527", "price": "£200,000", "address": "Albany Road, Chatham",
+         "humanised-property-type": "End of terrace house",
+         "property-title": "2 bedroom end of terrace house for sale", "bedrooms": 2,
+         "details-url": "/details/20637527/", "features": ["Tenure: Freehold", "Chain free"],
+         "location": {"lon": 0.5393225, "lat": 51.3709007}}
+    item = normalise_json_listing(d, "https://www.onthemarket.com", "sale")
+    assert item["property_type"] == "end-terrace"
+    assert item["lng"] == 0.5393225
+    assert item["url"] == "https://www.onthemarket.com/details/20637527/"
+    lst = to_raw_listing(item, OnTheMarket("https://www.onthemarket.com"), "ME4")
+    assert lst.tenure.value == "freehold"
+
+
+def test_rightmove_typeahead_uses_json_api():
+    """Typeahead answers a plain page load with XML, so the resolver must ask for JSON."""
+    from src.portals.sites import Rightmove
+
+    class FakeBrowser:
+        def fetch_json(self, url, polite=True):
+            return {"matches": [{"id": "1622", "type": "OUTCODE", "displayName": "ME4"}]}
+
+    class KV:
+        def kv_get(self, k):
+            return None
+
+        def kv_set(self, k, v):
+            pass
+
+    rm = Rightmove("https://www.rightmove.co.uk", "https://los.rightmove.co.uk/typeahead")
+    assert rm.prepare(FakeBrowser(), "ME4", {"portals": {}}, KV())
+    assert rm._ids["ME4"] == "OUTCODE^1622"

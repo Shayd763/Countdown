@@ -173,6 +173,18 @@ class PortalBrowser:
         except Exception as exc:  # noqa: BLE001
             return PageResult(url=url, status=None, error=f"{type(exc).__name__}: {exc}")
 
+    def fetch_json(self, url: str, *, polite: bool = True) -> Any:
+        """GET a JSON API through the browser profile (same cookies), asking for JSON explicitly.
+        Some endpoints (e.g. Rightmove typeahead) answer a normal page load with XML."""
+        if polite and self._last_fetch:
+            self._pause()
+        self._last_fetch = time.monotonic()
+        try:
+            resp = self._ctx.request.get(url, headers={"Accept": "application/json"})
+            return resp.json() if resp.ok else None
+        except Exception:  # noqa: BLE001
+            return None
+
     def dump_debug(self, label: str, res: PageResult) -> str:
         """Save HTML + screenshot so a broken parser can be fixed later."""
         DEBUG_DIR.mkdir(parents=True, exist_ok=True)

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 from dataclasses import dataclass
@@ -67,9 +66,8 @@ class Rightmove(Portal):
             self._ids[outcode] = pinned or cached
             return True
         url = f"{self.typeahead_url}?{urlencode({'query': outcode, 'limit': 10, 'exclude': 'STREET'})}"
-        res = browser.fetch(url, polite=True, cards=False)
+        data = browser.fetch_json(url, polite=True) or {}
         try:
-            data = json.loads(res.text)
             for m in data.get("matches") or data.get("typeAheadLocations") or []:
                 mtype = (m.get("type") or m.get("locationType") or "").upper()
                 name = (m.get("displayName") or m.get("name") or "").upper().replace(" ", "")
@@ -91,9 +89,8 @@ class Rightmove(Portal):
             self._ids[area] = pinned or cached
             return True
         url = f"{self.typeahead_url}?{urlencode({'query': area, 'limit': 10, 'exclude': 'STREET'})}"
-        res = browser.fetch(url, polite=True, cards=False)
+        data = browser.fetch_json(url, polite=True) or {}
         try:
-            data = json.loads(res.text)
             want = area.lower()
             for m in data.get("matches") or data.get("typeAheadLocations") or []:
                 mtype = (m.get("type") or m.get("locationType") or "").upper()
