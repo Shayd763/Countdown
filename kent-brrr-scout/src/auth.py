@@ -27,6 +27,7 @@ DEFAULT_PREFS: dict[str, Any] = {
     "regions": [],             # English regions; [] = all
     "property_types": [],      # [] = any type
     "categories": ["residential"],
+    "auctions": "any",         # "any" | "only" (auction lots only) | "hide" (no auction lots)
     "digest_size": 5,
     "plan": None,              # finance plan id for this person's views and alerts; None = default
 }

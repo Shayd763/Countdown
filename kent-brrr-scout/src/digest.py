@@ -69,6 +69,9 @@ def _matches(d: Deal, prefs: dict[str, Any]) -> bool:
         return False
     if prefs.get("categories") and lst.category.value not in prefs["categories"]:
         return False
+    auctions = prefs.get("auctions") or "any"
+    if (auctions == "only" and not lst.is_auction) or (auctions == "hide" and lst.is_auction):
+        return False
     if prefs.get("min_roce") not in (None, "") and r.roce_pct is not None \
             and r.roce_pct < float(prefs["min_roce"]):
         return False

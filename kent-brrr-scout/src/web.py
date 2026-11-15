@@ -97,6 +97,10 @@ def has_signal(d: Deal, signal: str) -> bool:
             return False
     if signal == "stale":
         return (days_on_market(lst) or 0) >= 90
+    if signal == "auction":
+        return bool(lst.is_auction)
+    if signal == "no_auction":
+        return not lst.is_auction
     return True
 
 

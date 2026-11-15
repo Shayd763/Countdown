@@ -209,3 +209,32 @@ def test_phone_enable_returns_tailscale_approval_link(monkeypatch):
     monkeypatch.setattr(web_account.subprocess, "run", fake_run)
     r = web_account.tailscale_enable(8000)
     assert r["approve_url"] == "https://login.tailscale.com/f/serve?node=abc123"
+
+
+def test_auction_filter_and_alert_preference():
+    from types import SimpleNamespace as NS
+
+    from src.digest import _matches
+    from src.models import PropertyCategory
+    from src.web import has_signal
+
+    def deal(auction):
+        lst = NS(is_auction=auction, outcode="ME4", postcode="ME4 5DN", property_type="terraced",
+                 category=PropertyCategory.RESIDENTIAL)
+        return NS(listing=lst, result=NS(roce_pct=20.0, total_cash_deployed=50_000))
+
+    lot, normal = deal(True), deal(False)
+    assert has_signal(lot, "auction") and not has_signal(normal, "auction")
+    assert has_signal(normal, "no_auction") and not has_signal(lot, "no_auction")
+    base = {"categories": ["residential"]}
+    assert _matches(lot, base) and _matches(normal, base)  # default: include auctions
+    assert _matches(lot, {**base, "auctions": "only"}) and not _matches(normal, {**base, "auctions": "only"})
+    assert _matches(normal, {**base, "auctions": "hide"}) and not _matches(lot, {**base, "auctions": "hide"})
+
+
+def test_auction_pref_saves(client):
+    c = client
+    _setup(c)
+    me = c.put("/api/auth/me", json={"prefs": {"auctions": "hide"}}).json()
+    assert me["prefs"]["auctions"] == "hide"
+    assert c.get("/api/deals", params={"signal": "no_auction"}).status_code == 200

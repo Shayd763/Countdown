@@ -501,7 +501,12 @@ function renderFilters() {
   $("pcPrefix").value = f.postcode;
   if (!Array.isArray(f.signals)) f.signals = [];
   const sg = $("signals"); sg.innerHTML = "";
-  [["reduced", "Price cut"], ["stale", "On market 90+ days"]].forEach(([v, l]) => sg.appendChild(chip(l, f.signals.includes(v), () => { toggleIn(f.signals, v); refresh(); })));
+  const AUCTION_PAIR = { auction: "no_auction", no_auction: "auction" };
+  [["reduced", "Price cut"], ["stale", "On market 90+ days"], ["auction", "Auctions only"], ["no_auction", "Hide auctions"]].forEach(([v, l]) => sg.appendChild(chip(l, f.signals.includes(v), () => {
+    toggleIn(f.signals, v);
+    if (AUCTION_PAIR[v] && f.signals.includes(v)) f.signals = f.signals.filter((x) => x !== AUCTION_PAIR[v]);
+    refresh();
+  })));
   const cats = $("categories"); cats.innerHTML = "";
   cats.appendChild(chip("All", f.categories.length === 0, () => { f.categories = []; refresh(); }));
   m.categories.forEach((c) => cats.appendChild(chip(c[0].toUpperCase() + c.slice(1), f.categories.includes(c), () => { toggleIn(f.categories, c); refresh(); })));
