@@ -311,3 +311,45 @@ def test_rent_fallbacks_stay_conservative():
     c = LocalMarketClient(_FakeStorage({1: [800, 900, 1000]}), cfg)
     r = c.get("rents", postcode="CT1", type="flat", bedrooms=0)
     assert r["data"]["long_let"]["average"] == 720
+
+
+def test_catch_up_window_covers_missed_nights():
+    from datetime import UTC, datetime, timedelta
+
+    from src.portals.collector import catch_up_days
+
+    now = datetime.now(UTC)
+    assert catch_up_days(None, 1) == 1                                         # first run
+    assert catch_up_days((now - timedelta(hours=20)).isoformat(), 1) == 1      # ran last night
+    assert catch_up_days((now - timedelta(days=2, hours=1)).isoformat(), 1) == 3  # missed one night
+    assert catch_up_days((now - timedelta(days=40)).isoformat(), 1) == 14     # capped
+
+
+def test_backfill_rotates_through_counties():
+    from datetime import UTC, datetime, timedelta
+
+    from src.portals.collector import backfill_due
+
+    counties = [f"C{i:02d}" for i in range(47)]
+    done: dict = {}
+    nights = 0
+    while len(done) < 47:
+        tonight = backfill_due(counties, done, 10, 30)
+        assert 0 < len(tonight) <= 10 and not set(tonight) & set(done)
+        done.update({c: datetime.now(UTC).isoformat() for c in tonight})
+        nights += 1
+    assert nights == 5
+    assert backfill_due(counties, done, 10, 30) == []                     # all fresh: nothing due
+    old = (datetime.now(UTC) - timedelta(days=31)).isoformat()
+    assert backfill_due(counties, {**done, "C07": old}, 10, 30) == ["C07"]  # monthly refresh
+
+
+def test_rightmove_days_rounded_to_allowed_values():
+    from src.config import load_config
+    from src.portals.sites import build_portals
+
+    cfg = load_config()
+    rm = next(p for p in build_portals(cfg) if p.name == "rightmove")
+    for asked, sent in ((1, 1), (2, 3), (5, 7), (10, 14), (14, 14)):
+        url = rm.area_search_url(cfg, "Kent", "residential", 0, 350000, asked)
+        assert f"maxDaysSinceAdded={sent}&" in url

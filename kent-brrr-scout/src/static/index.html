@@ -838,7 +838,7 @@ function renderChecks(checks) {
 }
 const STAGE_LABEL = { seen: "Seen", unchanged: "Unchanged, skipped", excluded: "Excluded by filters", no_comps: "Waiting for comps",
   checked: "Checked", possible: "Possible (light refurb)", passed: "Passed all gates", worth_offer: "Worth an offer" };
-const KIND_LABEL = { new: "New today", reduced: "Price cuts", stale: "90+ days on market", sweep: "Backfill sweep", sample: "Sample", feed: "Feeds" };
+const KIND_LABEL = { new: "New today", reduced: "Price cuts", stale: "90+ days on market", sweep: "Keyword sweep", backfill: "Last 14 days (deep)", sample: "Sample", feed: "Feeds" };
 async function loadFunnel() {
   let f; try { f = await api("/api/funnel?days=7"); } catch { return; }
   const L = f.latest; if (!L) return;

@@ -26,6 +26,36 @@ def _noop(*_a: Any, **_k: Any) -> None:
     pass
 
 
+def catch_up_days(last_iso: str | None, base_days: int, cap: int = 14) -> int:
+    """Days of listings to ask for: the configured window, widened to cover any gap since this
+    county was last searched on this portal (e.g. the laptop was off), up to `cap`."""
+    if not last_iso:
+        return base_days
+    try:
+        gap = (datetime.now(UTC) - datetime.fromisoformat(last_iso)).total_seconds() / 86400
+    except ValueError:
+        return base_days
+    return max(base_days, min(cap, int(gap + 0.999)))
+
+
+def backfill_due(areas: list[str], last_done: dict[str, str | None], per_night: int,
+                 every_days: int) -> list[str]:
+    """Counties whose deep search is due tonight: never-done first, then the oldest, at most
+    `per_night`, skipping any done within the last `every_days` days."""
+    now = datetime.now(UTC)
+    due = []
+    for a in sorted(areas):
+        last = last_done.get(a)
+        if last:
+            try:
+                if (now - datetime.fromisoformat(last)).days < every_days:
+                    continue
+            except ValueError:
+                pass
+        due.append((last or "", a))
+    return [a for _, a in sorted(due)[:max(0, per_night)]]
+
+
 def areas_tonight(areas: list[str], cycle_nights: int, today) -> list[str]:
     """Tonight's share of a rotating search. Never more slots than counties, or a small
     coverage (e.g. Kent only) would get nights with nothing to search."""
@@ -235,15 +265,20 @@ class PortalSession:
                     st["message"] = f"Could not find {area} on {name}"
                     continue
                 st["areas"] += 1
+                # Missed a night (laptop off, site blocked)? Widen the window to cover the gap.
+                seen_key = f"new_searched:{name}:{area}"
+                area_days = catch_up_days(self.storage.kv_get(seen_key), days)
+                area_ok = False
                 for ch in channels:
                     for kw in (keywords if ch == "residential" else [""]):
                         if st["state"] == "blocked":
                             break
                         items = self._pages(
                             portal, "", "sale", max_pages, label=f"{area} {ch}{' ' + kw if kw else ''}",
-                            url_for=lambda pg, a=area, c=ch, k=kw, pt=portal: pt.area_search_url(
-                                self.cfg, a, c, pg, prices[c], days, k))
+                            url_for=lambda pg, a=area, c=ch, k=kw, pt=portal, dd=area_days: pt.area_search_url(
+                                self.cfg, a, c, pg, prices[c], dd, k))
                         st["listings"] += len(items)
+                        area_ok = area_ok or st["state"] != "blocked"
                         for item in items:
                             if item.get("sstc"):
                                 continue
@@ -253,6 +288,8 @@ class PortalSession:
                                 continue
                             by_address.add(key)
                             listings[lst.listing_id] = lst
+                if area_ok and st["state"] != "blocked":
+                    self.storage.kv_set(seen_key, datetime.now(UTC).isoformat(timespec="seconds"))
             if st["state"] == "running":
                 st["state"] = "ok" if st["listings"] else "empty"
         self._found = listings
@@ -286,6 +323,10 @@ class PortalSession:
             s = searches["sweep"]
             plan.append(("sweep", tonight(s), list(s.get("keywords") or [""]), "newest",
                          int(s.get("pages_per_search", 4))))
+
+        if "backfill" in kinds:
+            self._collect_backfill(searches.get("backfill") or {}, areas, max_price, found,
+                                   seen_ids, by_address, market)
 
         today = date.today()
         for kind, kind_areas, keywords, sort_name, pages in plan:
@@ -346,6 +387,54 @@ class PortalSession:
         if market:
             self.storage.record_market(market)
         return self.locate(list(found.values()))
+
+    def _collect_backfill(self, spec: dict, areas: list[str], max_price: int, found: dict,
+                          seen_ids: set, by_address: set, market: list) -> int:
+        """Deep search of existing stock: everything listed in the last `within_days` days for a
+        few counties a night, rotating so the whole of England is covered every few nights."""
+        if not spec.get("enabled"):
+            return 0
+        within = int(spec.get("within_days", 14))
+        pages = int(spec.get("pages", 8))
+        per_night = int(spec.get("counties_per_night", 10))
+        every = int(spec.get("every_days", 30))
+        tonight = backfill_due(areas, {a: self.storage.kv_get(f"backfill_done:{a}") for a in areas},
+                               per_night, every)
+        added = 0
+        for area in tonight:
+            area_ok = False
+            for name in spec.get("portals") or list(self.portals):
+                portal = self.portals.get(name)
+                if not portal:
+                    continue
+                st = self.status[name]
+                if st["state"] == "blocked" or not portal.prepare_area(self.browser, area, self.cfg, self.storage):
+                    continue
+                st.setdefault("extra", {}).setdefault("backfill", 0)
+                items = self._pages(portal, "", "sale", pages, stop_at_seen=False, label=f"{area} backfill",
+                                    url_for=lambda pg, a=area, pt=portal: pt.area_search_url(
+                                        self.cfg, a, "residential", pg, max_price, within, ""))
+                st["listings"] += len(items)
+                if st["state"] != "blocked":
+                    area_ok = True
+                    if st["state"] in ("pending", "running"):
+                        st["state"] = "ok" if st["listings"] else "empty"
+                for item in items:
+                    if item.get("sstc"):
+                        continue
+                    lst = to_raw_listing(item, portal, "", search_area=area, search_kind="backfill")
+                    if lst.outcode:
+                        market.append(self._market_row(portal, lst.outcode, "sale", lst))
+                    key = _address_key(lst)
+                    if lst.listing_id in seen_ids or lst.listing_id in found or (lst.address and key in by_address):
+                        continue
+                    by_address.add(key)
+                    found[lst.listing_id] = lst
+                    st["extra"]["backfill"] += 1
+                    added += 1
+            if area_ok:
+                self.storage.kv_set(f"backfill_done:{area}", datetime.now(UTC).isoformat(timespec="seconds"))
+        return added
 
     def locate(self, listings: list[RawListing]) -> list[RawListing]:
         """Give every listing a postcode district (from its address, else its map position) and

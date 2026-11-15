@@ -32,6 +32,16 @@ coverage:
       pages_per_search: 4
       portals: [rightmove]
       keywords: [modernisation, renovation, refurbishment, "cash buyers", auction, investment, repossessed, probate]
+    # Deep search of existing stock: every residential listing from the last 14 days, a few
+    # counties a night, so the whole of England's current stock is read every few nights and
+    # again every month (`every_days`). Widens the funnel far beyond "added today".
+    backfill:
+      enabled: true
+      within_days: 14
+      counties_per_night: 10
+      pages: 8
+      every_days: 30
+      portals: [rightmove, onthemarket, zoopla]
   search_areas:
     - Bedfordshire
     - Berkshire

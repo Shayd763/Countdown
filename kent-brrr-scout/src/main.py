@@ -97,7 +97,8 @@ def process_listing(
     fn.add("seen", listing)
     # Listings found again by the reduced/stale/sweep searches: skip if the price hasn't moved
     # and we checked them recently. New listings are always checked.
-    if listing.search_kind in ("reduced", "stale", "sweep") and recently_checked(listing, storage, cfg):
+    if listing.search_kind in ("reduced", "stale", "sweep", "backfill") and recently_checked(
+            listing, storage, cfg):
         storage.upsert_listing(listing)
         summary.unchanged_skipped += 1
         fn.add("unchanged", listing)
@@ -301,7 +302,7 @@ def run_scan(
                 if nationwide:
                     search_areas = areas or (cfg.get("coverage") or {}).get("search_areas") or []
                     summary.areas = search_areas
-                    run_kinds = kinds or ["new", "reduced", "stale", "sweep"]
+                    run_kinds = kinds or ["new", "reduced", "stale", "sweep", "backfill"]
                     if "new" in run_kinds:
                         listings += session.collect_areas(search_areas)
                     first = dict(session.located)

@@ -43,7 +43,8 @@ class Portal:
         return tpl.format(
             base=self.base_url, loc=quote(self.area_loc(area), safe=""), slug=slugify(area),
             name=quote_plus(area), max_price=max_price, index=page * self.page_size, page1=page + 1,
-            days=days, zoopla_added="24_hours" if days <= 1 else ("3_days" if days <= 3 else "7_days"),
+            days=next((d for d in (1, 3, 7, 14) if d >= days), 14),  # Rightmove's allowed values
+            zoopla_added="24_hours" if days <= 1 else ("3_days" if days <= 3 else "7_days"),
             otm_added="24-hours" if days <= 1 else ("3-days" if days <= 3 else "7-days"),
             kw=f"&keywords={quote_plus(keyword)}" if keyword else "",
         )

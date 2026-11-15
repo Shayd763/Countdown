@@ -73,12 +73,24 @@ def test_mortgage_from_day_one_costs_interest_during_works():
     assert r.purchase_loan == 75_000 and r.bridging_costs == pytest.approx(4_968.75, abs=0.01)
 
 
-def test_all_cash_no_mortgage_fails_capital_recycled():
+def test_all_cash_no_mortgage_skips_capital_recycled():
+    """No refinance means no capital comes back by design: gate 4 doesn't apply to that plan."""
     plan = FinancePlan(id="a", label="a", purchase="cash", refinance=None)
     r = underwrite(**KW, plan=plan)
     assert r.refi_loan == 0 and r.money_left_in == 138_500 and r.annual_mortgage_payment == 0
-    assert not next(g for g in r.gates if g.name == "capital_recycled").passed
+    g4 = next(g for g in r.gates if g.name == "capital_recycled")
+    assert g4.passed and "Not applicable" in g4.detail and r.capital_recycled_pct == 0
+    assert r.passed == all(g.passed for g in r.gates if g.name != "capital_recycled")
     assert r.net_annual_cashflow == pytest.approx((14_400 - 3_168) * 0.81, abs=0.01)
+
+
+def test_refinance_plans_still_need_capital_recycled():
+    plan = FinancePlan(id="b", label="b", purchase="cash", refinance=None)
+    with_refi = underwrite(**KW)  # default plan refinances
+    assert with_refi.capital_recycled_pct > 0
+    g4 = next(g for g in with_refi.gates if g.name == "capital_recycled")
+    assert g4.passed == (with_refi.capital_recycled_pct >= 0.55)
+    assert "Not applicable" not in g4.detail and plan.refinance is None
 
 
 def test_every_configured_plan_builds():
@@ -115,7 +127,11 @@ def test_plan_switch_changes_numbers_everywhere(client):
                                                                     "plan": "cash_only"}).json()}
     lid = next(iter(base))
     assert base[lid]["plan"] == "Bridge, then Ltd buy-to-let" and cash[lid]["plan"] == "All cash, no mortgage"
-    assert cash[lid]["refi_loan"] == 0 and not any(d["passed"] for d in cash.values())
+    assert cash[lid]["refi_loan"] == 0
+    # all-cash deals are judged on the first three gates only (no refinance, so gate 4 doesn't apply)
+    full = c.get(f"/api/deals/{lid}", params={"plan": "cash_only"}).json()["result"]
+    g = {x["name"]: x["passed"] for x in full["gates"]}
+    assert g["capital_recycled"] and full["passed"] == (g["all_in_cap"] and g["gross_yield"] and g["net_cashflow"])
     # the person's saved plan becomes their default view and digest
     c.put("/api/auth/me", json={"prefs": {"plan": "cash_only"}})
     assert c.get("/api/digest").json()["plan"]["id"] == "cash_only"

@@ -369,10 +369,14 @@ def underwrite(
         ),
         GateResult(
             name="capital_recycled",
-            passed=capital_recycled_pct >= p.min_capital_recycled_pct,
+            # A plan with no refinance (all cash, held) never recycles capital by design, so this
+            # gate doesn't apply to it; judge those deals on the other three gates.
+            passed=plan.refinance is None or capital_recycled_pct >= p.min_capital_recycled_pct,
             value=round(capital_recycled_pct, 4),
             threshold=p.min_capital_recycled_pct,
             detail=(
+                f"Not applicable: no refinance in this plan ({plan.label}); cash stays in the deal"
+                if plan.refinance is None else
                 f"Net refi £{net_refi_proceeds:,.0f} of £{total_cash_deployed:,.0f} deployed "
                 f"= {capital_recycled_pct:.1%}"
             ),
