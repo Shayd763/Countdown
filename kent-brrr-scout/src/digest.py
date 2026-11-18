@@ -90,10 +90,18 @@ def build_digest(st: Storage, prefs: dict[str, Any]) -> dict[str, Any]:
     rows = st.query_deal_rows(hide_rejected=True, limit=2000, sort="roce_pct")
     for r in rows:  # every number under the person's chosen finance plan and current settings
         r["deal"] = r["deal"].model_copy(update={"result": reunderwrite(r["deal"], cfg, plan_id)})
-    rows = [r for r in rows if _matches(r["deal"], prefs)]
+    loose = [r for r in rows if _matches(r["deal"], {**prefs, "auctions": "any"})]
+    rows = [r for r in loose if _matches(r["deal"], prefs)]
     rows.sort(key=lambda r: (r["deal"].result.roce_pct is None, r["deal"].result.roce_pct or 0), reverse=True)
     if new_since:
         rows = [r for r in rows if (r["first_seen"] or "") >= new_since]
+    # Passing deals the auction / "new that morning" settings are hiding, so the app can say so.
+    ok = lambda r: r["deal"].result.passed and r["deal"].result.eligible  # noqa: E731
+    shown = {id(r) for r in rows}
+    hidden_pass = [r for r in loose if ok(r) and id(r) not in shown]
+    hidden = {"passing": len(hidden_pass),
+              "auctions": sum(1 for r in hidden_pass if not _matches(r["deal"], prefs)),
+              "only_new": sum(1 for r in hidden_pass if _matches(r["deal"], prefs))}
 
     passing = [r for r in rows if r["deal"].result.passed and r["deal"].result.eligible]
     # Near misses: eligible deals that would pass all four gates at the max offer price.
@@ -124,6 +132,7 @@ def build_digest(st: Storage, prefs: dict[str, Any]) -> dict[str, Any]:
                 "fetched": (summary or {}).get("fetched"),
                 "new_passing": (summary or {}).get("new_passing")} if last else None,
         "counts": {"matching": len(rows), "passing": len(passing), "near_misses": len(near)},
+        "hidden": hidden,
         "totals": {
             "cash_needed_all_passing": round(sum(r["deal"].result.total_cash_deployed for r in passing), 2),
             "monthly_cashflow_all_passing": round(sum(r["deal"].result.net_monthly_cashflow

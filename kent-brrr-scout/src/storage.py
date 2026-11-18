@@ -409,7 +409,18 @@ class Storage:
         self.db["kv"].upsert({"key": key, "value": json.dumps(value, default=str),
                               "updated_at": _now()}, pk="key")
 
+    def close_stale_runs(self, hours: float = 8) -> int:
+        """Runs still marked 'running' after the scan time limit were killed (time limit, reboot,
+        sleep); mark them so the history and the digest stop treating them as in progress."""
+        from datetime import datetime, timedelta, UTC
+        cutoff = (datetime.now(UTC) - timedelta(hours=hours)).isoformat(timespec="seconds")
+        stale = [r["id"] for r in self.db["runs"].rows_where("status = 'running' AND started_at < ?", [cutoff])]
+        for rid in stale:
+            self.db["runs"].update(rid, {"status": "interrupted", "finished_at": _now()})
+        return len(stale)
+
     def start_run(self, trigger: str, sources: list[str]) -> int:
+        self.close_stale_runs()
         return self.db["runs"].insert({"started_at": _now(), "trigger": trigger,
                                        "sources": ",".join(sources), "status": "running"}).last_pk
 

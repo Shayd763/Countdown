@@ -564,12 +564,17 @@ async function viewToday() {
     ${offlineNotice()}
     <div class="group"><div class="summary"><div class="lead">${lead}</div><p>${scanned}${!n && dg.counts.matching ? ` ${dg.counts.matching} listings match your filters.` : ""}</p></div>${totals}
       ${dg.funnel && dg.funnel.seen ? `<button class="funnel-line" id="funnelBtn"><span class="num"><b>${dg.funnel.seen.toLocaleString("en-GB")}</b> seen · <b>${dg.funnel.checked}</b> checked · <b>${dg.funnel.possible}</b> possible · <b class="green">${dg.funnel.passed}</b> passed</span>${ic("chev", "i chev")}</button>` : ""}</div>
+    ${dg.hidden && dg.hidden.passing ? `<div class="notice">${ic("info")}<div class="grow">${dg.hidden.passing} more deal${dg.hidden.passing > 1 ? "s pass" : " passes"} but ${dg.hidden.passing > 1 ? "are" : "is"} hidden by your Alerts settings${dg.hidden.auctions ? ` (${dg.hidden.auctions} auction lot${dg.hidden.auctions > 1 ? "s" : ""})` : ""}${dg.hidden.only_new ? ` (${dg.hidden.only_new} not new since the last scan)` : ""}.<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${dg.hidden.auctions ? `<button class="btn tinted" data-unhide="auctions">Show auctions</button>` : ""}${dg.hidden.only_new ? `<button class="btn tinted" data-unhide="only_new">Show older listings</button>` : ""}</div></div></div>` : ""}
     ${dg.best.length ? `<h2 class="gh">Best return<a href="#/deals">See all</a></h2>${dg.best.map((d) => dealCard(d)).join("")}` : ""}
     ${dg.near_misses.length ? `<h2 class="gh">Worth an offer</h2>${dg.near_misses.map((d) => dealCard(d, true)).join("")}` : ""}
     ${!dg.best.length && !dg.near_misses.length ? `<div class="empty">${ic("search")}Nothing to act on with ${esc(dg.plan ? dg.plan.label.toLowerCase() : "this plan")}.<br>Try another way of financing above, or<br>loosen your filters in Alerts.<div style="margin-top:16px"><a class="btn tinted" href="#/deals">Browse deals</a></div></div>` : ""}
   </div>`);
   bindPlanBar(viewToday);
   if ($("#funnelBtn")) $("#funnelBtn").onclick = openFunnel;
+  document.querySelectorAll("[data-unhide]").forEach((b) => b.onclick = async () => {
+    const prefs = b.dataset.unhide === "auctions" ? { auctions: "any" } : { only_new: false };
+    try { state.user = await api("/api/auth/me", { method: "PUT", body: { prefs } }); toast("Alerts updated", "check"); viewToday(); } catch (e) { toast(e.message, "info"); }
+  });
 }
 
 const STAGE_LABEL = { seen: "Seen on the portals", unchanged: "Seen before, price unchanged", excluded: "Excluded by your filters",
@@ -972,9 +977,10 @@ async function viewMe() {
     catch (e) { toast(e.message, "info", 5000); }
   };
   if ($("#scanNow")) $("#scanNow").onclick = async () => {
-    try { await api("/api/scan", { method: "POST", body: { sources: null } }); $("#scanMsg").textContent = "Starting"; pollScan(); }
-    catch (e) { toast(e.message, "info"); }
+    try { await api("/api/scan", { method: "POST", body: { sources: null } }); $("#scanMsg").textContent = "Starting"; toast("Scan started. England-wide takes 2–3 hours; deals appear when it finishes", "clock", 5000); pollScan(); }
+    catch (e) { toast(/already running/i.test(e.message) ? "A scan is already running. Deals appear when it finishes" : e.message, "info", 4500); pollScan(); }
   };
+  if ($("#scanMsg")) pollScan();
   $("#pwBtn").onclick = () => {
     openSheet(`<h2>Change password<button class="gbtn glass" id="pwx" aria-label="Close">${ic("x")}</button></h2>
       <div class="group"><label class="cell"><input type="password" id="pw0" autocomplete="current-password" placeholder="Current password" style="text-align:left;color:var(--label)"></label>
@@ -1061,9 +1067,10 @@ async function openProduct(key) {
 async function pollScan() {
   try {
     const j = await api("/api/job"), el = $("#scanMsg");
-    if (j && j.running) { if (el) el.textContent = (j.message || "").slice(0, 28); setTimeout(pollScan, 2000); }
-    else if (j && el) el.textContent = j.error ? "Failed" : `${j.result.passed} pass`;
-    if (j && !j.running && !j.error) toast(`Scan finished: ${j.result.fetched} listings, ${j.result.passed} pass`);
+    if (j && j.running) { if (el) { const mins = Math.max(0, Math.round((Date.now() - new Date(j.started_at)) / 60000)); el.textContent = `Scanning · ${mins < 60 ? mins + " min" : Math.floor(mins / 60) + "h " + (mins % 60) + "m"}`; el.title = j.message || ""; } if (el && document.body.contains(el)) setTimeout(pollScan, 5000); }
+    else if (j && el && j.kind === "scan") el.textContent = j.error ? "Failed" : (j.result ? `${j.result.passed} pass` : "");
+    if (j && !j.running && j.kind === "scan" && !j.error && j.result && pollScan.watching) toast(`Scan finished: ${j.result.fetched} listings, ${j.result.passed} pass`);
+    pollScan.watching = !!(j && j.running);
   } catch {}
 }
 

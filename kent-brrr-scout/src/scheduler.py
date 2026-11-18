@@ -130,7 +130,8 @@ def _win_xml(hour: int, minute: int) -> str:
     <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
     <StartWhenAvailable>true</StartWhenAvailable>
     <RunOnlyIfNetworkAvailable>true</RunOnlyIfNetworkAvailable>
-    <ExecutionTimeLimit>PT2H</ExecutionTimeLimit>
+    <WakeToRun>true</WakeToRun>
+    <ExecutionTimeLimit>PT8H</ExecutionTimeLimit>
     <Enabled>true</Enabled>
   </Settings>
   <Actions Context="Author">
@@ -171,9 +172,10 @@ def _win_status() -> dict[str, Any]:
             "next_run": nxt, "where": f"Task Scheduler › {WIN_TASK}"}
 
 
-def _win_app_xml() -> str:
+def _win_app_xml(lan: bool = False) -> str:
     """Start the web app quietly at logon so the phone app always has something to talk to.
-    The trigger names this user: an any-user logon trigger needs admin rights."""
+    The trigger names this user: an any-user logon trigger needs admin rights.
+    lan=True listens on the home network too, so a phone on the same Wi-Fi can reach it."""
     user = f"{os.environ.get('USERDOMAIN', '')}\\{os.environ.get('USERNAME', '')}".lstrip("\\")
     return f"""<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
@@ -194,18 +196,18 @@ def _win_app_xml() -> str:
   <Actions Context="Author">
     <Exec>
       <Command>{escape(_python())}</Command>
-      <Arguments>-m src.web</Arguments>
+      <Arguments>-m src.web{" --host 0.0.0.0" if lan else ""}</Arguments>
       <WorkingDirectory>{escape(str(PROJECT_ROOT))}</WorkingDirectory>
     </Exec>
   </Actions>
 </Task>"""
 
 
-def install_app(start_now: bool = True) -> str:
+def install_app(start_now: bool = True, lan: bool = False) -> str:
     if platform.system() != "Windows":
         raise RuntimeError("Starting the app at logon is set up for Windows only; on a Mac, use the launcher.")
     with tempfile.NamedTemporaryFile("w", suffix=".xml", delete=False, encoding="utf-16") as fh:
-        fh.write(_win_app_xml())
+        fh.write(_win_app_xml(lan))
         xml_path = fh.name
     try:
         r = _run(["schtasks", "/Create", "/TN", WIN_APP_TASK, "/XML", xml_path, "/F"])
@@ -309,7 +311,8 @@ def main() -> None:
     i.add_argument("--time", default=None, help="HH:MM, default from config schedule.time")
     sub.add_parser("remove")
     sub.add_parser("status")
-    sub.add_parser("install-app", help="Windows: start the app in the background at logon (for the phone app)")
+    ia = sub.add_parser("install-app", help="Windows: start the app in the background at logon (for the phone app)")
+    ia.add_argument("--lan", action="store_true", help="Also listen on the home Wi-Fi (phone on the same network)")
     sub.add_parser("remove-app")
     args = ap.parse_args()
     if args.cmd == "install":
@@ -319,7 +322,7 @@ def main() -> None:
     elif args.cmd == "remove":
         print(remove())
     elif args.cmd == "install-app":
-        print(install_app())
+        print(install_app(lan=args.lan))
     elif args.cmd == "remove-app":
         print(remove_app())
     else:
